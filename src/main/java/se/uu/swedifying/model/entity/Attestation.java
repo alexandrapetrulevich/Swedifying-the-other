@@ -1,6 +1,8 @@
-package se.uu.swedifying.model;
+package se.uu.swedifying.model.entity;
 
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -8,6 +10,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "ATTESTATION")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Attestation {
     @Id
     @GeneratedValue
@@ -16,5 +19,15 @@ public class Attestation {
 
     @Column(name = "ORIGINAL_FORM")
     private String originalForm;
+    
+    @ManyToOne
+    @JoinColumn(name = "LOCATION_ID")
+    private Location location;
+
+    @Builder
+    private Attestation(String originalForm, Location location) {
+        this.originalForm = originalForm;
+        this.location = location;
+    }
 
 }

@@ -1,21 +1,43 @@
-package se.uu.swedifying.model;
+package se.uu.swedifying.model.entity;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import se.uu.swedifying.model.util.ExistenceType;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "LOCATION")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Location {
     @Id
     @GeneratedValue
     @Column(name = "LOCATION_ID")
     private Long locationId;
 
+    @Column(name = "REAL_OR_FICTIONAL")
+    private ExistenceType realOrFictional;
     @Column(name = "LONGITUDE")
     private double longitude;
     @Column(name = "LATITUDE")
     private double latitude;
+
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "LOCALITY_TYPE_ID")
+    private LocalityType localityType;
+
+    @Builder
+    private Location(
+            long locationId
+            , ExistenceType realOrFictional
+            , double longitude
+            , double latitude
+            , LocalityType localityType) {
+        this.locationId = locationId;
+        this.realOrFictional = realOrFictional;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.localityType = localityType;
+    }
 }

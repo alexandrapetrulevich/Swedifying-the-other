@@ -1,4 +1,4 @@
-package se.uu.swedifying.model;
+package se.uu.swedifying.model.util;
 
 public enum Language {
     SE

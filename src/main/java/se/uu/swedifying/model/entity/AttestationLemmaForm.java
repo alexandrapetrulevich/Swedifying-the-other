@@ -1,7 +1,8 @@
-package se.uu.swedifying.model;
+package se.uu.swedifying.model.entity;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import se.uu.swedifying.model.util.Language;
 
 import javax.persistence.*;
 
