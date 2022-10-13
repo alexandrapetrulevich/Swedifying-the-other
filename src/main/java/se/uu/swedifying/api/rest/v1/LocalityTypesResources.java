@@ -30,13 +30,23 @@ public class LocalityTypesResources {
     }
 
     @GetMapping
-    public ResponseEntity<List<LocalityTypeDto>> getAllLocalityTypes() {
-        return ResponseEntity.ok(localityTypeService.getAllLocalityTypes());
+    public ResponseEntity<List<LocalityTypeDto>> getAllLocalityTypes(
+            @RequestParam(defaultValue = "") String filterText) {
+        if (!filterText.isBlank())
+            return ResponseEntity.ok(localityTypeService.getFilteredLocalityTypes(filterText));
+        else
+            return ResponseEntity.ok(localityTypeService.getAllLocalityTypes());
     }
 
     @GetMapping("/{localityTypeId}")
     public ResponseEntity<LocalityTypeDto> getLocalityTypeById(@PathVariable long localityTypeId) {
         return ResponseEntity.ok(localityTypeService.getLocalityTypeById(localityTypeId));
+    }
+
+    @DeleteMapping("/{localityTypeId}")
+    public ResponseEntity<Void> deleteLocalityType(@PathVariable long localityTypeId) {
+        localityTypeService.deleteLocalityTypeById(localityTypeId);
+        return ResponseEntity.noContent().build();
     }
 
 }

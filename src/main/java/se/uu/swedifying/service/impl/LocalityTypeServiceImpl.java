@@ -48,6 +48,25 @@ public class LocalityTypeServiceImpl implements LocalityTypeService {
     }
 
     @Override
+    public void deleteLocalityTypeById(long id) {
+        localityTypeRepository.deleteById(id);
+    }
+
+    @Override
+    public List<LocalityTypeDto> getFilteredLocalityTypes(String filterText) {
+        List<LocalityType> filteredLocalityTypes = filterText.startsWith("^") ?
+                localityTypeRepository.findByLocalityTypeNameStartsWith(filterText.substring(1))
+                : filterText.endsWith("$") ?
+                localityTypeRepository.findByLocalityTypeNameEndsWith(
+                        filterText.substring(0, filterText.length() - 1))
+                : localityTypeRepository.findByLocalityTypeNameContains(filterText);
+        return filteredLocalityTypes
+                .stream()
+                .map(localityType -> localityTypeToLocalityTypeDto(localityType))
+                .toList();
+    }
+
+    @Override
     public LocalityTypeDto getLocalityTypeById(long id) {
         return localityTypeToLocalityTypeDto(localityTypeRepository.findById(id).orElseThrow());
     }

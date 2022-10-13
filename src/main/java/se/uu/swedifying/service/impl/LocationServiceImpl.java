@@ -33,13 +33,14 @@ public class LocationServiceImpl implements LocationService {
                 .longitude(createLocationRequest.longitude())
                 .latitude(createLocationRequest.latitude())
                 .realOrFictional(createLocationRequest.realOrFictional())
+                .englishForm(createLocationRequest.englishForm())
                 .localityType(localityTypeService.localityTypeDtoToLocalityType(locationTypeDto))
                 .build();
         return locationToLocationDto(locationRepository.save(location));
     }
 
     private LocalityTypeDto handleLocalityType(CreateLocationRequest createLocationRequest) {
-        if (createLocationRequest.localityTypeId() != -1) {
+        if (createLocationRequest.localityTypeId() != null) {
             return localityTypeService
                     .getLocalityTypeById(createLocationRequest.localityTypeId());
         } else {
@@ -63,6 +64,7 @@ public class LocationServiceImpl implements LocationService {
                 , location.getRealOrFictional()
                 , location.getLongitude()
                 , location.getLatitude()
+                , location.getEnglishForm()
                 , localityTypeService.localityTypeToLocalityTypeDto(location.getLocalityType()));
     }
 
@@ -75,6 +77,7 @@ public class LocationServiceImpl implements LocationService {
                 .realOrFictional(locationDto.realOrFictional())
                 .longitude(locationDto.longitude())
                 .latitude(locationDto.latitude())
+                .englishForm(locationDto.englishForm())
                 .localityType(localityTypeService
                         .localityTypeDtoToLocalityType(locationDto.localityType()))
                 .build();
@@ -88,4 +91,6 @@ public class LocationServiceImpl implements LocationService {
                 .map(location -> locationToLocationDto(location))
                 .toList();
     }
+
+
 }

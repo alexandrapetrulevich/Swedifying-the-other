@@ -9,9 +9,11 @@ import java.util.List;
 public interface LocalityTypeService {
     LocalityTypeDto createLocalityType(CreateLocalityTypeRequest createLocalityTypeRequest);
     LocalityTypeDto getLocalityTypeById(long id);
+    List<LocalityTypeDto> getAllLocalityTypes();
+    List<LocalityTypeDto> getFilteredLocalityTypes(String filterText);
+    void deleteLocalityTypeById(long id);
 
     LocalityTypeDto localityTypeToLocalityTypeDto(LocalityType localityType);
     LocalityType localityTypeDtoToLocalityType(LocalityTypeDto localityTypeDto);
 
-    List<LocalityTypeDto> getAllLocalityTypes();
 }

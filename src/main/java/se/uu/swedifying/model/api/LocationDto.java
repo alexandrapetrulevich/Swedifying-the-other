@@ -7,5 +7,6 @@ public record LocationDto(
         , ExistenceType realOrFictional
         , double longitude
         , double latitude
+        , String englishForm
         , LocalityTypeDto localityType) {
 }

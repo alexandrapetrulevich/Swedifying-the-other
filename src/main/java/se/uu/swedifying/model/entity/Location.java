@@ -22,6 +22,9 @@ public class Location {
     @Column(name = "LATITUDE")
     private double latitude;
 
+    @Column(name = "ENGLISH_FORM")
+    private String englishForm;
+
     @Setter
     @ManyToOne
     @JoinColumn(name = "LOCALITY_TYPE_ID")
@@ -33,11 +36,13 @@ public class Location {
             , ExistenceType realOrFictional
             , double longitude
             , double latitude
+            , String englishForm
             , LocalityType localityType) {
         this.locationId = locationId;
         this.realOrFictional = realOrFictional;
         this.longitude = longitude;
         this.latitude = latitude;
+        this.englishForm = englishForm;
         this.localityType = localityType;
     }
 }
