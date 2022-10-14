@@ -2,6 +2,7 @@ package se.uu.swedifying.model.entity;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import se.uu.swedifying.model.util.Language;
 
 import javax.persistence.*;
 
@@ -11,6 +12,12 @@ import javax.persistence.*;
 public class AttestationPreposition {
     @Id
     @GeneratedValue
-    @Column(name = "ATTESTATION_PREPOSITION_ID")
-    private Long attestationPrepositionId;
+    @Column(name = "PREPOSITION_ID")
+    private Long prepositionId;
+
+    @Column(name = "PREPOSITION_NAME")
+    private String prepositionName;
+
+    @Column(name = "PREPOSITION_LANGUAGE")
+    private Language prepositionLanguage;
 }

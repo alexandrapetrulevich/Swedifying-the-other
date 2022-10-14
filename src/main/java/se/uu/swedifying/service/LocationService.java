@@ -7,11 +7,9 @@ import se.uu.swedifying.model.entity.Location;
 import java.util.List;
 
 public interface LocationService {
-    LocationDto createLocation(CreateLocationRequest createLocationRequest);
-    LocationDto getLocationById(long id);
+  LocationDto createLocation(CreateLocationRequest createLocationRequest);
 
-    LocationDto locationToLocationDto(Location location);
-    Location locationDtoToLocation(LocationDto locationDto);
+  LocationDto getLocationById(long id);
 
-    List<LocationDto> getAllLocations();
+  List<LocationDto> getAllLocations();
 }

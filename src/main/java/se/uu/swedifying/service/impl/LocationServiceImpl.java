@@ -15,82 +15,47 @@ import java.util.List;
 @Service
 public class LocationServiceImpl implements LocationService {
 
-    private final LocationRepository locationRepository;
-    private final LocalityTypeService localityTypeService;
+  private final LocationRepository locationRepository;
+  private final LocalityTypeService localityTypeService;
 
-    @Autowired
-    LocationServiceImpl(LocationRepository locationRepository, LocalityTypeService localityTypeService) {
-        this.locationRepository = locationRepository;
-        this.localityTypeService = localityTypeService;
+  @Autowired
+  LocationServiceImpl(LocationRepository locationRepository, LocalityTypeService localityTypeService) {
+    this.locationRepository = locationRepository;
+    this.localityTypeService = localityTypeService;
+  }
+
+  @Override
+  public LocationDto createLocation(CreateLocationRequest createLocationRequest) {
+    createLocationRequest.validate();
+    LocalityTypeDto locationTypeDto = handleLocalityType(createLocationRequest);
+    Location location = LocationConversionHelper.createLocationRequestToLocation(
+      createLocationRequest, locationTypeDto);
+    return LocationConversionHelper.locationToLocationDto(locationRepository.save(location));
+  }
+
+  private LocalityTypeDto handleLocalityType(CreateLocationRequest createLocationRequest) {
+    if (createLocationRequest.localityTypeId() != null) {
+      return localityTypeService
+        .getLocalityTypeById(createLocationRequest.localityTypeId());
+    } else {
+      return createLocationRequest.createLocalityTypeRequest() != null ?
+        localityTypeService
+          .createLocalityType(createLocationRequest.createLocalityTypeRequest())
+        : null;
     }
+  }
 
-    @Override
-    public LocationDto createLocation(CreateLocationRequest createLocationRequest) {
-        createLocationRequest.validate();
-        LocalityTypeDto locationTypeDto = handleLocalityType(createLocationRequest);
-        Location location = Location
-                .builder()
-                .longitude(createLocationRequest.longitude())
-                .latitude(createLocationRequest.latitude())
-                .realOrFictional(createLocationRequest.realOrFictional())
-                .englishForm(createLocationRequest.englishForm())
-                .localityType(localityTypeService.localityTypeDtoToLocalityType(locationTypeDto))
-                .build();
-        return locationToLocationDto(locationRepository.save(location));
-    }
+  @Override
+  public LocationDto getLocationById(long id) {
+    return LocationConversionHelper.locationToLocationDto(locationRepository.findById(id).orElseThrow());
+  }
 
-    private LocalityTypeDto handleLocalityType(CreateLocationRequest createLocationRequest) {
-        if (createLocationRequest.localityTypeId() != null) {
-            return localityTypeService
-                    .getLocalityTypeById(createLocationRequest.localityTypeId());
-        } else {
-            return createLocationRequest.createLocalityTypeRequest() != null ?
-                    localityTypeService
-                            .createLocalityType(createLocationRequest.createLocalityTypeRequest())
-                    : null;
-        }
-    }
-
-    @Override
-    public LocationDto getLocationById(long id) {
-        return locationToLocationDto(locationRepository.findById(id).orElseThrow());
-    }
-
-    @Override
-    public LocationDto locationToLocationDto(Location location) {
-        if (location == null) return null;
-        return new LocationDto(
-                location.getLocationId()
-                , location.getRealOrFictional()
-                , location.getLongitude()
-                , location.getLatitude()
-                , location.getEnglishForm()
-                , localityTypeService.localityTypeToLocalityTypeDto(location.getLocalityType()));
-    }
-
-    @Override
-    public Location locationDtoToLocation(LocationDto locationDto) {
-        if (locationDto == null) return null;
-        return Location
-                .builder()
-                .locationId(locationDto.locationId())
-                .realOrFictional(locationDto.realOrFictional())
-                .longitude(locationDto.longitude())
-                .latitude(locationDto.latitude())
-                .englishForm(locationDto.englishForm())
-                .localityType(localityTypeService
-                        .localityTypeDtoToLocalityType(locationDto.localityType()))
-                .build();
-    }
-
-    @Override
-    public List<LocationDto> getAllLocations() {
-        return locationRepository
-                .findAll()
-                .stream()
-                .map(location -> locationToLocationDto(location))
-                .toList();
-    }
-
-
+  @Override
+  public List<LocationDto> getAllLocations() {
+    return locationRepository
+      .findAll()
+      .stream()
+      .map(LocationConversionHelper::locationToLocationDto)
+      .toList();
+  }
 }

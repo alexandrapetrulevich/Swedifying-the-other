@@ -15,59 +15,52 @@ import java.util.List;
 @Service
 class AttestationServiceImpl implements AttestationService {
 
-    private final AttestationRepository attestationRepository;
-    private final LocationService locationService;
+  private final AttestationRepository attestationRepository;
+  private final LocationService locationService;
 
-    @Autowired
-    AttestationServiceImpl(
-            AttestationRepository attestationRepository
-            , LocationService locationService) {
-        this.attestationRepository = attestationRepository;
-        this.locationService = locationService;
+  @Autowired
+  AttestationServiceImpl(
+    AttestationRepository attestationRepository
+    , LocationService locationService) {
+    this.attestationRepository = attestationRepository;
+    this.locationService = locationService;
+  }
+
+  @Override
+  public AttestationDto createAttestation(CreateAttestationRequest createAttestationRequest) {
+    createAttestationRequest.validate();
+    LocationDto locationDto = handleLocation(createAttestationRequest);
+    Attestation attestation = AttestationConversionHelper
+      .createAttestationRequestToAttestation(
+        createAttestationRequest
+        , locationDto);
+    return AttestationConversionHelper
+      .attestationToAttestationDto(attestationRepository.save(attestation));
+  }
+
+  private LocationDto handleLocation(CreateAttestationRequest createAttestationRequest) {
+    if (createAttestationRequest.locationId() != -1) {
+      return locationService
+        .getLocationById(createAttestationRequest.locationId());
+    } else {
+      return createAttestationRequest.createLocationRequest() != null ?
+        locationService.createLocation(createAttestationRequest.createLocationRequest())
+        : null;
     }
+  }
 
+  @Override
+  public List<AttestationDto> getAllAttestations() {
+    return attestationRepository
+      .findAll()
+      .stream()
+      .map(AttestationConversionHelper::attestationToAttestationDto)
+      .toList();
+  }
 
-    @Override
-    public AttestationDto createAttestation(CreateAttestationRequest createAttestationRequest) {
-        createAttestationRequest.validate();
-        LocationDto locationDto = handleLocation(createAttestationRequest);
-        Attestation attestation = Attestation
-                .builder()
-                .originalForm(createAttestationRequest.originalForm())
-                .location(locationService.locationDtoToLocation(locationDto))
-                .build();
-        return attestationToAttestationDto(attestationRepository.save(attestation));
-    }
-
-    private LocationDto handleLocation(CreateAttestationRequest createAttestationRequest) {
-        if (createAttestationRequest.locationId() != -1) {
-            return locationService
-                    .getLocationById(createAttestationRequest.locationId());
-        } else {
-            return createAttestationRequest.createLocationRequest() != null ?
-                    locationService.createLocation(createAttestationRequest.createLocationRequest())
-                    : null;
-        }
-    }
-
-    private AttestationDto attestationToAttestationDto(Attestation attestation) {
-        return new AttestationDto(
-                attestation.getAttestationId()
-                , attestation.getOriginalForm()
-                , locationService.locationToLocationDto(attestation.getLocation()));
-    }
-
-    @Override
-    public List<AttestationDto> getAllAttestations() {
-        return attestationRepository
-                .findAll()
-                .stream()
-                .map(attestation -> attestationToAttestationDto(attestation))
-                .toList();
-    }
-
-    @Override
-    public AttestationDto getAttestationById(long id) {
-        return attestationToAttestationDto(attestationRepository.findById(id).orElseThrow());
-    }
+  @Override
+  public AttestationDto getAttestationById(long id) {
+    return AttestationConversionHelper
+      .attestationToAttestationDto(attestationRepository.findById(id).orElseThrow());
+  }
 }

@@ -7,7 +7,9 @@ import se.uu.swedifying.model.api.CreateAttestationRequest;
 import java.util.List;
 
 public interface AttestationService {
-    AttestationDto createAttestation(CreateAttestationRequest createAttestationRequest);
-    List<AttestationDto> getAllAttestations();
-    AttestationDto getAttestationById(long id);
+  AttestationDto createAttestation(CreateAttestationRequest createAttestationRequest);
+
+  List<AttestationDto> getAllAttestations();
+
+  AttestationDto getAttestationById(long id);
 }

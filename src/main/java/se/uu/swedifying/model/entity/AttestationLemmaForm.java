@@ -18,10 +18,11 @@ public class AttestationLemmaForm {
     @Column(name = "LEMMA_FORM_NAME")
     private String lemmaFormName;
 
+    @Column(name = "LEMMA_FORM_LANGUAGE")
+    private Language lemmaFormLanguage;
+
     @ManyToOne
     @JoinColumn(name = "LEMMA_FORM_LOCATION_ID")
     private Location lemmaFormLocation;
 
-    @Column(name = "LEMMA_FORM_LANGUAGE")
-    private Language lemmaFormLanguage;
 }

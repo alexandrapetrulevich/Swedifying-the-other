@@ -2,6 +2,7 @@ package se.uu.swedifying.model.entity;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import se.uu.swedifying.model.util.Language;
 
 import javax.persistence.*;
 
@@ -11,6 +12,16 @@ import javax.persistence.*;
 public class AttestationVariantForm {
     @Id
     @GeneratedValue
-    @Column(name = "ATTESTATION_VARIANT_FORM_ID")
-    private Long attestationVariantFormId;
+    @Column(name = "VARIANT_FORM_ID")
+    private Long variantFormId;
+
+    @Column(name = "VARIANT_FORM_NAME")
+    private String variantFormName;
+
+    @Column(name = "VARIANT_FORM_LANGUAGE")
+    private Language variantFormLanguage;
+
+    @ManyToOne
+    @JoinColumn(name = "VARIANT_FORM_LOCATION_ID")
+    private Location variantFormLocation;
 }

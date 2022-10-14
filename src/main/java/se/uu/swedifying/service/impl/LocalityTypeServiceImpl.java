@@ -13,61 +13,54 @@ import java.util.List;
 @Service
 public class LocalityTypeServiceImpl implements LocalityTypeService {
 
-    private final LocalityTypeRepository localityTypeRepository;
+  private final LocalityTypeRepository localityTypeRepository;
 
-    @Autowired
-    LocalityTypeServiceImpl(LocalityTypeRepository localityTypeRepository) {
-        this.localityTypeRepository = localityTypeRepository;
-    }
+  @Autowired
+  LocalityTypeServiceImpl(LocalityTypeRepository localityTypeRepository) {
+    this.localityTypeRepository = localityTypeRepository;
+  }
 
-    @Override
-    public LocalityTypeDto createLocalityType(CreateLocalityTypeRequest createLocalityTypeRequest) {
-        return localityTypeToLocalityTypeDto(
-                localityTypeRepository.save(new LocalityType(createLocalityTypeRequest.localityTypeName())));
-    }
+  @Override
+  public LocalityTypeDto createLocalityType(CreateLocalityTypeRequest createLocalityTypeRequest) {
+    return localityTypeToLocalityTypeDto(
+      localityTypeRepository.save(
+        LocalityTypeConversionHelper.createLocalityTypeRequestToLocalityType(createLocalityTypeRequest)));
+  }
 
-    @Override
-    public LocalityTypeDto localityTypeToLocalityTypeDto(LocalityType localityType) {
-        if (localityType == null) return null;
-        return new LocalityTypeDto(localityType.getLocalityTypeId(), localityType.getLocalityTypeName());
-    }
+  @Override
+  public List<LocalityTypeDto> getAllLocalityTypes() {
+    return localityTypeRepository
+      .findAll()
+      .stream()
+      .map(localityType -> localityTypeToLocalityTypeDto(localityType))
+      .toList();
+  }
 
-    @Override
-    public LocalityType localityTypeDtoToLocalityType(LocalityTypeDto localityTypeDto) {
-        if (localityTypeDto == null) return null;
-        return new LocalityType(localityTypeDto.localityTypeId(), localityTypeDto.localityTypeName());
-    }
+  @Override
+  public void deleteLocalityTypeById(long id) {
+    localityTypeRepository.deleteById(id);
+  }
 
-    @Override
-    public List<LocalityTypeDto> getAllLocalityTypes() {
-        return localityTypeRepository
-                .findAll()
-                .stream()
-                .map(localityType -> localityTypeToLocalityTypeDto(localityType))
-                .toList();
-    }
+  @Override
+  public List<LocalityTypeDto> getFilteredLocalityTypes(String filterText) {
+    List<LocalityType> filteredLocalityTypes = filterText.startsWith("^") ?
+      localityTypeRepository.findByLocalityTypeNameStartsWith(filterText.substring(1))
+      : filterText.endsWith("$") ?
+      localityTypeRepository.findByLocalityTypeNameEndsWith(
+        filterText.substring(0, filterText.length() - 1))
+      : localityTypeRepository.findByLocalityTypeNameContains(filterText);
+    return filteredLocalityTypes
+      .stream()
+      .map(localityType -> localityTypeToLocalityTypeDto(localityType))
+      .toList();
+  }
 
-    @Override
-    public void deleteLocalityTypeById(long id) {
-        localityTypeRepository.deleteById(id);
-    }
+  @Override
+  public LocalityTypeDto getLocalityTypeById(long id) {
+    return localityTypeToLocalityTypeDto(localityTypeRepository.findById(id).orElseThrow());
+  }
+  private LocalityTypeDto localityTypeToLocalityTypeDto(LocalityType localityType) {
+    return LocalityTypeConversionHelper.localityTypeToLocalityTypeDto(localityType);
+  }
 
-    @Override
-    public List<LocalityTypeDto> getFilteredLocalityTypes(String filterText) {
-        List<LocalityType> filteredLocalityTypes = filterText.startsWith("^") ?
-                localityTypeRepository.findByLocalityTypeNameStartsWith(filterText.substring(1))
-                : filterText.endsWith("$") ?
-                localityTypeRepository.findByLocalityTypeNameEndsWith(
-                        filterText.substring(0, filterText.length() - 1))
-                : localityTypeRepository.findByLocalityTypeNameContains(filterText);
-        return filteredLocalityTypes
-                .stream()
-                .map(localityType -> localityTypeToLocalityTypeDto(localityType))
-                .toList();
-    }
-
-    @Override
-    public LocalityTypeDto getLocalityTypeById(long id) {
-        return localityTypeToLocalityTypeDto(localityTypeRepository.findById(id).orElseThrow());
-    }
 }
