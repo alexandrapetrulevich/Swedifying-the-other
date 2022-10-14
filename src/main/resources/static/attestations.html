@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attestation</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/locations.js"></script>
+    <script>
+    $(document).ready(function(){
+        loadLocations(populateAvailableLocations);
+    });
+    function populateAvailableLocations(locations) {
+        for (let i = 0; i < locations.length; i++)
+        {
+            $("#availableLocations").append(new Option(locations[i].englishForm, locations[i].englishForm));
+        }
+    }
+    </script>
+</head>
+<body>
+    <select name="availableLocations" id="availableLocations">
+    </select>
+</body>
+</html>
