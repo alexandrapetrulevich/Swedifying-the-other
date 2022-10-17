@@ -1,6 +1,7 @@
 package se.uu.swedifying.model.entity;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import se.uu.swedifying.model.util.Language;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "ATTESTATION_VARIANT_FORM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class AttestationVariantForm {
     @Id
     @GeneratedValue

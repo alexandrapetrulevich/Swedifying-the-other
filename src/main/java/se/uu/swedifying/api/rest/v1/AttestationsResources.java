@@ -30,8 +30,15 @@ public class AttestationsResources {
     }
 
     @GetMapping
-    public ResponseEntity<List<AttestationDto>> getAllAttestations() {
-        return ResponseEntity.ok(attestationService.getAllAttestations());
+    public ResponseEntity<List<AttestationDto>> getAllAttestations(
+      @RequestParam(defaultValue = "") String morphNameType
+      , @RequestParam(defaultValue = "") String etymology
+    ) {
+        if (morphNameType.isBlank() && etymology.isBlank()) {
+            return ResponseEntity.ok(attestationService.getAllAttestations());
+        } else {
+            return ResponseEntity.ok(attestationService.getAllFiltered(morphNameType, etymology));
+        }
     }
 
     @GetMapping("/{attestationId}")

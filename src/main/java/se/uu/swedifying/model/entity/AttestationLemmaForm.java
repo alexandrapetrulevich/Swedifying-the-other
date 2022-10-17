@@ -1,7 +1,6 @@
 package se.uu.swedifying.model.entity;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import se.uu.swedifying.model.util.Language;
 
 import javax.persistence.*;
@@ -9,6 +8,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "ATTESTATION_LEMMA_FORM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@Getter
 public class AttestationLemmaForm {
     @Id
     @GeneratedValue

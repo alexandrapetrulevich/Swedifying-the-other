@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Locality types</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/attestations.js"></script>
+    <script>
+        $(document).ready(function(){
+            getAllAttestations(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, attestations) {
+            $("#attestationsTableHeader").text(headerText);
+            populateTable(attestations);
+        }
+
+        function populateTable(attestations) {
+            $("#attestationsTable > tbody").empty();
+            console.log("populate table...");
+            for (let i = 0; i < attestations.length; i++)
+            {
+                console.log(
+                    "Row no " + i + "... with attestation ID " + attestations[i].attestationId
+                    + " and original form " + attestations[i].originalForm);
+                $("#attestationsTable > tbody").append(
+                    "<tr>"
+                    + "<td>" + attestations[i].attestationId + "</td>"
+                    + "<td>" + attestations[i].originalForm + "</td>"
+                    + "<td>" + attestations[i].notes + "</td>"
+                    + "<td>" + attestations[i].adaptedToSwedish + "</td>"
+                    + "<td>" + attestations[i].determinationClause + "</td>"
+                    + "<td>" + attestations[i].mainClauseInPhrase + "</td>"
+                    + "<td>" + attestations[i].simpleRootMorpheme + "</td>"
+                    + "<td>" + attestations[i].diversionBase + "</td>"
+                    + "<td>" + attestations[i].mainClauseInSms + "</td>"
+                    + "<td>" + JSON.stringify(attestations[i].location) + "</td>"
+                    + "<td>" + attestations[i].location.localityType.localityTypeName + "</td>"
+                    + "<td>" + attestations[i].variantForm + "</td>"
+                    + "<td>" + attestations[i].lemmaForm + "</td>"
+                    + "<td>" + attestations[i].adaptationType + "</td>"
+                    + "<td>" + attestations[i].attestationPrepositions + "</td>"
+                    + "<td>" + attestations[i].morphologicalNameType + "</td>"
+                    + "<td>" + attestations[i].etymology + "</td>"
+                    + "</tr>"
+                );
+            }
+        }
+
+
+    </script>
+</head>
+<body>
+<nav class="nav">
+    <a class="nav-link active" aria-current="page" href="#">List attestations</a>
+    <a class="nav-link" href="./attestations.html">Attestations</a>
+    <a class="nav-link" href="./locality-types.html">Locality types</a>
+    <a class="nav-link" href="./locations.html">Locations</a>
+</nav>
+<h1 id="attestationsTableHeader">All attestations</h1>
+<table id="attestationsTable" class="table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Original form (Belägg)</th>
+        <th>Notes (-)</th>
+        <th>Adapted to Swedish (Anpassad till sv eller ej)</th>
+        <th>Determination Clause (Bestämningsled i en fras)</th>
+        <th>Main Clause In Phrase (Huvudled i en fras)</th>
+        <th>Simple root morpheme (Enkelt rotmorfem)</th>
+        <th>Diversion Base (Avledningsbas)</th>
+        <th>Main Clause In Sms (Huvudled i sms)</th>
+        <th>Location (-)</th>
+        <th>Location type (Lokalitetstyp)</th>
+        <th>Variant Form (Variantform)</th>
+        <th>Lemma form (Normaliserad form)</th>
+        <th>Adaptation Type (-)</th>
+        <th>Attestation Prepositions (-)</th>
+        <th>Morphological Name Type (Morfologisk namntyp)</th>
+        <th>Etymology (Etymologi)</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<br/>
+<form id="filterAttestationsForm">
+    <div class="mb-3">
+        <label for="filterAttestationsTextMorphNameType" class="form-label">Filter by Morphological Name Type:</label>
+        <input type="text" id="filterAttestationsTextMorphNameType" class="form-control">
+        <label for="filterAttestationsTextEtymology" class="form-label">Filter by etymology:</label>
+        <input type="text" id="filterAttestationsTextEtymology" class="form-control">
+    </div>
+    <div class="mb-3">
+        <input type="button" value="Do filter" class="btn btn-primary" onclick="doFilterAttestations('Filtered by', setHeaderAndPopulateTable)">
+    </div>
+</form>
+</body>
+</html>

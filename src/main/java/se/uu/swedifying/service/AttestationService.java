@@ -10,6 +10,7 @@ public interface AttestationService {
   AttestationDto createAttestation(CreateAttestationRequest createAttestationRequest);
 
   List<AttestationDto> getAllAttestations();
+  List<AttestationDto> getAllFiltered(String morphologicalNameTypeFilter, String etymologyFilter);
 
   AttestationDto getAttestationById(long id);
 }

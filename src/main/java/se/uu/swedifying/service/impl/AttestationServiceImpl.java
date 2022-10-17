@@ -6,7 +6,11 @@ import se.uu.swedifying.model.api.AttestationDto;
 import se.uu.swedifying.model.api.CreateAttestationRequest;
 import se.uu.swedifying.model.api.LocationDto;
 import se.uu.swedifying.model.entity.Attestation;
+import se.uu.swedifying.model.entity.Etymology;
+import se.uu.swedifying.model.entity.MorphologicalNameType;
 import se.uu.swedifying.repository.AttestationRepository;
+import se.uu.swedifying.repository.EtymologyRepository;
+import se.uu.swedifying.repository.MorphologicalNameTypeRepository;
 import se.uu.swedifying.service.AttestationService;
 import se.uu.swedifying.service.LocationService;
 
@@ -17,13 +21,19 @@ class AttestationServiceImpl implements AttestationService {
 
   private final AttestationRepository attestationRepository;
   private final LocationService locationService;
+  private final MorphologicalNameTypeRepository morphologicalNameTypeRepository;
+  private final EtymologyRepository etymologyRepository;
 
   @Autowired
   AttestationServiceImpl(
     AttestationRepository attestationRepository
-    , LocationService locationService) {
+    , LocationService locationService
+    , MorphologicalNameTypeRepository morphologicalNameTypeRepository
+    , EtymologyRepository etymologyRepository) {
     this.attestationRepository = attestationRepository;
     this.locationService = locationService;
+    this.morphologicalNameTypeRepository = morphologicalNameTypeRepository;
+    this.etymologyRepository = etymologyRepository;
   }
 
   @Override
@@ -62,5 +72,16 @@ class AttestationServiceImpl implements AttestationService {
   public AttestationDto getAttestationById(long id) {
     return AttestationConversionHelper
       .attestationToAttestationDto(attestationRepository.findById(id).orElseThrow());
+  }
+
+  @Override
+  public List<AttestationDto> getAllFiltered(String morphologicalNameTypeFilter, String etymologyFilter) {
+    List<MorphologicalNameType> morphologicalNameTypes = morphologicalNameTypeRepository
+      .findByNameContains(morphologicalNameTypeFilter);
+    List<Etymology> etymologies = etymologyRepository
+      .findByNameContains(etymologyFilter);
+    return attestationRepository.findByMorphologicalNameTypeInAndEtymologyIn(
+      morphologicalNameTypes
+      , etymologies).stream().map(AttestationConversionHelper::attestationToAttestationDto).toList();
   }
 }

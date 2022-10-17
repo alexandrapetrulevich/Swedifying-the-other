@@ -8,7 +8,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "LOCATION")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Builder
 public class Location {
     @Id
     @GeneratedValue
@@ -30,19 +32,4 @@ public class Location {
     @JoinColumn(name = "LOCALITY_TYPE_ID")
     private LocalityType localityType;
 
-    @Builder
-    private Location(
-            long locationId
-            , ExistenceType realOrFictional
-            , double longitude
-            , double latitude
-            , String englishForm
-            , LocalityType localityType) {
-        this.locationId = locationId;
-        this.realOrFictional = realOrFictional;
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.englishForm = englishForm;
-        this.localityType = localityType;
-    }
 }
