@@ -23,7 +23,7 @@ class AttestationConversionHelperTest {
       createAttestationRequest
       , null);
     assertEquals(expectedOriginalForm, attestation.getOriginalForm());
-    assertEquals(0L, attestation.getAttestationId());
+    assertNull(attestation.getAttestationId());
     assertNull(attestation.getLocation());
   }
 
@@ -55,7 +55,7 @@ class AttestationConversionHelperTest {
       createAttestationRequest
       , locationDto);
     assertEquals(expectedOriginalForm, attestation.getOriginalForm());
-    assertEquals(0L, attestation.getAttestationId());
+    assertNull(attestation.getAttestationId());
     Location location = attestation.getLocation();
     assertNull(location.getLocalityType());
     assertEquals(locationDto.locationId(), location.getLocationId());
@@ -78,12 +78,35 @@ class AttestationConversionHelperTest {
     String expectedOriginalForm = "originalForm";
     Attestation attestation = Attestation
       .builder()
-      .attestationId(1)
+      .attestationId(1L)
       .location(null)
       .originalForm(expectedOriginalForm)
       .build();
     AttestationDto attestationDto = AttestationConversionHelper.attestationToAttestationDto(attestation);
     assertEquals(attestation.getAttestationId(), attestationDto.attestationId());
     assertEquals(attestation.getOriginalForm(), attestationDto.originalForm());
+  }
+
+  @Test
+  void testAttestationToAttestationDtoWithLocationOk() {
+    String expectedOriginalForm = "originalForm";
+    Attestation attestation = Attestation
+      .builder()
+      .attestationId(1L)
+      .location(Location
+        .builder()
+        .locationId(1)
+        .englishForm("form")
+        .longitude(12)
+        .latitude(13)
+        .realOrFictional(ExistenceType.REAL)
+        .build())
+      .originalForm(expectedOriginalForm)
+      .build();
+    AttestationDto attestationDto = AttestationConversionHelper.attestationToAttestationDto(attestation);
+    assertEquals(attestation.getAttestationId(), attestationDto.attestationId());
+    assertEquals(attestation.getOriginalForm(), attestationDto.originalForm());
+    assertNotNull(attestationDto.location());
+    assertEquals(attestation.getLocation().getLocationId(), attestationDto.location().locationId());
   }
 }

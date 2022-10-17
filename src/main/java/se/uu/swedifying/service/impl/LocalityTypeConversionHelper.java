@@ -4,12 +4,17 @@ import se.uu.swedifying.model.api.CreateLocalityTypeRequest;
 import se.uu.swedifying.model.api.LocalityTypeDto;
 import se.uu.swedifying.model.entity.LocalityType;
 
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
+
 class LocalityTypeConversionHelper {
 
   private LocalityTypeConversionHelper() {
   }
 
-  static LocalityType createLocalityTypeRequestToLocalityType(CreateLocalityTypeRequest createLocalityTypeRequest) {
+  static LocalityType createLocalityTypeRequestToLocalityType(
+    @NotNull CreateLocalityTypeRequest createLocalityTypeRequest) {
+    Objects.requireNonNull(createLocalityTypeRequest);
     return new LocalityType(createLocalityTypeRequest.localityTypeName());
   }
 

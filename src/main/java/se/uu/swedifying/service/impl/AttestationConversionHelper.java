@@ -1,6 +1,5 @@
 package se.uu.swedifying.service.impl;
 
-import org.springframework.lang.Nullable;
 import se.uu.swedifying.model.api.AttestationDto;
 import se.uu.swedifying.model.api.CreateAttestationRequest;
 import se.uu.swedifying.model.api.LocationDto;
@@ -16,7 +15,7 @@ class AttestationConversionHelper {
 
   static Attestation createAttestationRequestToAttestation(
     @NotNull CreateAttestationRequest createAttestationRequest
-    , @Nullable LocationDto locationDto) {
+    , LocationDto locationDto) {
     Objects.requireNonNull(createAttestationRequest);
     return Attestation
       .builder()

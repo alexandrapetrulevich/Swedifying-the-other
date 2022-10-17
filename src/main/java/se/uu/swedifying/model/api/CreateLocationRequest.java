@@ -1,7 +1,5 @@
 package se.uu.swedifying.model.api;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import se.uu.swedifying.model.util.ExistenceType;
 
 public record CreateLocationRequest(
