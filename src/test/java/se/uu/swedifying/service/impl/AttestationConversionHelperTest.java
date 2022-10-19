@@ -6,7 +6,6 @@ import se.uu.swedifying.model.api.CreateAttestationRequest;
 import se.uu.swedifying.model.api.LocationDto;
 import se.uu.swedifying.model.entity.Attestation;
 import se.uu.swedifying.model.entity.Location;
-import se.uu.swedifying.model.util.ExistenceType;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,7 +44,6 @@ class AttestationConversionHelperTest {
       .englishForm("location")
       .latitude(1.0)
       .longitude(1.0)
-      .realOrFictional(ExistenceType.REAL)
       .build();
     CreateAttestationRequest createAttestationRequest = new CreateAttestationRequest(
       expectedOriginalForm
@@ -59,8 +57,7 @@ class AttestationConversionHelperTest {
     Location location = attestation.getLocation();
     assertNull(location.getLocalityType());
     assertEquals(locationDto.locationId(), location.getLocationId());
-    assertEquals(locationDto.realOrFictional(), location.getRealOrFictional());
-    assertEquals(locationDto.englishForm(), location.getEnglishForm());
+    assertEquals(locationDto.englishForm(), location.getModernLookupForm());
     assertEquals(locationDto.latitude(), location.getLatitude());
     assertEquals(locationDto.longitude(), location.getLongitude());
   }
@@ -95,11 +92,10 @@ class AttestationConversionHelperTest {
       .attestationId(1L)
       .location(Location
         .builder()
-        .locationId(1)
-        .englishForm("form")
+        .locationId(1L)
+        .modernLookupForm("form")
         .longitude(12)
         .latitude(13)
-        .realOrFictional(ExistenceType.REAL)
         .build())
       .originalForm(expectedOriginalForm)
       .build();

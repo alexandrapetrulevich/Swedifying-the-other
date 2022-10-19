@@ -1,15 +1,16 @@
 package se.uu.swedifying.model.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import se.uu.swedifying.model.util.Language;
+import lombok.*;
+import se.uu.swedifying.model.util.IsAdaptedToSwedishType;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "ATTESTATION_VARIANT_FORM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 @Getter
 public class AttestationVariantForm {
     @Id
@@ -17,13 +18,19 @@ public class AttestationVariantForm {
     @Column(name = "VARIANT_FORM_ID")
     private Long variantFormId;
 
-    @Column(name = "VARIANT_FORM_NAME")
-    private String variantFormName;
+    @Column(name = "VARIANT_FORM")
+    private String variantForm;
 
-    @Column(name = "VARIANT_FORM_LANGUAGE")
-    private Language variantFormLanguage;
+    private IsAdaptedToSwedishType isAdaptedToSwedish;
+
+    @ManyToMany
+    @JoinTable(
+      name = "VARIANT_TO_ADAPTATION_TYPE_RELATION",
+      joinColumns = @JoinColumn(name = "VARIANT_FORM_ID"),
+      inverseJoinColumns = @JoinColumn(name = "ADAPTATION_TYPE_ID"))
+    private List<AdaptationType> adaptationType;
 
     @ManyToOne
-    @JoinColumn(name = "VARIANT_FORM_LOCATION_ID")
-    private Location variantFormLocation;
+    @JoinColumn(name = "NORMALIZED_FORM_ID")
+    private AttestationNormalizedForm normalizedForm;
 }

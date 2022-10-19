@@ -15,7 +15,7 @@ class LocalityTypeConversionHelper {
   static LocalityType createLocalityTypeRequestToLocalityType(
     @NotNull CreateLocalityTypeRequest createLocalityTypeRequest) {
     Objects.requireNonNull(createLocalityTypeRequest);
-    return new LocalityType(createLocalityTypeRequest.localityTypeName());
+    return LocalityType.builder().localityTypeName(createLocalityTypeRequest.localityTypeName()).build();
   }
 
   static LocalityTypeDto localityTypeToLocalityTypeDto(LocalityType localityType) {
@@ -25,6 +25,10 @@ class LocalityTypeConversionHelper {
 
   static LocalityType localityTypeDtoToLocalityType(LocalityTypeDto localityTypeDto) {
     if (localityTypeDto == null) return null;
-    return new LocalityType(localityTypeDto.localityTypeId(), localityTypeDto.localityTypeName());
+    return LocalityType
+      .builder()
+      .localityTypeId(localityTypeDto.localityTypeId())
+      .localityTypeName(localityTypeDto.localityTypeName())
+      .build();
   }
 }

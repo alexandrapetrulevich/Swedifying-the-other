@@ -20,7 +20,6 @@ public record AttestationDto(
   , String variantForm
   , String lemmaForm
   , String adaptationType
-  , Set<String> attestationPrepositions
   , String morphologicalNameType
   , String etymology) {
 }

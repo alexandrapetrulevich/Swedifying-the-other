@@ -1,7 +1,6 @@
 package se.uu.swedifying.model.entity;
 
 import lombok.*;
-import se.uu.swedifying.model.util.ExistenceType;
 
 import javax.persistence.*;
 
@@ -17,17 +16,18 @@ public class Location {
     @Column(name = "LOCATION_ID")
     private Long locationId;
 
-    @Column(name = "REAL_OR_FICTIONAL")
-    private ExistenceType realOrFictional;
     @Column(name = "LONGITUDE")
     private double longitude;
     @Column(name = "LATITUDE")
     private double latitude;
 
-    @Column(name = "ENGLISH_FORM")
-    private String englishForm;
+    @Column(name = "MODERN_LOOKUP_FORM")
+    private String modernLookupForm;
 
-    @Setter
+    @ManyToOne
+    @JoinColumn(name = "DISTRICT_OR_PARISH_ID")
+    private SubRegion districtOrParish;
+
     @ManyToOne
     @JoinColumn(name = "LOCALITY_TYPE_ID")
     private LocalityType localityType;

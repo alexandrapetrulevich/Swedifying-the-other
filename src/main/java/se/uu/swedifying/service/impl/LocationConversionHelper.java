@@ -16,8 +16,7 @@ class LocationConversionHelper {
       .builder()
       .longitude(createLocationRequest.longitude())
       .latitude(createLocationRequest.latitude())
-      .realOrFictional(createLocationRequest.realOrFictional())
-      .englishForm(createLocationRequest.englishForm())
+      .modernLookupForm(createLocationRequest.englishForm())
       .localityType(LocalityTypeConversionHelper.localityTypeDtoToLocalityType(locationTypeDto))
       .build();
   }
@@ -26,10 +25,9 @@ class LocationConversionHelper {
     if (location == null) return null;
     return new LocationDto(
       location.getLocationId()
-      , location.getRealOrFictional()
       , location.getLongitude()
       , location.getLatitude()
-      , location.getEnglishForm()
+      , location.getModernLookupForm()
       , LocalityTypeConversionHelper
       .localityTypeToLocalityTypeDto(location.getLocalityType()));
   }
@@ -39,10 +37,9 @@ class LocationConversionHelper {
     return Location
       .builder()
       .locationId(locationDto.locationId())
-      .realOrFictional(locationDto.realOrFictional())
       .longitude(locationDto.longitude())
       .latitude(locationDto.latitude())
-      .englishForm(locationDto.englishForm())
+      .modernLookupForm(locationDto.englishForm())
       .localityType(LocalityTypeConversionHelper
         .localityTypeDtoToLocalityType(locationDto.localityType()))
       .build();

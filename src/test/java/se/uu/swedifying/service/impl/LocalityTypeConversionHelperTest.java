@@ -32,7 +32,11 @@ class LocalityTypeConversionHelperTest {
   void localityTypeToLocalityTypeDto() {
     long expectedLocalityTypeId = 1;
     String expectedLocalityTypeName = "locality type";
-    LocalityType localityType = new LocalityType(expectedLocalityTypeId, expectedLocalityTypeName);
+    LocalityType localityType = LocalityType
+      .builder()
+      .localityTypeId(expectedLocalityTypeId)
+      .localityTypeName(expectedLocalityTypeName)
+      .build();
     LocalityTypeDto localityTypeDto = LocalityTypeConversionHelper
       .localityTypeToLocalityTypeDto(localityType);
     assertEquals(localityType.getLocalityTypeId(), localityTypeDto.localityTypeId());

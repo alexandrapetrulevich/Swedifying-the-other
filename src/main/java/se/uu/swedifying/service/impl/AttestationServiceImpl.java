@@ -5,12 +5,9 @@ import org.springframework.stereotype.Service;
 import se.uu.swedifying.model.api.AttestationDto;
 import se.uu.swedifying.model.api.CreateAttestationRequest;
 import se.uu.swedifying.model.api.LocationDto;
-import se.uu.swedifying.model.entity.Attestation;
-import se.uu.swedifying.model.entity.Etymology;
-import se.uu.swedifying.model.entity.MorphologicalNameType;
-import se.uu.swedifying.repository.AttestationRepository;
-import se.uu.swedifying.repository.EtymologyRepository;
-import se.uu.swedifying.repository.MorphologicalNameTypeRepository;
+import se.uu.swedifying.model.entity.*;
+import se.uu.swedifying.model.util.MorphologicalNameType;
+import se.uu.swedifying.repository.*;
 import se.uu.swedifying.service.AttestationService;
 import se.uu.swedifying.service.LocationService;
 
@@ -20,20 +17,25 @@ import java.util.List;
 class AttestationServiceImpl implements AttestationService {
 
   private final AttestationRepository attestationRepository;
+
+  private final AttestationVariantFormRepository attestationVariantFormRepository;
+  private final AttestationNormalizedFormRepository attestationNormalizedFormRepository;
+
+  private final LanguageRepository languageRepository;
   private final LocationService locationService;
-  private final MorphologicalNameTypeRepository morphologicalNameTypeRepository;
-  private final EtymologyRepository etymologyRepository;
 
   @Autowired
   AttestationServiceImpl(
     AttestationRepository attestationRepository
     , LocationService locationService
-    , MorphologicalNameTypeRepository morphologicalNameTypeRepository
-    , EtymologyRepository etymologyRepository) {
+    , AttestationVariantFormRepository attestationVariantFormRepository
+    , AttestationNormalizedFormRepository attestationNormalizedFormRepository
+    , LanguageRepository languageRepository) {
     this.attestationRepository = attestationRepository;
     this.locationService = locationService;
-    this.morphologicalNameTypeRepository = morphologicalNameTypeRepository;
-    this.etymologyRepository = etymologyRepository;
+    this.attestationVariantFormRepository = attestationVariantFormRepository;
+    this.attestationNormalizedFormRepository = attestationNormalizedFormRepository;
+    this.languageRepository = languageRepository;
   }
 
   @Override
@@ -76,12 +78,18 @@ class AttestationServiceImpl implements AttestationService {
 
   @Override
   public List<AttestationDto> getAllFiltered(String morphologicalNameTypeFilter, String etymologyFilter) {
-    List<MorphologicalNameType> morphologicalNameTypes = morphologicalNameTypeRepository
-      .findByNameContains(morphologicalNameTypeFilter);
-    List<Etymology> etymologies = etymologyRepository
-      .findByNameContains(etymologyFilter);
-    return attestationRepository.findByMorphologicalNameTypeInAndEtymologyIn(
-      morphologicalNameTypes
-      , etymologies).stream().map(AttestationConversionHelper::attestationToAttestationDto).toList();
+    MorphologicalNameType morphologicalNameType =
+      morphologicalNameTypeFilter != null ?
+        MorphologicalNameType.valueOf(morphologicalNameTypeFilter)
+        : null;
+    List<Language> etymologies = languageRepository.findByLanguageNameContains(etymologyFilter);
+    List<AttestationNormalizedForm> normalizedForms = attestationNormalizedFormRepository
+      .findByMorphologicalNameTypeAndEtymologyIn(morphologicalNameType, etymologies);
+    List<AttestationVariantForm> variantForms = attestationVariantFormRepository
+      .findByNormalizedFormIn(normalizedForms);
+    return attestationRepository
+      .findByVariantFormIn(variantForms)
+      .stream()
+      .map(AttestationConversionHelper::attestationToAttestationDto).toList();
   }
 }

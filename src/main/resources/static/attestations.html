@@ -15,15 +15,20 @@
     function populateAvailableLocations(locations) {
         for (let i = 0; i < locations.length; i++)
         {
-            $("#availableLocations").append(
-                new Option(locations[i].englishForm, locations[i].englishForm + " ("
-                    + locations[i].localityType.localityTypeName + ")"));
+            $("#availableLocations")
+                .append(
+                    new Option(
+                        locations[i].englishForm
+                        + " (" + locations[i].localityType.localityTypeName + ")"));
         }
     }
 
     function adaptedToSwedishClicked() {
         $("#adaptationType").prop("disabled", !$("#adaptedToSwedish").is(':checked'));
     }
+
+
+
 
     </script>
 </head>
@@ -39,14 +44,14 @@
     <div class="row mb-3">
         <label for="attestationText" class="col-sm-2 col-form-label">Attestation:</label>
         <div class="col-sm-10">
-            <input type="text" id="attestationText" class="form-control"/>
+            <input type="text" id="attestationText" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
 
         <label for="variantForm" class="col-sm-2 col-form-label">Variant form:</label>
         <div class="col-sm-10">
-            <input type="text" id="variantForm" class="form-control"/>
+            <input type="text" id="variantForm" class="form-control form-control-sm"/>
         </div>
     </div>
 
@@ -54,56 +59,56 @@
 
         <label for="normalizedForm" class="col-sm-2 col-form-label">Normalized form:</label>
         <div class="col-sm-10">
-            <input type="text" id="normalizedForm" class="form-control"/>
+            <input type="text" id="normalizedForm" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
 
         <label for="morphologicalNameType" class="col-sm-2 col-form-label">Morphological name type:</label>
         <div class="col-sm-10">
-            <input type="text" id="morphologicalNameType" class="form-control"/>
+            <input type="text" id="morphologicalNameType" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
 
         <label for="determinationClauseInPhrase" class="col-sm-2 col-form-label">Determination clause in phrase:</label>
         <div class="col-sm-10">
-            <input type="text" id="determinationClauseInPhrase" class="form-control"/>
+            <input type="text" id="determinationClauseInPhrase" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
 
         <label for="mainClauseInPhrase" class="col-sm-2 col-form-label">Main clause in phrase:</label>
         <div class="col-sm-10">
-            <input type="text" id="mainClauseInPhrase" class="form-control"/>
+            <input type="text" id="mainClauseInPhrase" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
 
         <label for="simpleRootMorpheme" class="col-sm-2 col-form-label">Simple root morpheme:</label>
         <div class="col-sm-10">
-            <input type="text" id="simpleRootMorpheme" class="form-control"/>
+            <input type="text" id="simpleRootMorpheme" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
 
         <label for="diversionBase" class="col-sm-2 col-form-label">Diversion base:</label>
         <div class="col-sm-10">
-            <input type="text" id="diversionBase" class="form-control"/>
+            <input type="text" id="diversionBase" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
 
         <label for="mainClauseInSms" class="col-sm-2 col-form-label">Main clause in sms:</label>
         <div class="col-sm-10">
-            <input type="text" id="mainClauseInSms" class="form-control"/>
+            <input type="text" id="mainClauseInSms" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
 
         <label for="etymology" class="col-sm-2 col-form-label">Etymology:</label>
         <div class="col-sm-10">
-            <input type="text" id="etymology" class="form-control"/>
+            <input type="text" id="etymology" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
@@ -119,7 +124,7 @@
 
         <label for="adaptationType" class="col-sm-2 col-form-label">Adaptation type:</label>
         <div class="col-sm-10">
-            <input type="text" id="adaptationType" class="form-control"/>
+            <input type="text" id="adaptationType" class="form-control form-control-sm"/>
         </div>
     </div>
     <div class="row mb-3">
