@@ -1,7 +1,5 @@
 package se.uu.swedifying.model.api;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 public record CreateAttestationRequest(
         String originalForm
         , Long locationId

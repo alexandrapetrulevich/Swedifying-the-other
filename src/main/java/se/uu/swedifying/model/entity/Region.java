@@ -5,16 +5,18 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "LAND_SURVEYOR")
+@Table(name = "REGION")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-public class LandSurveyor {
+public class Region {
   @Id
   @GeneratedValue
-  @Column(name = "LAND_SURVEYOR_ID")
-  private Long landSurveyorId;
-  @Column(name = "NAME")
-  private String name;
+  @Column(name = "REGION_ID")
+  private Long regionId;
+
+  @Column(name = "REGION_NAME", nullable = false, unique = true)
+  private String regionName;
+
 }

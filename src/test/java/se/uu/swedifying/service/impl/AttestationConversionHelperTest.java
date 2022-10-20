@@ -6,7 +6,6 @@ import se.uu.swedifying.model.api.CreateAttestationRequest;
 import se.uu.swedifying.model.api.LocationDto;
 import se.uu.swedifying.model.entity.Attestation;
 import se.uu.swedifying.model.entity.Location;
-import se.uu.swedifying.model.util.ExistenceType;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +22,7 @@ class AttestationConversionHelperTest {
       createAttestationRequest
       , null);
     assertEquals(expectedOriginalForm, attestation.getOriginalForm());
-    assertEquals(0L, attestation.getAttestationId());
+    assertNull(attestation.getAttestationId());
     assertNull(attestation.getLocation());
   }
 
@@ -45,7 +44,6 @@ class AttestationConversionHelperTest {
       .englishForm("location")
       .latitude(1.0)
       .longitude(1.0)
-      .realOrFictional(ExistenceType.REAL)
       .build();
     CreateAttestationRequest createAttestationRequest = new CreateAttestationRequest(
       expectedOriginalForm
@@ -55,12 +53,11 @@ class AttestationConversionHelperTest {
       createAttestationRequest
       , locationDto);
     assertEquals(expectedOriginalForm, attestation.getOriginalForm());
-    assertEquals(0L, attestation.getAttestationId());
+    assertNull(attestation.getAttestationId());
     Location location = attestation.getLocation();
     assertNull(location.getLocalityType());
     assertEquals(locationDto.locationId(), location.getLocationId());
-    assertEquals(locationDto.realOrFictional(), location.getRealOrFictional());
-    assertEquals(locationDto.englishForm(), location.getEnglishForm());
+    assertEquals(locationDto.englishForm(), location.getModernLookupForm());
     assertEquals(locationDto.latitude(), location.getLatitude());
     assertEquals(locationDto.longitude(), location.getLongitude());
   }
@@ -78,12 +75,34 @@ class AttestationConversionHelperTest {
     String expectedOriginalForm = "originalForm";
     Attestation attestation = Attestation
       .builder()
-      .attestationId(1)
+      .attestationId(1L)
       .location(null)
       .originalForm(expectedOriginalForm)
       .build();
     AttestationDto attestationDto = AttestationConversionHelper.attestationToAttestationDto(attestation);
     assertEquals(attestation.getAttestationId(), attestationDto.attestationId());
     assertEquals(attestation.getOriginalForm(), attestationDto.originalForm());
+  }
+
+  @Test
+  void testAttestationToAttestationDtoWithLocationOk() {
+    String expectedOriginalForm = "originalForm";
+    Attestation attestation = Attestation
+      .builder()
+      .attestationId(1L)
+      .location(Location
+        .builder()
+        .locationId(1L)
+        .modernLookupForm("form")
+        .longitude(12)
+        .latitude(13)
+        .build())
+      .originalForm(expectedOriginalForm)
+      .build();
+    AttestationDto attestationDto = AttestationConversionHelper.attestationToAttestationDto(attestation);
+    assertEquals(attestation.getAttestationId(), attestationDto.attestationId());
+    assertEquals(attestation.getOriginalForm(), attestationDto.originalForm());
+    assertNotNull(attestationDto.location());
+    assertEquals(attestation.getLocation().getLocationId(), attestationDto.location().locationId());
   }
 }

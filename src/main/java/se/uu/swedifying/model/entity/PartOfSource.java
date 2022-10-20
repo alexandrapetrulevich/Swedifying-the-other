@@ -5,16 +5,17 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "LAND_SURVEYOR")
+@Table(name = "PART_OF_SOURCE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-public class LandSurveyor {
+public class PartOfSource {
   @Id
   @GeneratedValue
-  @Column(name = "LAND_SURVEYOR_ID")
-  private Long landSurveyorId;
-  @Column(name = "NAME")
-  private String name;
+  @Column(name = "PART_OF_SOURCE_ID")
+  private Long partOfSourceId;
+
+  @Column(name = "PART_OF_SOURCE_NAME", nullable = false, unique = true)
+  private String partOfSourceName;
 }

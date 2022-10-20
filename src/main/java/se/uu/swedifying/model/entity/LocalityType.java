@@ -1,14 +1,14 @@
 package se.uu.swedifying.model.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "LOCALITY_TYPE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 @Getter
 public class LocalityType {
     @Id
@@ -18,13 +18,5 @@ public class LocalityType {
 
     @Column(name = "LOCALITY_TYPE_NAME", nullable = false, unique = true)
     private String localityTypeName;
-
-    public LocalityType(String localityTypeName) {
-        this.localityTypeName = localityTypeName;
-    }
-    public LocalityType(long localityTypeId, String localityTypeName) {
-        this.localityTypeId = localityTypeId;
-        this.localityTypeName = localityTypeName;
-    }
 
 }
