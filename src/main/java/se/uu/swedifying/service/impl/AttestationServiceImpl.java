@@ -62,12 +62,12 @@ class AttestationServiceImpl implements AttestationService {
   }
 
   @Override
-  public List<AttestationDto> getAllAttestations() {
-    return attestationRepository
-      .findAll()
-      .stream()
-      .map(AttestationConversionHelper::attestationToAttestationDto)
-      .toList();
+  public List<Attestation> getAllAttestations() {
+    List<Attestation> allAttestations = attestationRepository.findAll();
+    return allAttestations;
+      //.stream()
+      //.map(AttestationConversionHelper::attestationToAttestationDto)
+      //.toList();
   }
 
   @Override
@@ -77,7 +77,7 @@ class AttestationServiceImpl implements AttestationService {
   }
 
   @Override
-  public List<AttestationDto> getAllFiltered(String morphologicalNameTypeFilter, String etymologyFilter) {
+  public List<Attestation> getAllFiltered(String morphologicalNameTypeFilter, String etymologyFilter) {
     MorphologicalNameType morphologicalNameType =
       morphologicalNameTypeFilter != null ?
         MorphologicalNameType.valueOf(morphologicalNameTypeFilter)
@@ -88,8 +88,8 @@ class AttestationServiceImpl implements AttestationService {
     List<AttestationVariantForm> variantForms = attestationVariantFormRepository
       .findByNormalizedFormIn(normalizedForms);
     return attestationRepository
-      .findByVariantFormIn(variantForms)
-      .stream()
-      .map(AttestationConversionHelper::attestationToAttestationDto).toList();
+      .findByVariantFormIn(variantForms);
+      //.stream()
+      //.map(AttestationConversionHelper::attestationToAttestationDto).toList();
   }
 }

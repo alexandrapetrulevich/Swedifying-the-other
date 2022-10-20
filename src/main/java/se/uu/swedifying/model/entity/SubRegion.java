@@ -1,6 +1,7 @@
 package se.uu.swedifying.model.entity;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public abstract class SubRegion {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,5 +22,5 @@ public abstract class SubRegion {
 
   @ManyToOne
   @JoinColumn(name = "BELONGS_TO_REGION_ID")
-  private Region belongsTo;
+  private Region belongsToRegion;
 }

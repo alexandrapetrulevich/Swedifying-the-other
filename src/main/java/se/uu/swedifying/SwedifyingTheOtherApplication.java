@@ -292,7 +292,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
     subRegionRepository.save(
       District
         .builder()
-        .belongsTo(regionRepository.findByRegionName("Pommern"))
+        .belongsToRegion(regionRepository.findByRegionName("Pommern"))
         .name("Wolgasts distrikt")
         .build());
   }

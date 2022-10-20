@@ -30,25 +30,31 @@
                     "<tr>"
                     + "<td>" + attestations[i].attestationId + "</td>"
                     + "<td>" + attestations[i].originalForm + "</td>"
-                    + "<td>" + attestations[i].notes + "</td>"
-                    + "<td>" + attestations[i].adaptedToSwedish + "</td>"
-                    + "<td>" + attestations[i].determinationClause + "</td>"
-                    + "<td>" + attestations[i].mainClauseInPhrase + "</td>"
-                    + "<td>" + attestations[i].simpleRootMorpheme + "</td>"
-                    + "<td>" + attestations[i].diversionBase + "</td>"
-                    + "<td>" + attestations[i].mainClauseInSms + "</td>"
+                    + "<td>" + JSON.stringify(attestations[i].variantForm) + "</td>"
                     + "<td>" + JSON.stringify(attestations[i].location) + "</td>"
-                    + "<td>" + attestations[i].location.localityType.localityTypeName + "</td>"
-                    + "<td>" + attestations[i].variantForm + "</td>"
-                    + "<td>" + attestations[i].lemmaForm + "</td>"
-                    + "<td>" + attestations[i].adaptationType + "</td>"
-                    + "<td>" + attestations[i].attestationPrepositions + "</td>"
-                    + "<td>" + attestations[i].morphologicalNameType + "</td>"
-                    + "<td>" + attestations[i].etymology + "</td>"
+                    + "<td>" + JSON.stringify(attestations[i].sourceFinding) + "</td>"
+                    + "<td>" + attestations[i].notes + "</td>"
                     + "</tr>"
                 );
             }
         }
+
+        /*
+        <div class="accordion" id="accordionExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Accordion Item #1
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                    </div>
+                </div>
+            </div>
+        </div>
+        */
 
 
     </script>
@@ -64,23 +70,12 @@
 <table id="attestationsTable" class="table">
     <thead>
     <tr>
-        <th>ID</th>
+        <th>Attestation ID</th>
         <th>Original form (Belägg)</th>
-        <th>Notes (-)</th>
-        <th>Adapted to Swedish (Anpassad till sv eller ej)</th>
-        <th>Determination Clause (Bestämningsled i en fras)</th>
-        <th>Main Clause In Phrase (Huvudled i en fras)</th>
-        <th>Simple root morpheme (Enkelt rotmorfem)</th>
-        <th>Diversion Base (Avledningsbas)</th>
-        <th>Main Clause In Composition (Huvudled i sammansättning)</th>
-        <th>Location (-)</th>
-        <th>Location type (Lokalitetstyp)</th>
         <th>Variant Form (Variantform)</th>
-        <th>Lemma form (Normaliserad form)</th>
-        <th>Adaptation Type (-)</th>
-        <th>Attestation Prepositions (-)</th>
-        <th>Morphological Name Type (Morfologisk namntyp)</th>
-        <th>Etymology (Etymologi)</th>
+        <th>Location (-)</th>
+        <th>SourceFinding</th>
+        <th>Notes (Anteckningar)</th>
     </tr>
     </thead>
     <tbody>

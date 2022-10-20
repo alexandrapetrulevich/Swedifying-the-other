@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import se.uu.swedifying.model.api.AttestationDto;
 import se.uu.swedifying.model.api.CreateAttestationRequest;
+import se.uu.swedifying.model.entity.Attestation;
 import se.uu.swedifying.service.AttestationService;
 
 import java.net.URI;
@@ -30,7 +31,7 @@ public class AttestationsResources {
     }
 
     @GetMapping
-    public ResponseEntity<List<AttestationDto>> getAllAttestations(
+    public ResponseEntity<List<Attestation>> getAllAttestations(
       @RequestParam(defaultValue = "") String morphNameType
       , @RequestParam(defaultValue = "") String etymology
     ) {
