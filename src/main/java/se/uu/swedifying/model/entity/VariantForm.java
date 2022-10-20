@@ -7,12 +7,12 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "ATTESTATION_VARIANT_FORM")
+@Table(name = "VARIANT_FORM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-public class AttestationVariantForm {
+public class VariantForm {
     @Id
     @GeneratedValue
     @Column(name = "VARIANT_FORM_ID")
@@ -21,6 +21,7 @@ public class AttestationVariantForm {
     @Column(name = "VARIANT_FORM")
     private String variantForm;
 
+    @Column(name = "IS_ADAPTED_TO_SWEDISH")
     private IsAdaptedToSwedishType isAdaptedToSwedish;
 
     @ManyToMany
@@ -28,9 +29,10 @@ public class AttestationVariantForm {
       name = "VARIANT_TO_ADAPTATION_TYPE_RELATION",
       joinColumns = @JoinColumn(name = "VARIANT_FORM_ID"),
       inverseJoinColumns = @JoinColumn(name = "ADAPTATION_TYPE_ID"))
-    private List<AdaptationType> adaptationType;
+    @Singular
+    private List<AdaptationType> adaptationTypes;
 
     @ManyToOne
     @JoinColumn(name = "NORMALIZED_FORM_ID")
-    private AttestationNormalizedForm normalizedForm;
+    private NormalizedForm normalizedForm;
 }

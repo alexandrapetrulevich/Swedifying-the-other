@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "SUB_REGION")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,6 +19,7 @@ public abstract class SubRegion {
   @Column(name = "SUB_REGION_ID", nullable = false)
   private Long subRegionId;
 
+  @Column(name = "NAME")
   private String name;
 
   @ManyToOne

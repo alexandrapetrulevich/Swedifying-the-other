@@ -22,11 +22,10 @@ public class Source {
   @Column(name = "SOURCE_ID")
   private Long sourceId;
 
+  @Column(name = "DATING")
   private LocalDate dating;
-
 
   @ManyToOne
   @JoinColumn(name = "LAND_SURVEYOR_ID")
   private LandSurveyor landSurveyor;
-
 }

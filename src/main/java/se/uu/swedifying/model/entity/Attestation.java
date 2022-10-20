@@ -16,12 +16,12 @@ public class Attestation {
     @Column(name = "ATTESTATION_ID")
     private Long attestationId;
 
-    @Column(name = "ORIGINAL_FORM")
+    @Column(name = "ORIGINAL_FORM", nullable = false)
     private String originalForm;
 
     @ManyToOne
     @JoinColumn(name = "VARIANT_FORM_ID")
-    private AttestationVariantForm variantForm;
+    private VariantForm variantForm;
 
     @ManyToOne
     @JoinColumn(name = "LOCATION_ID")

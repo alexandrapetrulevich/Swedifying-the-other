@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "REGION")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder

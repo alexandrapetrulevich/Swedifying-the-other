@@ -16,6 +16,6 @@ public class AdaptationType {
   @Column(name = "ADAPTATION_TYPE_ID")
   private Long adaptationTypeId;
 
-  @Column(name = "ADAPTATION_TYPE_NAME")
+  @Column(name = "NAME", nullable = false, unique = true)
   private String name;
 }

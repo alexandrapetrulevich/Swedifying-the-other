@@ -5,15 +5,15 @@ Place-name database for the project Swedifying the other https://www.vr.se/engli
 ```
 [
   {
-    "attestationId": 34,
+    "attestationId": 35,
     "originalForm": "Grosse Ernshoff[s] Åkermark Uthi Wolgasts District",
     "variantForm": {
-      "variantFormId": 31,
+      "variantFormId": 32,
       "variantForm": "Grosse Ernsthoff",
       "isAdaptedToSwedish": "NO",
-      "adaptationType": [],
+      "adaptationTypes": [],
       "normalizedForm": {
-        "normalizedFormId": 28,
+        "normalizedFormId": 29,
         "normalizedForm": "Grosse Ernsthoff",
         "morphologicalNameType": "COMPOSITION",
         "morphologicalNameTypeIsShaky": false,
@@ -37,7 +37,7 @@ Place-name database for the project Swedifying the other https://www.vr.se/engli
       }
     },
     "location": {
-      "locationId": 25,
+      "locationId": 26,
       "longitude": 0,
       "latitude": 0,
       "modernLookupForm": "Gross Ernsthof",
@@ -55,15 +55,18 @@ Place-name database for the project Swedifying the other https://www.vr.se/engli
       }
     },
     "sourceFinding": {
-      "sourceFindingId": 22,
+      "sourceFindingId": 23,
       "source": {
-        "sourceId": 21,
+        "sourceId": 22,
         "dating": "1694-06-19",
         "landSurveyor": {
           "landSurveyorId": 14,
           "name": "Simon Skragge"
         },
-        "signature": "BI",
+        "mapSignature": {
+          "mapSignatureId": 21,
+          "mapSignature": "BI"
+        },
         "mapSheet": 1
       },
       "partOfSource": {
@@ -74,20 +77,20 @@ Place-name database for the project Swedifying the other https://www.vr.se/engli
     "notes": "Niemeyer 2:32f."
   },
   {
-    "attestationId": 35,
+    "attestationId": 36,
     "originalForm": "Grosse Ernshoff[s] Åkermark Uthi Wolgasts District",
     "variantForm": {
-      "variantFormId": 32,
+      "variantFormId": 33,
       "variantForm": "Wolgasts distrikt",
       "isAdaptedToSwedish": "YES",
-      "adaptationType": [
+      "adaptationTypes": [
         {
           "adaptationTypeId": 15,
           "name": "morfologisk anpassning av förleden"
         }
       ],
       "normalizedForm": {
-        "normalizedFormId": 29,
+        "normalizedFormId": 30,
         "normalizedForm": "Wolgasts distrikt",
         "morphologicalNameType": "PHRASE",
         "morphologicalNameTypeIsShaky": false,
@@ -111,7 +114,7 @@ Place-name database for the project Swedifying the other https://www.vr.se/engli
       }
     },
     "location": {
-      "locationId": 26,
+      "locationId": 27,
       "longitude": 0,
       "latitude": 0,
       "modernLookupForm": "",
@@ -129,15 +132,18 @@ Place-name database for the project Swedifying the other https://www.vr.se/engli
       }
     },
     "sourceFinding": {
-      "sourceFindingId": 23,
+      "sourceFindingId": 24,
       "source": {
-        "sourceId": 21,
+        "sourceId": 22,
         "dating": "1694-06-19",
         "landSurveyor": {
           "landSurveyorId": 14,
           "name": "Simon Skragge"
         },
-        "signature": "BI",
+        "mapSignature": {
+          "mapSignatureId": 21,
+          "mapSignature": "BI"
+        },
         "mapSheet": 1
       },
       "partOfSource": {
@@ -148,17 +154,17 @@ Place-name database for the project Swedifying the other https://www.vr.se/engli
     "notes": "Distriktsnamnet är anpassat till sv dock ej bebyggelsenamnet Wolgast som har slavisk etymologi och som medierats via tyska. I notarum står inte sällan \"Wolgasts ampt\"."
   },
   {
-    "attestationId": 36,
+    "attestationId": 37,
     "originalForm": "Wolgasts Stadz Grentz",
     "variantForm": {
-      "variantFormId": 33,
+      "variantFormId": 34,
       "variantForm": "Wolgast",
       "isAdaptedToSwedish": "NO",
-      "adaptationType": [],
+      "adaptationTypes": [],
       "normalizedForm": null
     },
     "location": {
-      "locationId": 27,
+      "locationId": 28,
       "longitude": 0,
       "latitude": 0,
       "modernLookupForm": "Wolgast",
@@ -176,15 +182,18 @@ Place-name database for the project Swedifying the other https://www.vr.se/engli
       }
     },
     "sourceFinding": {
-      "sourceFindingId": 24,
+      "sourceFindingId": 25,
       "source": {
-        "sourceId": 21,
+        "sourceId": 22,
         "dating": "1694-06-19",
         "landSurveyor": {
           "landSurveyorId": 14,
           "name": "Simon Skragge"
         },
-        "signature": "BI",
+        "mapSignature": {
+          "mapSignatureId": 21,
+          "mapSignature": "BI"
+        },
         "mapSheet": 1
       },
       "partOfSource": null

@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 @SuperBuilder
@@ -14,6 +17,9 @@ import javax.persistence.Entity;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class MapSource extends Source {
-  private String signature;
+  @ManyToOne
+  @JoinColumn(name = "MAP_SIGNATURE_ID")
+  private MapSignature mapSignature;
+  @Column(name = "MAP_SHEET")
   private int mapSheet;
 }

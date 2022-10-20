@@ -1,9 +1,6 @@
 package se.uu.swedifying.model.api;
 
 import lombok.Builder;
-import se.uu.swedifying.model.entity.AttestationVariantForm;
-
-import java.util.Set;
 
 @Builder
 public record AttestationDto(

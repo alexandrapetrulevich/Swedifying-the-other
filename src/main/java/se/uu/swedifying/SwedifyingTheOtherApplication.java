@@ -23,7 +23,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
   @Autowired
   LocationRepository locationRepository;
   @Autowired
-  AttestationNormalizedFormRepository attestationNormalizedFormRepository;
+  NormalizedFormRepository normalizedFormRepository;
   @Autowired
   AdaptationTypeRepository adaptationTypeRepository;
   @Autowired
@@ -42,7 +42,10 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
   SourceFindingRepository sourceFindingRepository;
 
   @Autowired
-  AttestationVariantFormRepository attestationVariantFormRepository;
+  VariantFormRepository variantFormRepository;
+
+  @Autowired
+  MapSignatureRepository mapSignatureRepository;
 
   public static void main(String[] args) {
     SpringApplication.run(SwedifyingTheOtherApplication.class, args);
@@ -67,7 +70,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
       Attestation
         .builder()
         .originalForm("Grosse Ernshoff[s] Åkermark Uthi Wolgasts District")
-        .variantForm(attestationVariantFormRepository.findByVariantForm("Grosse Ernsthoff"))
+        .variantForm(variantFormRepository.findByVariantForm("Grosse Ernsthoff"))
         .location(locationRepository.findByModernLookupForm("Gross Ernsthof"))
         .sourceFinding(sourceFindings.get(0))
         .notes("Niemeyer 2:32f.")
@@ -76,7 +79,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
       Attestation
         .builder()
         .originalForm("Grosse Ernshoff[s] Åkermark Uthi Wolgasts District")
-        .variantForm(attestationVariantFormRepository.findByVariantForm("Wolgasts distrikt"))
+        .variantForm(variantFormRepository.findByVariantForm("Wolgasts distrikt"))
         .location(locationRepository.findByModernLookupForm(""))
         .sourceFinding(sourceFindings.get(1))
         .notes("Distriktsnamnet är anpassat till sv dock ej bebyggelsenamnet Wolgast som har slavisk etymologi och som medierats via tyska. I notarum står inte sällan \"Wolgasts ampt\".")
@@ -85,7 +88,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
       Attestation
         .builder()
         .originalForm("Wolgasts Stadz Grentz")
-        .variantForm(attestationVariantFormRepository.findByVariantForm("Wolgast"))
+        .variantForm(variantFormRepository.findByVariantForm("Wolgast"))
         .location(locationRepository.findByModernLookupForm("Wolgast"))
         .sourceFinding(sourceFindings.get(2))
         .notes("Eichler & Walther 1988:300")
@@ -93,34 +96,34 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
   }
 
   private void addVariantForms() {
-    attestationVariantFormRepository
-      .save(AttestationVariantForm
+    variantFormRepository
+      .save(VariantForm
         .builder()
         .variantForm("Grosse Ernsthoff")
         .isAdaptedToSwedish(IsAdaptedToSwedishType.NO)
-        .normalizedForm(attestationNormalizedFormRepository.findByNormalizedForm("Grosse Ernsthoff"))
+        .normalizedForm(normalizedFormRepository.findByNormalizedForm("Grosse Ernsthoff"))
         .build());
-    attestationVariantFormRepository
-      .save(AttestationVariantForm
+    variantFormRepository
+      .save(VariantForm
         .builder()
         .variantForm("Wolgasts distrikt")
         .isAdaptedToSwedish(IsAdaptedToSwedishType.YES)
         .adaptationType(
-          List.of(adaptationTypeRepository.findByName("morfologisk anpassning av förleden")))
-        .normalizedForm(attestationNormalizedFormRepository.findByNormalizedForm("Wolgasts distrikt"))
+          adaptationTypeRepository.findByName("morfologisk anpassning av förleden"))
+        .normalizedForm(normalizedFormRepository.findByNormalizedForm("Wolgasts distrikt"))
         .build());
-    attestationVariantFormRepository
-      .save(AttestationVariantForm
+    variantFormRepository
+      .save(VariantForm
         .builder()
         .variantForm("Wolgast")
         .isAdaptedToSwedish(IsAdaptedToSwedishType.NO)
-        .normalizedForm(attestationNormalizedFormRepository.findByNormalizedForm("Wolgast"))
+        .normalizedForm(normalizedFormRepository.findByNormalizedForm("Wolgast"))
         .build());
   }
 
   private void addNormalizedForms() {
-    attestationNormalizedFormRepository.save(
-      AttestationNormalizedForm
+    normalizedFormRepository.save(
+      NormalizedForm
         .builder()
         .normalizedForm("Grosse Ernsthoff")
         //.morphologicalNameType(MorphologicalNameType.PHRASE)
@@ -136,8 +139,8 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
         .etymology(languageRepository.findByLanguageCode("de"))
         .mediatingLanguage(null)
         .build());
-    attestationNormalizedFormRepository.save(
-      AttestationNormalizedForm
+    normalizedFormRepository.save(
+      NormalizedForm
         .builder()
         .normalizedForm("Wolgasts distrikt")
         .morphologicalNameType(MorphologicalNameType.PHRASE)
@@ -153,8 +156,8 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
         .mediatingLanguage(null)
         .build());
 
-    attestationNormalizedFormRepository.save(
-      AttestationNormalizedForm
+    normalizedFormRepository.save(
+      NormalizedForm
         .builder()
         .normalizedForm("Wolgasts")
         .morphologicalNameType(MorphologicalNameType.DERIVATION)
@@ -218,10 +221,12 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
   }
 
   private MapSource addSources() {
+    MapSignature mapSignature = mapSignatureRepository
+      .save(MapSignature.builder().mapSignature("BI").build());
     return sourceRepository.save(
       MapSource
         .builder()
-        .signature("BI")
+        .mapSignature(mapSignature)
         .mapSheet(1)
         .dating(LocalDate.of(1694, Month.JUNE, 20))
         .landSurveyor(landSurveyorRepository.findByName("Simon Skragge"))

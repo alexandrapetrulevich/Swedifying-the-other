@@ -2,7 +2,6 @@ package se.uu.swedifying.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import se.uu.swedifying.model.api.AttestationDto;
 import se.uu.swedifying.model.api.CreateAttestationRequest;
 import se.uu.swedifying.model.api.LocationDto;
 import se.uu.swedifying.model.entity.*;
@@ -18,8 +17,8 @@ class AttestationServiceImpl implements AttestationService {
 
   private final AttestationRepository attestationRepository;
 
-  private final AttestationVariantFormRepository attestationVariantFormRepository;
-  private final AttestationNormalizedFormRepository attestationNormalizedFormRepository;
+  private final VariantFormRepository variantFormRepository;
+  private final NormalizedFormRepository normalizedFormRepository;
 
   private final LanguageRepository languageRepository;
   private final LocationService locationService;
@@ -28,26 +27,27 @@ class AttestationServiceImpl implements AttestationService {
   AttestationServiceImpl(
     AttestationRepository attestationRepository
     , LocationService locationService
-    , AttestationVariantFormRepository attestationVariantFormRepository
-    , AttestationNormalizedFormRepository attestationNormalizedFormRepository
+    , VariantFormRepository variantFormRepository
+    , NormalizedFormRepository normalizedFormRepository
     , LanguageRepository languageRepository) {
     this.attestationRepository = attestationRepository;
     this.locationService = locationService;
-    this.attestationVariantFormRepository = attestationVariantFormRepository;
-    this.attestationNormalizedFormRepository = attestationNormalizedFormRepository;
+    this.variantFormRepository = variantFormRepository;
+    this.normalizedFormRepository = normalizedFormRepository;
     this.languageRepository = languageRepository;
   }
 
   @Override
-  public AttestationDto createAttestation(CreateAttestationRequest createAttestationRequest) {
+  public Attestation createAttestation(CreateAttestationRequest createAttestationRequest) {
     createAttestationRequest.validate();
     LocationDto locationDto = handleLocation(createAttestationRequest);
     Attestation attestation = AttestationConversionHelper
       .createAttestationRequestToAttestation(
         createAttestationRequest
         , locationDto);
-    return AttestationConversionHelper
-      .attestationToAttestationDto(attestationRepository.save(attestation));
+    return attestationRepository.save(attestation);
+    //return AttestationConversionHelper
+    //  .attestationToAttestationDto(attestationRepository.save(attestation));
   }
 
   private LocationDto handleLocation(CreateAttestationRequest createAttestationRequest) {
@@ -71,9 +71,10 @@ class AttestationServiceImpl implements AttestationService {
   }
 
   @Override
-  public AttestationDto getAttestationById(long id) {
-    return AttestationConversionHelper
-      .attestationToAttestationDto(attestationRepository.findById(id).orElseThrow());
+  public Attestation getAttestationById(long id) {
+    return attestationRepository.findById(id).orElseThrow();
+    //return AttestationConversionHelper
+    //  .attestationToAttestationDto(attestationRepository.findById(id).orElseThrow());
   }
 
   @Override
@@ -83,9 +84,9 @@ class AttestationServiceImpl implements AttestationService {
         MorphologicalNameType.valueOf(morphologicalNameTypeFilter)
         : null;
     List<Language> etymologies = languageRepository.findByLanguageNameContains(etymologyFilter);
-    List<AttestationNormalizedForm> normalizedForms = attestationNormalizedFormRepository
+    List<NormalizedForm> normalizedForms = normalizedFormRepository
       .findByMorphologicalNameTypeAndEtymologyIn(morphologicalNameType, etymologies);
-    List<AttestationVariantForm> variantForms = attestationVariantFormRepository
+    List<VariantForm> variantForms = variantFormRepository
       .findByNormalizedFormIn(normalizedForms);
     return attestationRepository
       .findByVariantFormIn(variantForms);
