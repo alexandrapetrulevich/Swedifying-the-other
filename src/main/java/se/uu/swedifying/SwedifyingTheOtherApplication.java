@@ -5,7 +5,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import se.uu.swedifying.model.entity.*;
-import se.uu.swedifying.model.util.ComparativeFormInformation;
 import se.uu.swedifying.model.util.IsAdaptedToSwedishType;
 import se.uu.swedifying.model.util.MorphologicalData;
 import se.uu.swedifying.model.util.MorphologicalNameType;
@@ -133,13 +132,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
             .determinationClauseInComposition("Ernst")
             .mainClauseInComposition("hof")
             .build())
-        .comparativeFormInformation(
-          ComparativeFormInformation
-            .builder()
-            .comparativeFormFromMediatingSource("1618 Ernsthoff")
-            .mediatingSourceInformation("Lubinsche Karte")
-            .build()
-        )
+        .comparativeFormInformation("1618 Ernsthoff, Lubinsche Karte")
         .etymology(languageRepository.findByLanguageCode("de"))
         .mediatingLanguage(null)
         .build());
@@ -155,13 +148,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
             .determinationClauseInPhrase("Wolgasts")
             .mainClauseInPhrase("distrikt")
             .build())
-        .comparativeFormInformation(
-          ComparativeFormInformation
-            .builder()
-            .comparativeFormFromMediatingSource("Wolgastischer District, Amte Wolgast")
-            .mediatingSourceInformation("Kahldensche Matrikel")
-            .build()
-        )
+        .comparativeFormInformation("Wolgastischer District, Amte Wolgast. Kahldensche Matrikel")
         .etymology(languageRepository.findByLanguageCode("de"))
         .mediatingLanguage(null)
         .build());
@@ -178,13 +165,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
             .derivationBase("Voligost")
             .derivationMorpheme("j")
             .build())
-        .comparativeFormInformation(
-          ComparativeFormInformation
-            .builder()
-            .comparativeFormFromMediatingSource("1140 castra hec, scilicet … Wologost : Wolgast; 1186 usque Wolegost et a Wolegost")
-            .mediatingSourceInformation("PUB 1:33, 130")
-            .build()
-        )
+        .comparativeFormInformation("1140 castra hec, scilicet … Wologost : Wolgast; 1186 usque Wolegost et a Wolegost. PUB 1:33, 130")
         .etymology(languageRepository.findByLanguageCode("slav"))
         .mediatingLanguage(languageRepository.findByLanguageCode("de"))
         .build());
@@ -220,7 +201,6 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
         SourceFinding
           .builder()
           .partOfSource(partOfSourceRepository.findByPartOfSourceName("Rubrik"))
-          .separateDescription("Grosse Ernsthåff, Grosse Ernshoff, Grosse Erns=hoff")
           .source(source)
           .build())
       , sourceFindingRepository.save(

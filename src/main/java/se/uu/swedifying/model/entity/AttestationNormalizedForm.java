@@ -1,7 +1,6 @@
 package se.uu.swedifying.model.entity;
 
 import lombok.*;
-import se.uu.swedifying.model.util.ComparativeFormInformation;
 import se.uu.swedifying.model.util.MorphologicalData;
 import se.uu.swedifying.model.util.MorphologicalNameType;
 
@@ -27,8 +26,7 @@ public class AttestationNormalizedForm {
   @Embedded
   private MorphologicalData morphologicalData;
 
-  @Embedded
-  private ComparativeFormInformation comparativeFormInformation;
+  private String comparativeFormInformation;
 
   @ManyToOne
   @JoinColumn(name = "ETYMOLOGY_LANGUAGE_ID")

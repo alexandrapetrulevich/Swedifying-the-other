@@ -23,6 +23,4 @@ public class SourceFinding {
   @ManyToOne
   @JoinColumn(name = "PART_OF_SOURCE_TYPE_ID")
   private PartOfSource partOfSource;
-
-  private String separateDescription;
 }
