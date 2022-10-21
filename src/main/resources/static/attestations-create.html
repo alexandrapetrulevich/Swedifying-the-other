@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attestation</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/locations.js"></script>
+    <script>
+    $(document).ready(function(){
+        loadLocations(populateAvailableLocations);
+        loadVariantForms(populateVariantForms);
+        loadSourceFindings(populateSourceFindings);
+        adaptedToSwedishClicked();
+    });
+
+    function loadVariantForms(callback) {
+        $.get("/api/variantForms/",  function(data, status) {
+            callback(data._embedded.variantForms);
+        }, "json");
+    }
+
+    function populateVariantForms(variantForms) {
+        for (let i = 0; i < variantForms.length; i++)
+        {
+            $("#availableVariantForms")
+                .append(
+                    new Option(
+                        variantForms[i].variantForm
+                        + " (" + variantForms[i]._links.self.href + ")"
+                        , variantForms[i]._links.self.href));
+        }
+        variantFormSelected();
+    }
+
+    function variantFormSelected() {
+        console.log("variantFormSelected");
+    }
+
+    function loadSourceFindings(callback) {
+        $.get("/api/sourceFindings/",  function(data, status) {
+            callback(data._embedded.sourceFindings);
+        }, "json");
+    }
+
+    function populateSourceFindings(sourceFindings) {
+        for (let i = 0; i < sourceFindings.length; i++)
+        {
+            $("#availableSourceFindings")
+                .append(
+                    new Option(
+                        sourceFindings[i]._links.self.href.split("/").pop()
+                        + " (" + sourceFindings[i]._links.self.href + ")"
+                        , sourceFindings[i]._links.self.href));
+        }
+        sourceFindingSelected();
+    }
+
+    function sourceFindingSelected() {
+        console.log("sourceFindingSelected");
+    }
+
+    function populateAvailableLocations(locations) {
+        for (let i = 0; i < locations.length; i++)
+        {
+            $("#availableLocations")
+                .append(
+                    new Option(
+                        locations[i].modernLookupForm
+                        + " (" + locations[i]._links.self.href + ")"
+                        , locations[i]._links.self.href));
+        }
+        locationSelected();
+    }
+
+    function adaptedToSwedishClicked() {
+        $("#adaptationType").prop("disabled", !$("#adaptedToSwedish").is(':checked'));
+    }
+
+    function displayLocalityType(localityType) {
+        $("#locationLocalityType").val(localityType.localityTypeName);
+        $("#locationLocalityTypeId").val(localityType._links.self.href.split("/").pop());
+    }
+
+    function displayRegion(region) {
+        $("#locationRegion").val(region.regionName);
+        $("#locationRegionId").val(region._links.self.href.split("/").pop());
+    }
+
+    function displayDistrictOrParish(districtOrParish) {
+        $("#locationDistrictOrParish").val(districtOrParish.name);
+        $("#locationDistrictOrParishId").val(districtOrParish._links.self.href.split("/").pop());
+        $.get(districtOrParish._links.belongsToRegion.href, function(data, status) {
+            displayRegion(data);
+        }, "json");
+    }
+
+    function displaySelectedLocation(location) {
+        $("#locationId").val(location._links.self.href.split("/").pop());
+        $("#locationLongitude").val(location.longitude);
+        $("#locationLatitude").val(location.latitude);
+        $("#locationModernLookupForm").val(location.modernLookupForm);
+
+        $.get(location._links.localityType.href, function(data, status) {
+            displayLocalityType(data);
+        }, "json");
+
+        $.get(location._links.districtOrParish.href, function(data, status) {
+            displayDistrictOrParish(data);
+        }, "json");
+
+    }
+
+    function locationSelected() {
+        var selectedOption = $("#availableLocations").val();
+        $.get(selectedOption, function(data, status) {
+            displaySelectedLocation(data);
+        }, "json");
+    }
+
+
+
+
+
+
+    </script>
+</head>
+<body>
+
+<a href="#">Attestations</a>
+<a href="./locality-types.html">Locality types</a>
+<a href="./attestations-list.html">List attestations</a>
+<a href="./locations.html">Locations</a>
+<h1>Create new attestation</h1>
+<form id="createAttestationForm">
+    <label for="originalForm"><b>Original form:</b></label>
+    <input type="text" maxlength="100" id="originalForm"/><br/>
+
+    <label for="notes"><b>Notes:</b></label>
+    <textarea name="notes" form="createAttestationForm" id="notes">Notes...</textarea> <br/>
+
+    <label for="availableLocations"><b>Location:</b></label>
+    <select name="availableLocations" id="availableLocations" onchange="locationSelected()">
+    </select><br/>
+
+    <label for="locationId">Location id:</label>
+    <input type="text" name="locationId" id="locationId" disabled><br/>
+
+    <label for="locationLongitude">Location longitude:</label>
+    <input type="text" name="locationLongitude" id="locationLongitude" disabled><br/>
+
+    <label for="locationLatitude">Location latitude:</label>
+    <input type="text" name="locationLatitude" id="locationLatitude" disabled><br/>
+
+    <label for="locationModernLookupForm">Modern Lookup Form:</label>
+    <input type="text" name="locationModernLookupForm" id="locationModernLookupForm" disabled><br/>
+
+    <label for="locationLocalityTypeId">Location locality type ID:</label>
+    <input type="text" name="locationLocalityTypeId" id="locationLocalityTypeId" disabled><br/>
+
+    <label for="locationLocalityType">Location locality type:</label>
+    <input type="text" name="locationLocalityType" id="locationLocalityType" disabled><br/>
+
+    <label for="locationDistrictOrParishId">District or parish ID:</label>
+    <input type="text" name="locationDistrictOrParishId" id="locationDistrictOrParishId" disabled><br/>
+
+    <label for="locationDistrictOrParish">District or parish:</label>
+    <input type="text" name="locationDistrictOrParish" id="locationDistrictOrParish" disabled><br/>
+
+    <label for="locationRegionId">Region ID:</label>
+    <input type="text" name="locationRegionId" id="locationRegionId" disabled><br/>
+
+    <label for="locationRegion">Region:</label>
+    <input type="text" name="locationRegion" id="locationRegion" disabled><br/>
+
+    <label for="availableVariantForms"><b>Variant form:</b></label>
+    <select name="availableVariantForms" id="availableVariantForms"></select><br/>
+
+    <label for="availableSourceFindings"><b>Source findings:</b></label>
+    <select name="availableSourceFindings" id="availableSourceFindings"></select><br/>
+
+    <label for="normalizedForm">Normalized form:</label>
+    <input type="text" id="normalizedForm" disabled/><br/>
+
+    <label for="morphologicalNameType">Morphological name type:</label>
+    <input type="text" id="morphologicalNameType"/><br/>
+
+    <label for="determinationClauseInPhrase">Determination clause in phrase:</label>
+    <input type="text" id="determinationClauseInPhrase"/><br/>
+
+    <label for="mainClauseInPhrase">Main clause in phrase:</label>
+    <input type="text" id="mainClauseInPhrase"/><br/>
+
+    <label for="simpleRootMorpheme">Simple root morpheme:</label>
+    <input type="text" id="simpleRootMorpheme"/><br/>
+
+    <label for="diversionBase">Diversion base:</label>
+    <input type="text" id="diversionBase"/><br/>
+
+    <label for="mainClauseInSms">Main clause in sms:</label>
+    <input type="text" id="mainClauseInSms"/><br/>
+
+    <label for="etymology">Etymology:</label>
+    <input type="text" id="etymology"/><br/>
+
+    <input type="checkbox" id="adaptedToSwedish"
+           onclick="adaptedToSwedishClicked()"/>
+    <label for="adaptedToSwedish">Adapted to Swedish:</label><br/>
+
+    <label for="adaptationType">Adaptation type:</label>
+    <input type="text" id="adaptationType"/><br/>
+
+    <input type="button" onclick="createLocalityType(populateTable)" value="Create">
+</form>
+
+</body>
+</html>
