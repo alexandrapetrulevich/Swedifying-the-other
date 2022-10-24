@@ -10,7 +10,7 @@
             getAllLocalityTypes(populateTable);
         });
 
-        function setHeaderAndPopulateHeader(headerText, localityTypes) {
+        function setHeaderAndPopulateTable(headerText, localityTypes) {
             $("#localityTypesTableHeader").text(headerText);
             populateTable(localityTypes);
         }
@@ -20,17 +20,28 @@
             for (let i = 0; i < localityTypes.length; i++)
             {
                 $("#localityTypesTable > tbody").append(
-                    "<tr><td>" + localityTypes[i].localityTypeId + "</td><td>" + localityTypes[i].localityTypeName + "</td></tr>"
+                    "<tr><td>"
+                    + localityTypes[i].localityTypeId
+                    + "</td><td>"
+                    + localityTypes[i].localityTypeName
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + localityTypes[i].localityTypeId + ");\">Edit</button>"
+                    + "</td></tr>"
                 );
             }
+        }
+
+        function goToEditView(localityTypeId) {
+            location.href = "/locality-types-create-edit.html?localityTypeId=" + localityTypeId;
         }
 
 
     </script>
 </head>
 <body>
-<a href="#">Locality types</a>
-<a href="./attestations-create.html">Attestations</a>
+<a href="#">List locality types</a>
+<a href="./locality-types-create-edit.html">Locality types create/edit</a>
+<a href="./attestations-create-edit.html">Attestations create/edit</a>
 <a href="./attestations-list.html">List attestations</a>
 <a href="./locations.html">Locations</a>
 <h1 id="localityTypesTableHeader">All locality types</h1>
@@ -39,6 +50,7 @@
     <tr>
         <th>ID</th>
         <th>Name</th>
+        <th>Edit</th>
     </tr>
     </thead>
     <tbody>
@@ -49,16 +61,7 @@
 <form id="filterLocalityTypesForm">
     <label for="filterLocalityTypesForm_filter">Filter by name: </label>
     <input type="text" id="filterLocalityTypesForm_filter">
-
-    <input type="button" value="Do filter" onclick="doFilterLocalityTypes('Filtered by', setHeaderAndPopulateHeader)">
-
-</form>
-
-<h1>Create new locality type</h1>
-<form id="createLocalityTypeForm">
-    <label for="createLocalityTypeForm_localityTypeName">Locality type name: </label>
-    <input type="text" id="createLocalityTypeForm_localityTypeName">
-    <input type="button" onclick="createLocalityType(populateTable)" value="Create">
+    <input type="button" value="Do filter" onclick="doFilterLocalityTypes('Filtered by', setHeaderAndPopulateTable)">
 </form>
 
 </body>

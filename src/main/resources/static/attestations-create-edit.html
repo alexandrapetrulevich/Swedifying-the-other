@@ -5,13 +5,40 @@
     <title>Attestation</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/locations.js"></script>
+    <script src="./js/util.js"></script>
     <script>
     $(document).ready(function(){
         loadLocations(populateAvailableLocations);
         loadVariantForms(populateVariantForms);
         loadSourceFindings(populateSourceFindings);
-        adaptedToSwedishClicked();
+        let searchParams = new URLSearchParams(window.location.search)
+        if (searchParams.has("attestationId")) {
+            let attestationId = searchParams.get("attestationId");
+            console.log("Editing attestation " + attestationId);
+            loadAttestation(attestationId);
+            $("#createEditHeader").text("Edit attestation " + attestationId);
+            $("#createEditButton").prop("value", "Update");
+        }
     });
+
+    function loadAttestation(attestationId) {
+        $.get("/api/attestations/" + attestationId + "?projection=attestationView",  function(data, status) {
+            displayAttestation(data);
+        }, "json");
+    }
+
+    function displayAttestation(attestation) {
+        $("#originalForm").val(attestation.originalForm);
+        $("#notes").val(attestation.notes);
+        var selectedVariantForm = removeTrialingProjection(attestation.variantForm._links.self.href);
+        console.log("Selecting variant form " + selectedVariantForm);
+        $("#availableVariantForms").val(selectedVariantForm);
+        $("#availableLocations").val(removeTrialingProjection(attestation.location._links.self.href));
+        $("#availableSourceFindings").val(removeTrialingProjection(attestation.sourceFinding._links.self.href));
+        variantFormSelected();
+        locationSelected();
+        sourceFindingSelected();
+    }
 
     function loadVariantForms(callback) {
         $.get("/api/variantForms/",  function(data, status) {
@@ -33,11 +60,28 @@
     }
 
     function variantFormSelected() {
+        var selectedVariantForm = $("#availableVariantForms").val();
+        $.get(selectedVariantForm + "?projection=variantFormView", function(data, status) {
+            displaySelectedVariantForm(data);
+        }, "json");
         console.log("variantFormSelected");
     }
 
+    function displaySelectedVariantForm(variantForm) {
+        $("#variantFormIsAdaptedToSwedish").val(variantForm.isAdaptedToSwedish);
+        if (variantForm.isAdaptedToSwedish === "NO") {
+            $("#variantFormAdaptationType").val("N/A");
+        } else {
+            var adaptationTypesString = variantForm.adaptationTypes[0].name;
+            for (let i = 1; i < variantForm.adaptationTypes.length; i++) {
+                adaptationTypesString += ", " + variantForm.adaptationTypes[i].name;
+            }
+            $("#variantFormAdaptationType").val(adaptationTypesString);
+        }
+    }
+
     function loadSourceFindings(callback) {
-        $.get("/api/sourceFindings/",  function(data, status) {
+        $.get("/api/sourceFindings/", function(data, status) {
             callback(data._embedded.sourceFindings);
         }, "json");
     }
@@ -60,6 +104,7 @@
     }
 
     function populateAvailableLocations(locations) {
+        console.log("populateAvailableLocations");
         for (let i = 0; i < locations.length; i++)
         {
             $("#availableLocations")
@@ -89,9 +134,8 @@
     function displayDistrictOrParish(districtOrParish) {
         $("#locationDistrictOrParish").val(districtOrParish.name);
         $("#locationDistrictOrParishId").val(districtOrParish._links.self.href.split("/").pop());
-        $.get(districtOrParish._links.belongsToRegion.href, function(data, status) {
-            displayRegion(data);
-        }, "json");
+
+        displayRegion(districtOrParish.belongsToRegion);
     }
 
     function displaySelectedLocation(location) {
@@ -100,19 +144,14 @@
         $("#locationLatitude").val(location.latitude);
         $("#locationModernLookupForm").val(location.modernLookupForm);
 
-        $.get(location._links.localityType.href, function(data, status) {
-            displayLocalityType(data);
-        }, "json");
-
-        $.get(location._links.districtOrParish.href, function(data, status) {
-            displayDistrictOrParish(data);
-        }, "json");
+        displayLocalityType(location.localityType);
+        displayDistrictOrParish(location.districtOrParish);
 
     }
 
     function locationSelected() {
-        var selectedOption = $("#availableLocations").val();
-        $.get(selectedOption, function(data, status) {
+        var selectedLocation = $("#availableLocations").val();
+        $.get(selectedLocation + "?projection=locationView", function(data, status) {
             displaySelectedLocation(data);
         }, "json");
     }
@@ -126,17 +165,17 @@
 </head>
 <body>
 
-<a href="#">Attestations</a>
+<a href="#">Create/edit attestation</a>
 <a href="./locality-types.html">Locality types</a>
 <a href="./attestations-list.html">List attestations</a>
 <a href="./locations.html">Locations</a>
-<h1>Create new attestation</h1>
-<form id="createAttestationForm">
+<h1 id="createEditHeader">Create new attestation</h1>
+<form id="createEditAttestationForm">
     <label for="originalForm"><b>Original form:</b></label>
-    <input type="text" maxlength="100" id="originalForm"/><br/>
+    <input type="text" size="100" id="originalForm"/><br/>
 
     <label for="notes"><b>Notes:</b></label>
-    <textarea name="notes" form="createAttestationForm" id="notes">Notes...</textarea> <br/>
+    <textarea name="notes" form="createEditAttestationForm" id="notes">Notes...</textarea> <br/>
 
     <label for="availableLocations"><b>Location:</b></label>
     <select name="availableLocations" id="availableLocations" onchange="locationSelected()">
@@ -173,7 +212,15 @@
     <input type="text" name="locationRegion" id="locationRegion" disabled><br/>
 
     <label for="availableVariantForms"><b>Variant form:</b></label>
-    <select name="availableVariantForms" id="availableVariantForms"></select><br/>
+    <select name="availableVariantForms" id="availableVariantForms" onchange="variantFormSelected()"></select><br/>
+
+    <label for="variantFormIsAdaptedToSwedish">Is adapted to Swedish:</label>
+    <input type="text" id="variantFormIsAdaptedToSwedish" disabled/><br/>
+
+    <label for="variantFormAdaptationType">Adaptation type:</label>
+    <input type="text" size="100" id="variantFormAdaptationType" disabled/><br/>
+
+
 
     <label for="availableSourceFindings"><b>Source findings:</b></label>
     <select name="availableSourceFindings" id="availableSourceFindings"></select><br/>
@@ -202,14 +249,8 @@
     <label for="etymology">Etymology:</label>
     <input type="text" id="etymology"/><br/>
 
-    <input type="checkbox" id="adaptedToSwedish"
-           onclick="adaptedToSwedishClicked()"/>
-    <label for="adaptedToSwedish">Adapted to Swedish:</label><br/>
 
-    <label for="adaptationType">Adaptation type:</label>
-    <input type="text" id="adaptationType"/><br/>
-
-    <input type="button" onclick="createLocalityType(populateTable)" value="Create">
+    <input id="createEditButton" type="button" onclick="createLocalityType(populateTable)" value="Create">
 </form>
 
 </body>
