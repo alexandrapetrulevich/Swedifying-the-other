@@ -22,4 +22,6 @@ public interface NormalizedFormView {
   MorphologicalDataView getMorphologicalData();
 
   LanguageView getEtymology();
+
+  LanguageView getMediatingLanguage();
 }

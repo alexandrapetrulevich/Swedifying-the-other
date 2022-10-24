@@ -19,8 +19,6 @@ public interface AttestationView {
 
   String getNotes();
 
-  //@Value("#{target.getVariantForm().getVariantForm()}")
-  //String getVariantForm();
   VariantFormView getVariantForm();
 
   LocationView getLocation();

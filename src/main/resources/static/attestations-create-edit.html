@@ -48,8 +48,7 @@
     }
 
     function populateVariantForms(variantForms) {
-        for (let i = 0; i < variantForms.length; i++)
-        {
+        for (let i = 0; i < variantForms.length; i++) {
             $("#availableVariantForms")
                 .append(
                     new Option(
@@ -69,15 +68,104 @@
     }
 
     function displaySelectedVariantForm(variantForm) {
+        $("#variantFormId").val(variantForm.variantFormId);
         $("#variantFormIsAdaptedToSwedish").val(variantForm.isAdaptedToSwedish);
         if (variantForm.isAdaptedToSwedish === "NO") {
             $("#variantFormAdaptationType").val("N/A");
         } else {
-            var adaptationTypesString = variantForm.adaptationTypes[0].name;
+            var adaptationTypesString = variantForm.adaptationTypes[0].name
+                + "(ID "
+                + variantForm.adaptationTypes[0].adaptationTypeId
+                + ")";
             for (let i = 1; i < variantForm.adaptationTypes.length; i++) {
-                adaptationTypesString += ", " + variantForm.adaptationTypes[i].name;
+                adaptationTypesString += ", " + variantForm.adaptationTypes[i].name
+                    + "(ID "
+                    + variantForm.adaptationTypes[i].adaptationTypeId
+                    + ")";
             }
             $("#variantFormAdaptationType").val(adaptationTypesString);
+        }
+        displayNormalizedForm(variantForm.normalizedForm);
+    }
+
+    function displayNormalizedForm(normalizedForm) {
+        $("#normalizedFormNormalizedFormId").val(normalizedForm.normalizedFormId);
+        $("#normalizedFormNormalizedForm").val(normalizedForm.normalizedForm);
+        var morphologicalNameType = normalizedForm.morphologicalNameType;
+        if (normalizedForm.morphologicalNameTypeIsShaky) {
+            morphologicalNameType = morphologicalNameType + "?";
+        }
+        $("#normalizedFormMorphologicalNameType").val(morphologicalNameType);
+        $("#normalizedFormComparativeFormInformation").val(normalizedForm.comparativeFormInformation);
+        displayMorphologicalData(normalizedForm.morphologicalData);
+        displayEtymology(normalizedForm.etymology);
+        displayMediatingLanguage(normalizedForm.mediatingLanguage);
+    }
+
+    function displayMorphologicalData(morphologicalData) {
+        if (morphologicalData.mainClauseInPhrase == null) {
+            $("#normalizedFormMainClauseInPhrase").val("N/A");
+        } else {
+            $("#normalizedFormMainClauseInPhrase").val(morphologicalData.mainClauseInPhrase);
+        }
+
+        if (morphologicalData.simpleRootMorpheme == null) {
+            $("#normalizedFormSimpleRootMorpheme").val("N/A");
+        } else {
+            $("#normalizedFormSimpleRootMorpheme").val(morphologicalData.simpleRootMorpheme);
+        }
+
+        if (morphologicalData.derivationMorpheme == null) {
+            $("#normalizedFormDerivationMorpheme").val("N/A");
+        } else {
+            $("#normalizedFormDerivationMorpheme").val(morphologicalData.derivationMorpheme);
+        }
+
+        if (morphologicalData.determinationClauseInPhrase == null) {
+            $("#normalizedFormDeterminationClauseInPhrase").val("N/A");
+        } else {
+            $("#normalizedFormDeterminationClauseInPhrase").val(morphologicalData.determinationClauseInPhrase);
+        }
+
+        if (morphologicalData.jointMorphemeInComposition == null) {
+            $("#normalizedFormJointMorphemeInComposition").val("N/A");
+        } else {
+            $("#normalizedFormJointMorphemeInComposition").val(morphologicalData.jointMorphemeInComposition);
+        }
+
+        if (morphologicalData.mainClauseInComposition == null) {
+            $("#normalizedFormMainClauseInComposition").val("N/A");
+        } else {
+            $("#normalizedFormMainClauseInComposition").val(morphologicalData.mainClauseInComposition);
+        }
+
+        if (morphologicalData.determinationClauseInComposition == null) {
+            $("#normalizedFormDeterminationClauseInComposition").val("N/A");
+        } else {
+            $("#normalizedFormDeterminationClauseInComposition").val(morphologicalData.determinationClauseInComposition);
+        }
+
+        if (morphologicalData.derivationBase == null) {
+            $("#normalizedFormDerivationBase").val("N/A");
+        } else {
+            $("#normalizedFormDerivationBase").val(morphologicalData.derivationBase);
+        }
+    }
+
+    function displayEtymology(etymology) {
+        displayLanguage("#normalizedFormEtymology", etymology);
+    }
+
+    function displayMediatingLanguage(mediatingLanguage) {
+        displayLanguage("#normalizedFormMediatingLanguage", mediatingLanguage);
+    }
+
+    function displayLanguage(textId, language) {
+        if (language != null) {
+            $(textId).val(
+                language.languageName + " (" + language.languageCode + ", " + language.languageId + ")");
+        } else {
+            $(textId).val("N/A");
         }
     }
 
@@ -102,6 +190,59 @@
 
     function sourceFindingSelected() {
         console.log("sourceFindingSelected");
+        var selectedSourceFinding = $("#availableSourceFindings").val();
+        $.get(selectedSourceFinding + "?projection=sourceFindingView", function(data, status) {
+            displaySelectedSourceFinding(data);
+        }, "json");
+    }
+
+    function displaySelectedSourceFinding(sourceFinding) {
+        $("#sourceFindingSourceId").val(sourceFinding.source.sourceId);
+        $("#sourceFindingSourceType").val(sourceFinding.source.type);
+        $("#sourceFindingSourceDating").val(sourceFinding.source.dating);
+        $("#sourceFindingSourceLandSurveyor")
+            .val(sourceFinding.source.landSurveyor.name
+                + " (ID: "
+                + sourceFinding.source.landSurveyor.landSurveyorId
+                + ")");
+        $("#sourceFindingPartOfSource")
+            .val(sourceFinding.partOfSource.partOfSourceName
+                + " (ID: "
+                + sourceFinding.partOfSource.partOfSourceId
+                + ")");
+
+        var urlToGet = removeTrialingProjection(sourceFinding._links.source.href);
+        if (sourceFinding.source.type.startsWith("Map")) {
+            urlToGet = urlToGet + "?projection=mapSourceView";
+        } else if (sourceFinding.source.type.startsWith("Text")) {
+            urlToGet = urlToGet + "?projection=textSourceView";
+        }
+        $.get(urlToGet, function(data, status) {
+            displaySourceTypeSpecific(data, sourceFinding.source.type);
+        }, "json");
+    }
+
+    function displaySourceTypeSpecific(source, sourceType) {
+        if (sourceType.startsWith("Map")) {
+            $("#sourceFindingMapSourceMapSignature").val(source.mapSignature.mapSignature + " (ID: " + source.mapSignature.mapSignatureId + ")")
+            $("#sourceFindingMapSourceMapSheet").val(source.mapSheet);
+            $("#sourceFindingTextSourceName").val("N/A");
+            $("#sourceFindingTextSourceSubsection").val("N/A");
+            $("#sourceFindingTextSourcePage").val("N/A");
+        } else if (sourceType.startsWith("Text")) {
+            $("#sourceFindingMapSourceMapSignature").val("N/A")
+            $("#sourceFindingMapSourceMapSheet").val("N/A");
+            $("#sourceFindingTextSourceName").val(source.name);
+            $("#sourceFindingTextSourceSubsection").val(source.subSection);
+            $("#sourceFindingTextSourcePage").val(source.page);
+        } else {
+            console.log("Unknown source type: " + sourceType);
+            $("#sourceFindingMapSourceMapSignature").val("N/A")
+            $("#sourceFindingMapSourceMapSheet").val("N/A");
+            $("#sourceFindingTextSourceName").val("N/A");
+            $("#sourceFindingTextSourceSubsection").val("N/A");
+            $("#sourceFindingTextSourcePage").val("N/A");
+        }
     }
 
     function populateAvailableLocations(locations) {
@@ -222,40 +363,90 @@
     <label for="availableVariantForms"><b>Variant form:</b></label>
     <select name="availableVariantForms" id="availableVariantForms" onchange="variantFormSelected()"></select><br/>
 
+    <label for="variantFormId">Variant form ID:</label>
+    <input type="text" id="variantFormId" disabled/><br/>
+
     <label for="variantFormIsAdaptedToSwedish">Is adapted to Swedish:</label>
     <input type="text" id="variantFormIsAdaptedToSwedish" disabled/><br/>
 
     <label for="variantFormAdaptationType">Adaptation type:</label>
     <input type="text" size="100" id="variantFormAdaptationType" disabled/><br/>
 
+    <label for="normalizedFormNormalizedFormId">Normalized form ID:</label>
+    <input type="text" id="normalizedFormNormalizedFormId" disabled/><br/>
+
+    <label for="normalizedFormNormalizedForm">Normalized form:</label>
+    <input type="text" id="normalizedFormNormalizedForm" disabled/><br/>
+
+    <label for="normalizedFormMorphologicalNameType">Morphological name type:</label>
+    <input type="text" id="normalizedFormMorphologicalNameType" disabled/><br/>
+
+    <label for="normalizedFormComparativeFormInformation">Comparative form information:</label>
+    <input type="text" id="normalizedFormComparativeFormInformation" disabled/><br/>
+
+    <label for="normalizedFormEtymology">Etymology:</label>
+    <input type="text" id="normalizedFormEtymology" disabled/><br/>
+
+    <label for="normalizedFormMediatingLanguage">Mediating language:</label>
+    <input type="text" id="normalizedFormMediatingLanguage" disabled/><br/>
+
+    <label for="normalizedFormMainClauseInPhrase">Main clause in phrase:</label>
+    <input type="text" id="normalizedFormMainClauseInPhrase" disabled/><br/>
+
+    <label for="normalizedFormSimpleRootMorpheme">Simple root morpheme:</label>
+    <input type="text" id="normalizedFormSimpleRootMorpheme" disabled/><br/>
+
+    <label for="normalizedFormDerivationMorpheme">Derivation morpheme:</label>
+    <input type="text" id="normalizedFormDerivationMorpheme" disabled/><br/>
+
+    <label for="normalizedFormDeterminationClauseInPhrase">Determination clause in phrase:</label>
+    <input type="text" id="normalizedFormDeterminationClauseInPhrase" disabled/><br/>
+
+    <label for="normalizedFormJointMorphemeInComposition">Joint morpheme in composition:</label>
+    <input type="text" id="normalizedFormJointMorphemeInComposition" disabled/><br/>
+
+    <label for="normalizedFormMainClauseInComposition">Main clause in composition:</label>
+    <input type="text" id="normalizedFormMainClauseInComposition" disabled/><br/>
+
+    <label for="normalizedFormDeterminationClauseInComposition">Determination clause in composition:</label>
+    <input type="text" id="normalizedFormDeterminationClauseInComposition" disabled/><br/>
+
+    <label for="normalizedFormDerivationBase">Derivation base:</label>
+    <input type="text" id="normalizedFormDerivationBase" disabled/><br/>
 
 
-    <label for="availableSourceFindings"><b>Source findings:</b></label>
-    <select name="availableSourceFindings" id="availableSourceFindings"></select><br/>
+    <label for="availableSourceFindings"><b>Source finding:</b></label>
+    <select name="availableSourceFindings" id="availableSourceFindings" onchange="sourceFindingSelected()"></select><br/>
 
-    <label for="normalizedForm">Normalized form:</label>
-    <input type="text" id="normalizedForm" disabled/><br/>
+    <label for="sourceFindingSourceId">Source ID:</label>
+    <input type="text" id="sourceFindingSourceId" disabled/><br/>
 
-    <label for="morphologicalNameType">Morphological name type:</label>
-    <input type="text" id="morphologicalNameType"/><br/>
+    <label for="sourceFindingSourceType">Source type:</label>
+    <input type="text" id="sourceFindingSourceType" disabled/><br/>
 
-    <label for="determinationClauseInPhrase">Determination clause in phrase:</label>
-    <input type="text" id="determinationClauseInPhrase"/><br/>
+    <label for="sourceFindingMapSourceMapSignature">Map signature:</label>
+    <input type="text" id="sourceFindingMapSourceMapSignature" disabled/><br/>
 
-    <label for="mainClauseInPhrase">Main clause in phrase:</label>
-    <input type="text" id="mainClauseInPhrase"/><br/>
+    <label for="sourceFindingMapSourceMapSheet">Map sheet:</label>
+    <input type="text" id="sourceFindingMapSourceMapSheet" disabled/><br/>
 
-    <label for="simpleRootMorpheme">Simple root morpheme:</label>
-    <input type="text" id="simpleRootMorpheme"/><br/>
+    <label for="sourceFindingTextSourceName">Text source name:</label>
+    <input type="text" id="sourceFindingTextSourceName" disabled/><br/>
 
-    <label for="diversionBase">Diversion base:</label>
-    <input type="text" id="diversionBase"/><br/>
+    <label for="sourceFindingTextSourceSubsection">Text source subsection:</label>
+    <input type="text" id="sourceFindingTextSourceSubsection" disabled/><br/>
 
-    <label for="mainClauseInSms">Main clause in sms:</label>
-    <input type="text" id="mainClauseInSms"/><br/>
+    <label for="sourceFindingTextSourcePage">Text source page:</label>
+    <input type="text" id="sourceFindingTextSourcePage" disabled/><br/>
 
-    <label for="etymology">Etymology:</label>
-    <input type="text" id="etymology"/><br/>
+    <label for="sourceFindingSourceDating">Source dating:</label>
+    <input type="text" id="sourceFindingSourceDating" disabled/><br/>
+
+    <label for="sourceFindingSourceLandSurveyor">Land surveyor (name and ID):</label>
+    <input type="text" id="sourceFindingSourceLandSurveyor" disabled/><br/>
+
+    <label for="sourceFindingPartOfSource">Part of source:</label>
+    <input type="text" id="sourceFindingPartOfSource" disabled/><br/>
 
 
     <input id="createEditButton" type="button" onclick="createLocalityType(populateTable)" value="Create">
