@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Create/edit locality types</title>
+    <link rel="stylesheet" href="./css/style.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
@@ -48,11 +49,16 @@
 </head>
 <body>
 
-<a href="#">Create/edit locality types</a>
-<a href="./locality-types.html">Locality types</a>
-<a href="./attestations-create-edit.html">Create/edit attestations</a>
-<a href="./attestations-list.html">List attestations</a>
-<a href="./locations.html">Locations</a>
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestation</a>
+<a href="./attestations-list.html">List attestation</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
 
 <h1 id="createEditLocalityTypeHeader">Create new locality type</h1>
 
@@ -60,7 +66,7 @@
     <label for="localityTypeName"><b>Locality type name:</b></label>
     <input type="text" size="50" id="localityTypeName"/><br/>
 
-    <input id="createEditButton" type="button" onclick="createOrEditLocalityType(localityTypeCreated, globLocalityTypeId)" value="Create">
+    <input id="createEditButton" type="button" onclick="createOrEditLocalityType(localityTypeCreatedOrEdited, globLocalityTypeId)" value="Create">
 </form>
 
 </body>

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Locality types</title>
+    <link rel="stylesheet" href="./css/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/attestations.js"></script>
     <script>
@@ -37,15 +38,23 @@
         }
 
 
+
     </script>
 </head>
 <body>
-    <a href="#">List attestations</a>
-    <a href="./attestations-create.edit.html">Attestations</a>
-    <a href="./locality-types.html">Locality types</a>
-    <a href="./locations.html">Locations</a>
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestation</a>
+<a href="#" class="current-page-in-menu">List attestations</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
 <h1 id="attestationsTableHeader">All attestations</h1>
-<table id="attestationsTable" >
+<table id="attestationsTable">
     <thead>
     <tr>
         <th>Attestation ID</th>
@@ -61,13 +70,13 @@
 </table>
 <br/>
 <form id="filterAttestationsForm">
-    
-        <label for="filterAttestationsTextMorphNameType" >Filter by Morphological Name Type:</label>
-        <input type="text" id="filterAttestationsTextMorphNameType" >
-        <label for="filterAttestationsTextEtymology" >Filter by etymology:</label>
-        <input type="text" id="filterAttestationsTextEtymology" >
-    
-        <input type="button" value="Do filter"  onclick="doFilterAttestations('Filtered by', setHeaderAndPopulateTable)">
+
+    <label for="filterAttestationsTextMorphNameType">Filter by Morphological Name Type:</label>
+    <input type="text" id="filterAttestationsTextMorphNameType">
+    <label for="filterAttestationsTextEtymology">Filter by etymology:</label>
+    <input type="text" id="filterAttestationsTextEtymology">
+
+    <input type="button" value="Do filter" onclick="doFilterAttestations('Filtered by', setHeaderAndPopulateTable)">
 </form>
 </body>
 </html>
