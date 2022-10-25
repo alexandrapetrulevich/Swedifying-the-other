@@ -9,3 +9,7 @@ th {
 .current-page-in-menu {
   font-weight: bold;
 }
+
+label.for-editable {
+  font-weight: bold;
+}

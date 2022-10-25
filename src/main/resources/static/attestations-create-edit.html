@@ -9,7 +9,7 @@
     <script src="./js/util.js"></script>
     <script>
     $(document).ready(function(){
-        loadLocations(populateAvailableLocations);
+        getAllLocations(populateAvailableLocations);
         loadVariantForms(populateVariantForms);
         loadSourceFindings(populateSourceFindings);
         let searchParams = new URLSearchParams(window.location.search)
@@ -246,7 +246,6 @@
     }
 
     function populateAvailableLocations(locations) {
-        console.log("populateAvailableLocations");
         for (let i = 0; i < locations.length; i++)
         {
             $("#availableLocations")
@@ -312,6 +311,12 @@
 <br />
 <a href="#" class="current-page-in-menu">Create/edit attestation</a>
 <a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
 <br />
 <a href="./locality-types-create-edit.html">Create/edit Locality types</a>
 <a href="./locality-types-list.html">List locality types</a>

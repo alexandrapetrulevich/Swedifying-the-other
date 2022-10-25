@@ -1,5 +1,6 @@
 package se.uu.swedifying.model.projection;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
 import se.uu.swedifying.model.entity.AdaptationType;
 
@@ -8,6 +9,7 @@ import se.uu.swedifying.model.entity.AdaptationType;
  */
 @Projection(types = {AdaptationType.class})
 public interface AdaptationTypeView {
+  @Value("#{target.adaptationTypeId}")
   Long getAdaptationTypeId();
 
   String getName();

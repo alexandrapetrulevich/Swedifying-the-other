@@ -1,5 +1,4 @@
 function getAllAdaptationTypes(callback) {
-    console.log("getAllAdaptationTypes!");
     $.get("/api/adaptationTypes?projection=adaptationTypeView", function(data, status) {
             callback(data._embedded.adaptationTypes);
         }, "json");
