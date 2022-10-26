@@ -1,24 +1,15 @@
+
 function getAllLandSurveyors(callback) {
-    $.get("/api/landSurveyors?projection=landSurveyorView", function(data, status) {
+    genericGetAll(
+        "landSurveyors"
+        , "landSurveyorView"
+        , function(data) {
             callback(data._embedded.landSurveyors);
-        }, "json");
+        });
 }
 
 function getLandSurveyorById(id, callback, errorCallback) {
-    $.ajax({
-       url: "/api/landSurveyors/" + id
-       , type: 'GET'
-       , contentType: "application/json; charset=utf-8"
-       , success:
-        function(data) {
-            callback(data);
-        }
-       , error:
-        function(jqXHR, textStatus, errorThrown) {
-            console.log("getLandSurveyorById " + id + " error, jqXHR.status: " + jqXHR.status);
-            errorCallback(jqXHR.status);
-        }
-    });
+    genericGetById(id, "landSurveyors", callback, errorCallback);
 }
 
 function createOrEditLandSurveyor(callback, landSurveyorId) {
@@ -26,27 +17,13 @@ function createOrEditLandSurveyor(callback, landSurveyorId) {
 
     if (landSurveyorId === "") {
         var landSurveyorData = {name:landSurveyorNameValue};
-        $.post({
-            url: "/api/landSurveyors"
-            , data: JSON.stringify(landSurveyorData)
-            , contentType: "application/json; charset=utf-8"
-        }).done(function(data) {
-            callback(data);
-        });
+        genericCreate(landSurveyorData, "landSurveyors", callback);
     } else {
         var landSurveyorData = {
             landSurveyorId:parseInt(landSurveyorId)
             , name:landSurveyorNameValue
             };
-        $.ajax({
-           url: "/api/landSurveyors/" + landSurveyorId
-           , type: 'PUT'
-           , data: JSON.stringify(landSurveyorData)
-           , contentType: "application/json; charset=utf-8"
-           , success: function(data) {
-             callback(data);
-           }
-        });
+        genericUpdate(landSurveyorData, "landSurveyors", landSurveyorId, "PUT", callback);
     }
 }
 

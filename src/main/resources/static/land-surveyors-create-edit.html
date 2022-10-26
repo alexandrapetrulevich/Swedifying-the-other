@@ -56,9 +56,9 @@
 
     function landSurveyorCreatedOrEdited(landSurveyor) {
         if (globLandSurveyorId === "") {
-            alert("Created district " + landSurveyor.name + " (ID " +  landSurveyor.landSurveyorId + ")");
+            alert("Created land-surveyor " + landSurveyor.name + " (ID " +  landSurveyor.landSurveyorId + ")");
         } else {
-            alert("Edited district " + landSurveyor.name + " (ID " +  landSurveyor.landSurveyorId + ")");
+            alert("Edited land-surveyor " + landSurveyor.name + " (ID " +  landSurveyor.landSurveyorId + ")");
         }
         $("#landSurveyorName").val("");
         setUpForCreate();
@@ -74,7 +74,7 @@
 <a href="./attestations-create-edit.html">Create/edit attestations</a>
 <a href="./attestations-list.html">List attestations</a>
 <br />
-<a href="#" class="current-page-in-menu">Create/edit districts</a>
+<a href="./districts-create-edit.html">Create/edit districts</a>
 <a href="./districts-list.html">List districts</a>
 <br />
 <a href="#" class="current-page-in-menu">Create/edit land surveyors</a>
@@ -87,8 +87,8 @@
 
 <h1 id="createEditLandSurveyorHeader">Create new land surveyor</h1>
 
-<form id="createEditDistrictForm" >
-    <label for="landSurveyorName" class="for-editable"><b>District name:</b></label>
+<form id="createEditLandSurveyorForm" >
+    <label for="landSurveyorName" class="for-editable"><b>Land surveyor name:</b></label>
     <input type="text" size="50" id="landSurveyorName"/><br/>
 
     <input id="createEditButton" type="button" onclick="createOrEditLandSurveyor(landSurveyorCreatedOrEdited, globLandSurveyorId)" value="Create">
