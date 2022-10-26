@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit map signatures</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/map-signatures.js"></script>
+    <script>
+    var globMapSignatureId = "";
+    $(document).ready(function(){
+        init();
+    });
+
+    function init() {
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("mapSignatureId")) {
+            setUpForEdit(searchParams.get("mapSignatureId"));
+        }
+    }
+
+    function setUpForEdit(mapSignatureId) {
+        globMapSignatureId = mapSignatureId;
+        console.log("Map signature id to edit " + globMapSignatureId);
+        loadMapSignature(globMapSignatureId);
+        $("#createEditMapSignatureHeader").text("Editing map signature " + globMapSignatureId);
+        $("#createEditButton").prop("value", "Update");
+    }
+
+    function loadMapSignature(mapSignatureId) {
+        getMapSignatureById(mapSignatureId, displayMapSignature, handleGetMapSignatureError);
+    }
+
+    function handleGetMapSignatureError(httpErrorStatus) {
+        var errorText = "Could not get map signature " + globMapSignatureId;
+        if (httpErrorStatus == 404) {
+            errorText += ", map signature not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globMapSignatureId = "";
+        $("#createEditMapSignatureHeader").text("Create new map signature");
+        $("#createEditButton").prop("value", "Create");
+    }
+
+    function displayMapSignature(mapSignature) {
+        $("#mapSignatureName").val(mapSignature.mapSignature);
+    }
+
+    function mapSignatureCreatedOrEdited(mapSignature) {
+        if (globMapSignatureId === "") {
+            alert("Created map-signature " + mapSignature.mapSignature + " (ID " +  mapSignature.mapSignatureId + ")");
+        } else {
+            alert("Edited map-signature " + mapSignature.mapSignature + " (ID " +  mapSignature.mapSignatureId + ")");
+        }
+        $("#mapSignatureName").val("");
+        setUpForCreate();
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit map signatures</a>
+<a href="./map-signatures-list.html">List map signatures</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="createEditMapSignatureHeader">Create new map signature</h1>
+
+<form id="createEditMapSignatureForm" >
+    <label for="mapSignatureName" class="for-editable"><b>Map signature name:</b></label>
+    <input type="text" size="50" id="mapSignatureName"/><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditMapSignature(mapSignatureCreatedOrEdited, globMapSignatureId)" value="Create">
+</form>
+
+</body>
+</html>
