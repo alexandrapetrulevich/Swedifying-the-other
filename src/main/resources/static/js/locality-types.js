@@ -5,6 +5,11 @@ function getAllLocalityTypes(callback) {
         }, "json");
 }
 
+function getLocalityTypeById(id, callback, errorCallback) {
+    genericGetById(id, "localityTypes", callback, errorCallback);
+}
+
+
 function createOrEditLocalityType(callback, localityTypeId) {
     var localityTypeNameValue = $("#localityTypeName").val();
 

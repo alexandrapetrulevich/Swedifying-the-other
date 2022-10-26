@@ -274,6 +274,21 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
         .belongsToRegion(regionRepository.findByRegionName("Pommern"))
         .name("Wolgasts distrikt")
         .build());
+    Precinct nyland = subRegionRepository.save(
+      Precinct
+        .builder()
+        .belongsToRegion(regionRepository.findByRegionName("Finland"))
+        .name("Nyland")
+        .build()
+    );
+    subRegionRepository.save(
+      Parish
+        .builder()
+        .belongsToPrecinct(nyland)
+        .belongsToRegion(regionRepository.findByRegionName("Finland"))
+        .name("Helsingfors socken")
+        .build()
+    );
   }
 
   private void addRegions() {

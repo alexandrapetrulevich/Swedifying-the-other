@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List locations</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/locality-types.js"></script>
+    <script src="./js/locations.js"></script>
+    <script>
+        $(document).ready(function(){
+            getAllLocations(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, locations) {
+            $("#locationsTableHeader").text(headerText);
+            populateTable(locations);
+        }
+
+        function populateTable(locations) {
+            $("#locationsTable > tbody").empty();
+            for (let i = 0; i < locations.length; i++)
+            {
+                belongsToPrecinct = "N/A";
+                if (locations[i].districtOrParish.type === "Parish") {
+                    belongsToPrecinct = "Precinct";
+                }
+                $("#locationsTable > tbody").append(
+                    "<tr><td>"
+                    + locations[i].locationId
+                    + "</td><td>"
+                    + locations[i].modernLookupForm
+                    + "</td><td>"
+                    + locations[i].longitude
+                    + "</td><td>"
+                    + locations[i].latitude
+                    + "</td><td>"
+                    + locations[i].districtOrParish.name + " (" + locations[i].districtOrParish.type + ")"
+                    + "</td><td>"
+                    + belongsToPrecinct
+                    + "</td><td>"
+                    + locations[i].districtOrParish.belongsToRegion.regionName
+                    + "</td><td>"
+                    + locations[i].localityType.localityTypeName
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + locations[i].locationId + ");\">Edit</button>"
+                    + "</td></tr>"
+                );
+            }
+        }
+
+        function goToEditView(locationId) {
+            location.href = "/locations-create-edit.html?locationId=" + locationId;
+        }
+    </script>
+</head>
+<body>
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestation</a>
+<a href="./attestations-list.html">List attestation</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="#" class="current-page-in-menu">List locations</a>
+<a href="./locations-create-edit.html">Create/edit locations</a>
+
+<h1 id="locationsTableHeader">All locations</h1>
+<table id="locationsTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Modern lookup form</th>
+        <th>Longitude</th>
+        <th>Latitude</th>
+        <th>District/parish</th>
+        <th>Belongs to precinct (parish)</th>
+        <th>Belongs to region (district/parish)</th>
+        <th>Locality type</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<br/>
+
+<form id="filterLocationsForm">
+    <label for="filterLocationsForm_filter">Filter by name: </label>
+    <input type="text" id="filterLocationsForm_filter">
+    <input type="button" value="Do filter" onclick="doFilterLocations('Filtered by', setHeaderAndPopulateTable)">
+</form>
+
+</body>
+</html>

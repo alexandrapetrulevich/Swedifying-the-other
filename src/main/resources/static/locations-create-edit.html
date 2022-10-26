@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit locations</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/locations.js"></script>
+    <script src="./js/sub-regions.js"></script>
+    <script src="./js/districts.js"></script>
+    <script src="./js/parishes.js"></script>
+    <script src="./js/locality-types.js"></script>
+    <script>
+    var globLocationId = "";
+    $(document).ready(function(){
+        init();
+    });
+
+    function init() {
+        loadAvailableSubRegions();
+        loadAvailableLocalityTypes();
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("locationId")) {
+            setUpForEdit(searchParams.get("locationId"));
+        }
+    }
+
+    function loadAvailableSubRegions() {
+        getAllDistricts(populateDistrictsOptions);
+        getAllParishes(populateParishesOptions);
+    }
+
+    function populateDistrictsOptions(districts) {
+        for (let i = 0; i < districts.length; i++) {
+            $("#districtOrParish")
+                .append(
+                    new Option(
+                        districts[i].name
+                            + " (type: district, "
+                            + removeTrialingProjection(districts[i]._links.self.href) + ")"
+                        , removeTrialingProjection(districts[i]._links.self.href)));
+        }
+        displayRegion(districts[0].belongsToRegion);
+    }
+
+    function populateParishesOptions(parishes) {
+        for (let i = 0; i < parishes.length; i++) {
+            $("#districtOrParish")
+                .append(
+                    new Option(
+                        parishes[i].name
+                            + " (type: parish, belongs to precinct " + parishes[i].belongsToPrecinct.name + ", "
+                            + removeTrialingProjection(parishes[i]._links.self.href) + ")"
+                        , removeTrialingProjection(parishes[i]._links.self.href)));
+        }
+    }
+
+    function loadAvailableLocalityTypes() {
+        getAllLocalityTypes(populateLocalityTypesOptions);
+    }
+
+    function populateLocalityTypesOptions(localityTypes) {
+        for (let i = 0; i < localityTypes.length; i++) {
+            $("#localityType")
+                .append(
+                    new Option(
+                        localityTypes[i].localityTypeName
+                        + " (" + localityTypes[i]._links.self.href + ")"
+                        , localityTypes[i]._links.self.href));
+        }
+    }
+
+    function setUpForEdit(locationId) {
+        globLocationId = locationId;
+        console.log("Location id to edit " + globLocationId);
+        loadLocation(globLocationId);
+        $("#createEditLocationHeader").text("Editing location " + globLocationId);
+        $("#createEditButton").prop("value", "Update");
+    }
+
+    function loadLocation(locationId) {
+        getLocationById(locationId, displayLocation, handleGetLocationError);
+    }
+
+    function handleGetLocationError(httpErrorStatus) {
+        var errorText = "Could not get location " + globLocationId;
+        if (httpErrorStatus == 404) {
+            errorText += ", location not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globLocationId = "";
+        $("#createEditLocationHeader").text("Create new location");
+        $("#createEditButton").prop("value", "Create");
+        $("#locationName").val("");
+    }
+
+    function displayLocation(location) {
+        $("#modernLookupForm").val(location.modernLookupForm);
+        $("#longitude").val(location.longitude);
+        $("#latitude").val(location.latitude);
+        displayDistrictOrParish(location.districtOrParish);
+        displayLocalityType(location.localityType);
+    }
+
+    function displayDistrictOrParish(districtOrParish) {
+        $("#districtOrParish").val(removeTrialingProjection(districtOrParish._links.self.href));
+        displayRegion(districtOrParish.belongsToRegion);
+    }
+
+    function displayRegion(region) {
+        $("#locationRegion").val(region.regionName + " (" + removeTrialingProjection(region._links.self.href).split("/").pop() + ")");
+    }
+
+    function displayLocalityType(localityType) {
+        $("#localityType").val(removeTrialingProjection(localityType._links.self.href));
+    }
+
+    function locationCreatedOrEdited(location) {
+        if (globLocationId === "") {
+            alert("Created location "
+                + location.modernLookupForm
+                + " (ID " +  location.locationId + ")");
+        } else {
+            alert("Edited location "
+                + location.modernLookupForm
+                + " (ID " +  location.locationId + ")");
+        }
+        setUpForCreate();
+    }
+
+    function districtOrParishSelected() {
+        var selectedDistrictOrParishId = $("#districtOrParish").val().split("/").pop();
+        getSubRegionById(selectedDistrictOrParishId, displayDistrictOrParish);
+    }
+
+    function localityTypeSelected() {
+        console.log("Selected locality type: " + $("#localityType").val());
+        //var selectedLocalityTypeId = $("#localityType").val().split("/").pop();
+        //getLocalityTypeById(selectedLocalityTypeId, displayLocalityType);
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit locations</a>
+<a href="./locations-list.html">List locations</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="createEditLocationHeader">Create new location</h1>
+
+<form id="createEditLocationForm" >
+    <label for="modernLookupForm" class="for-editable"><b>Modern lookup form:</b></label>
+    <input type="text" size="50" id="modernLookupForm"/><br/>
+
+    <label for="longitude" class="for-editable"><b>Longitude:</b></label>
+    <input type="text" id="longitude"/><br/>
+
+    <label for="latitude" class="for-editable"><b>Latitude:</b></label>
+    <input type="text" id="latitude"/><br/>
+
+    <label for="districtOrParish" class="for-editable">District or parish:</label>
+    <select name="districtOrParish" id="districtOrParish" onchange="districtOrParishSelected()">
+    </select><br/>
+
+    <label for="locationRegion">Region:</label>
+    <input type="text" id="locationRegion" disabled/><br/>
+
+    <label for="localityType" class="for-editable">Locality type:</label>
+    <select name="localityType" id="localityType" onchange="localityTypeSelected()">
+    </select><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditLocation(locationCreatedOrEdited, globLocationId)" value="Create">
+</form>
+
+</body>
+</html>

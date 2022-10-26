@@ -8,9 +8,13 @@ function genericGetAll(resource, projection, callback) {
     }, "json");
 }
 
-function genericGetById(id, resource, callback, errorCallback) {
+function genericGetById(id, resource, callback, errorCallback, projection) {
+    var url = "/api/" + resource + "/" + id;
+    if (projection != null) {
+        url += "?projection=" + projection;
+    }
     $.ajax({
-       url: "/api/" + resource + "/" + id
+       url: url
        , type: 'GET'
        , contentType: "application/json; charset=utf-8"
        , success:
