@@ -34,7 +34,7 @@ function doFilterLandSurveyors(newHeaderText, callback) {
     if (filterByName != "") {
         newHeaderText = newHeaderText + " name " + filterByName;
     } else {
-        newHeaderText = "No filter";
+        newHeaderText = "All land surveyors";
     }
 
     $.get("/api/landSurveyors/search/findByNameContains"

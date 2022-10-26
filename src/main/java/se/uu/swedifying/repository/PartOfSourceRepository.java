@@ -10,4 +10,6 @@ public interface PartOfSourceRepository extends CrudRepository<PartOfSource, Lon
   PartOfSource findByPartOfSourceName(String name);
   @Override
   List<PartOfSource> findAll();
+
+  List<PartOfSource> findByPartOfSourceNameContains(String partOfSourceNameFilter);
 }

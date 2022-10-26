@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit regions</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/regions.js"></script>
+    <script>
+    var globRegionId = "";
+    $(document).ready(function(){
+        init();
+    });
+
+    function init() {
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("regionId")) {
+            setUpForEdit(searchParams.get("regionId"));
+        }
+    }
+
+    function setUpForEdit(regionId) {
+        globRegionId = regionId;
+        console.log("Region id to edit " + globRegionId);
+        loadRegion(globRegionId);
+        $("#createEditRegionHeader").text("Editing region " + globRegionId);
+        $("#createEditButton").prop("value", "Update");
+    }
+
+    function loadRegion(regionId) {
+        getRegionById(regionId, displayRegion, handleGetRegionError);
+    }
+
+    function handleGetRegionError(httpErrorStatus) {
+        var errorText = "Could not get region " + globRegionId;
+        if (httpErrorStatus == 404) {
+            errorText += ", region not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globRegionId = "";
+        $("#createEditRegionHeader").text("Create new region");
+        $("#createEditButton").prop("value", "Create");
+        $("#regionName").val("");
+    }
+
+    function displayRegion(region) {
+        $("#regionName").val(region.regionName);
+    }
+
+    function regionCreatedOrEdited(region) {
+        if (globRegionId === "") {
+            alert("Created region "
+                + region.regionName
+                + " (ID " +  region.regionId + ")");
+        } else {
+            alert("Edited region "
+                + region.regionName
+                + " (ID " +  region.regionId + ")");
+        }
+        setUpForCreate();
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit regions</a>
+<a href="./regions-list.html">List regions</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="createEditRegionHeader">Create new region</h1>
+
+<form id="createEditRegionForm" >
+    <label for="regionName" class="for-editable"><b>Region name:</b></label>
+    <input type="text" size="50" id="regionName"/><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditRegion(regionCreatedOrEdited, globRegionId)" value="Create">
+</form>
+
+</body>
+</html>

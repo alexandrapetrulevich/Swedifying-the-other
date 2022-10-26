@@ -1,47 +1,44 @@
+
 function getAllRegions(callback) {
-    $.get("/api/regions?projection=regionView", function(data, status) {
+    genericGetAll(
+        "regions"
+        , "regionView"
+        , function(data) {
             callback(data._embedded.regions);
-        }, "json");
+        });
 }
 
-/*
-function createOrEditDistrict(callback, districtId) {
-    var districtNameValue = $("#districtName").val();
-    var districtBelongsToRegionValue = $("#availableRegions").val();
+function getRegionById(id, callback, errorCallback) {
+    genericGetById(id, "regions", callback, errorCallback);
+}
 
-    if (districtId === "") {
-        var districtData = {name:districtNameValue, belongsToRegion:districtBelongsToRegionValue};
-        $.post({
-            url: "/api/districts"
-            , data: JSON.stringify(districtData)
-            , contentType: "application/json; charset=utf-8"
-        }).done(function(data) {
-            callback(data);
-        });
+function createOrEditRegion(callback, regionId) {
+    var regionNameValue = $("#regionName").val();
+
+    if (regionId === "") {
+        var regionData = {regionName:regionNameValue};
+        genericCreate(regionData, "regions", callback);
     } else {
-        var districtData = {
-            subRegionId:parseInt(districtId)
-            , name:districtNameValue
-            , belongsToRegion:districtBelongsToRegionValue
+        var regionData = {
+            regionId:parseInt(regionId)
+            , regionName:regionNameValue
             };
-        $.ajax({
-           url: "/api/districts/" + districtId
-           , type: 'PUT'
-           , data: JSON.stringify(districtData)
-           , contentType: "application/json; charset=utf-8"
-           , success: function(data) {
-             callback(data);
-           }
-        });
+        genericUpdate(regionData, "regions", regionId, "PUT", callback);
     }
 }
 
-function doFilterDistricts(newHeaderText, callback) {
-    var filterText = $("#filterDistrictsForm_filter").val();
-    newHeaderText = newHeaderText + " \"" + filterText + "\"";
-    $.get("/api/districts/search/findByNameContains?filter="
-        + encodeURIComponent(filterText) + "&projection=districtView", function(data, status) {
-                callback(newHeaderText, data._embedded.district);
+function doFilterRegions(newHeaderText, callback) {
+    var filterByRegionName = $("#filterByRegionName").val();
+    var queryParams = "?projection=regionView"
+        + "&regionNameFilter=" + encodeURIComponent(filterByRegionName);
+    if (filterByRegionName != "") {
+        newHeaderText = newHeaderText + " region name " + filterByRegionName;
+    } else {
+        newHeaderText = "All regions";
+    }
+
+    $.get("/api/regions/search/findByRegionNameContains"
+        + queryParams, function(data, status) {
+                callback(newHeaderText, data._embedded.regions);
             }, "json");
 }
-*/
