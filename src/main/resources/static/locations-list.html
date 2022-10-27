@@ -4,23 +4,23 @@
     <meta charset="UTF-8">
     <title>List locations</title>
     <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/locality-types.js"></script>
     <script src="./js/precincts.js"></script>
     <script src="./js/locations.js"></script>
     <script>
-        $(document).ready(function(){
-            getAllLocations(populateTable);
+        document.addEventListener('DOMContentLoaded', function() {
+           getAllLocations(populateTable);
         });
 
         function setHeaderAndPopulateTable(headerText, locations) {
-            $("#locationsTableHeader").text(headerText);
+            document.getElementById("locationsTableHeader").innerHTML = headerText;
             populateTable(locations);
         }
 
         function populateTable(locations) {
-            $("#locationsTable > tbody").empty();
+            var tbody = document.getElementById('tbodyid');
+            tbody.innerHTML = "";
             for (let i = 0; i < locations.length; i++)
             {
                 belongsToPrecinct = "N/A";
@@ -32,10 +32,10 @@
                         , function(precinct) {
                             cellId = "belongsToPrecinctCell" + i;
                             console.log("Updating cell " + cellId + " with precinct " + precinct.name);
-                            $("#" + cellId).html(precinct.name);
+                            document.getElementById("" + cellId).html(precinct.name);
                         });
                 }
-                $("#locationsTable > tbody").append(
+                tbody.innerHTML +=
                     "<tr><td>"
                     + locations[i].locationId
                     + "</td><td>"
@@ -54,8 +54,7 @@
                     + locations[i].localityType.localityTypeName
                     + "</td><td>"
                     + "<button type=\"button\" onclick=\"goToEditView(" + locations[i].locationId + ");\">Edit</button>"
-                    + "</td></tr>"
-                );
+                    + "</td></tr>";
             }
         }
 
@@ -98,7 +97,7 @@
         <th>Edit</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="tbodyid">
     </tbody>
 </table>
 <br/>

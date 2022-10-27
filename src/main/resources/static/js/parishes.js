@@ -8,7 +8,7 @@ function getAllParishes(callback) {
         });
 }
 
-async function getAllParishes() {
+async function getAllParishesAsync() {
     const response = await fetch("/api/parishes?projection=parishView");
     return response.json();
 }

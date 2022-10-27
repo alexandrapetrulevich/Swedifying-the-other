@@ -4,7 +4,7 @@ function getAllDistricts(callback) {
         }, "json");
 }
 
-async function getAllDistricts() {
+async function getAllDistrictsAsync() {
     const response = await fetch("/api/districts?projection=districtView");
     return response.json();
 }

@@ -30,7 +30,7 @@ function createOrEditLocation(callback, locationId) {
         genericCreate(locationData, "locations", callback);
     } else {
         locationData.locationId = parseInt(locationId);
-        genericUpdate(locationData, "locations", locationId, "PUT", callback);
+        genericUpdate(locationData, "locations", locationId, "PATCH", callback);
     }
 }
 

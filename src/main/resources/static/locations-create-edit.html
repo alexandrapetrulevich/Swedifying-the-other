@@ -46,14 +46,14 @@
     }
 
     async function loadAvailableSubRegions() {
-        let distData = await getAllDistricts();
+        let distData = await getAllDistrictsAsync();
         populateDistrictsOptions(distData._embedded.districts);
-        let parData = await getAllParishes();
+        let parData = await getAllParishesAsync();
         populateParishesOptions(parData._embedded.parishes);
     }
 
     async function loadAvailableLocalityTypes() {
-        let data = await getAllLocalityTypes();
+        let data = await getAllLocalityTypesAsync();
         populateLocalityTypesOptions(data._embedded.localityTypes);
     }
 

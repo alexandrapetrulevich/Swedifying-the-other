@@ -1,11 +1,16 @@
 function getAllLocalityTypes(callback) {
-    console.log("getAllLocalityTypes!");
-    $.get("/api/localityTypes?projection=localityTypeView", function(data, status) {
-            callback(data._embedded.localityTypes);
-        }, "json");
+    console.log("getAllLocalityTypes with callback!");
+    genericGetAll(
+            "localityTypes"
+            , "localityTypeView"
+            , function(data) {
+                console.log("getAllLocalityTypes, calling callback");
+                callback(data._embedded.localityTypes);
+            });
 }
 
-async function getAllLocalityTypes() {
+async function getAllLocalityTypesAsync() {
+    console.log("getAllLocalityTypes no callback!");
     const response = await fetch("/api/localityTypes?projection=localityTypeView");
     return response.json();
 }
@@ -16,36 +21,22 @@ function getLocalityTypeById(id, callback, errorCallback) {
 
 
 function createOrEditLocalityType(callback, localityTypeId) {
-    var localityTypeNameValue = $("#localityTypeName").val();
+    var localityTypeNameValue = document.getElementById("localityTypeName").value;
 
     if (localityTypeId === "") {
         var localityTypeData = {localityTypeName:localityTypeNameValue};
-        $.post({
-            url: "/api/localityTypes"
-            , data: JSON.stringify(localityTypeData)
-            , contentType: "application/json; charset=utf-8"
-        }).done(function(data) {
-            callback(data.localityTypeId);
-        });
+        genericCreate(localityTypeData, "localityTypes", callback);
     } else {
         var localityTypeData = {localityTypeName:localityTypeNameValue, localityTypeId:parseInt(localityTypeId)};
-        $.ajax({
-           url: "/api/localityTypes/" + localityTypeId
-           , type: 'PUT'
-           , data: JSON.stringify(localityTypeData)
-           , contentType: "application/json; charset=utf-8"
-           , success: function(data) {
-             callback(data.localityTypeId);
-           }
-        });
+        genericUpdate(localityTypeData, "localityTypes", localityTypeId, "PUT", callback);
     }
 }
 
 function doFilterLocalityTypes(newHeaderText, callback) {
-    var filterText = $("#filterLocalityTypesForm_filter").val();
+    var filterText = document.getElementById("filterLocalityTypesForm_filter").value;
     newHeaderText = newHeaderText + " \"" + filterText + "\"";
-    $.get("/api/localityTypes/search/findByLocalityTypeNameContains?filter="
-        + encodeURIComponent(filterText) + "&projection=localityTypeView", function(data, status) {
-                callback(newHeaderText, data._embedded.localityTypes);
-            }, "json");
+    fetch("/api/localityTypes/search/findByLocalityTypeNameContains?filter="
+        + encodeURIComponent(filterText) + "&projection=localityTypeView")
+        .then((response) => response.json())
+        .then((result) => callback(newHeaderText, result._embedded.localityTypes));
 }

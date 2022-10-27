@@ -36,13 +36,13 @@
         $("#localityTypeName").val(localityType.localityTypeName);
     }
 
-    function localityTypeCreatedOrEdited(localityTypeId) {
+    function localityTypeCreatedOrEdited(localityType) {
         if (globLocalityTypeId === "") {
             alert("CREATED!");
         } else {
             alert("EDITED " + globLocalityTypeId);
         }
-        globLocalityTypeId = localityTypeId;
+        globLocalityTypeId = localityType.localityTypeId;
     }
 
     </script>
