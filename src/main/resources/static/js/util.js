@@ -2,10 +2,18 @@ function removeTrialingProjection(string) {
     return string.replace(/\{\?projection\}/, "");
 }
 
+function getIdFromHref(href) {
+    return removeTrialingProjection(href).split("/").pop();
+}
+
 function genericGetAll(resource, projection, callback) {
-    $.get("/api/" + resource + "?projection=" + projection, function(data, status) {
-        callback(data);
-    }, "json");
+    genericGet("/api/" + resource + "?projection=" + projection, callback);
+}
+
+function genericGet(url, callback) {
+    fetch(url)
+        .then((response) => response.json())
+        .then((result) => callback(result));
 }
 
 function genericGetById(id, resource, callback, errorCallback, projection) {
@@ -13,20 +21,23 @@ function genericGetById(id, resource, callback, errorCallback, projection) {
     if (projection != null) {
         url += "?projection=" + projection;
     }
-    $.ajax({
-       url: url
-       , type: 'GET'
-       , contentType: "application/json; charset=utf-8"
-       , success:
-        function(data) {
-            callback(data);
-        }
-       , error:
-        function(jqXHR, textStatus, errorThrown) {
-            console.log("Get by ID " + id + " on resource " + resource + " returned error, jqXHR.status: " + jqXHR.status);
-            errorCallback(jqXHR.status);
-        }
-    });
+
+    fetch(url)
+        .then(async function(response) {
+            if (!response.ok) {
+                console.log("response nok, called GET " + url);
+                throw new Error(response.status);
+            } else {
+                console.log("response ok, called GET " + url);
+                var result = await response.json();
+                console.log("Calling callback...");
+                callback(result);
+            }
+        })
+        .catch((error) => {
+            console.log("Calling error callback...");
+            errorCallback(error);
+        });
 }
 
 function genericCreate(dataToSend, resource, callback) {

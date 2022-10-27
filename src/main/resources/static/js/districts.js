@@ -4,6 +4,11 @@ function getAllDistricts(callback) {
         }, "json");
 }
 
+async function getAllDistricts() {
+    const response = await fetch("/api/districts?projection=districtView");
+    return response.json();
+}
+
 function getDistrictById(id, callback, errorCallback) {
     $.ajax({
        url: "/api/districts/" + id

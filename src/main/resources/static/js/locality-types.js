@@ -5,6 +5,11 @@ function getAllLocalityTypes(callback) {
         }, "json");
 }
 
+async function getAllLocalityTypes() {
+    const response = await fetch("/api/localityTypes?projection=localityTypeView");
+    return response.json();
+}
+
 function getLocalityTypeById(id, callback, errorCallback) {
     genericGetById(id, "localityTypes", callback, errorCallback);
 }

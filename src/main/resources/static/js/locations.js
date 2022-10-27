@@ -12,11 +12,11 @@ function getLocationById(id, callback, errorCallback) {
 }
 
 function createOrEditLocation(callback, locationId) {
-    var longitudeValue = $("#longitude").val();
-    var latitudeValue = $("#latitude").val();
-    var modernLookupFormValue = $("#modernLookupForm").val();
-    var districtOrParishValue = $("#districtOrParish").val();
-    var localityTypeValue = $("#localityType").val();
+    var longitudeValue = document.getElementById("longitude").value;
+    var latitudeValue = document.getElementById("latitude").value;
+    var modernLookupFormValue = document.getElementById("modernLookupForm").value;
+    var districtOrParishValue = document.getElementById("districtOrParish").value;
+    var localityTypeValue = document.getElementById("localityType").value;
 
     var locationData = {
         locationId:null
@@ -33,8 +33,6 @@ function createOrEditLocation(callback, locationId) {
         genericUpdate(locationData, "locations", locationId, "PUT", callback);
     }
 }
-
-
 
 function getQueryParamsAndHeaderTextAndSearchResource(origHeaderText, filterByName, filterByCode) {
     var queryParams = "?projection=locationView";
@@ -63,14 +61,14 @@ function getQueryParamsAndHeaderTextAndSearchResource(origHeaderText, filterByNa
 }
 
 function doFilterLocations(newHeaderText, callback) {
-    var filterByName = $("#filterByLocationName").val();
-    var filterByCode = $("#filterByLocationCode").val();
+    var filterByModernLookupForm = document.getElementById("filterByModernLookupForm").value;
 
-    var queryHeaderResource = getQueryParamsAndHeaderTextAndSearchResource(newHeaderText, filterByName, filterByCode);
+    var queryHeaderResource = {
+        queryParams:"?projection=locationView&filterByModernLookupForm=" + filterByModernLookupForm
+        , headerText:newHeaderText + " modern lookup form " + filterByModernLookupForm
+        , searchResource:"findByModernLookupFormContains"};
 
-    $.get("/api/locations/search/" + queryHeaderResource.searchResource + queryHeaderResource.queryParams
-        , function(data, status) {
-            callback(queryHeaderResource.headerText, data._embedded.locations);
-        }
-        , "json");
+    fetch("/api/locations/search/" + queryHeaderResource.searchResource + queryHeaderResource.queryParams)
+        .then((response) => response.json())
+        .then((result) => callback(queryHeaderResource.headerText, result._embedded.locations));
 }
