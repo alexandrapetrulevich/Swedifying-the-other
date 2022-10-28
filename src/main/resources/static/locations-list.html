@@ -19,8 +19,8 @@
         }
 
         function populateTable(locations) {
-            var tbody = document.getElementById('tbodyid');
-            tbody.innerHTML = "";
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
             for (let i = 0; i < locations.length; i++)
             {
                 belongsToPrecinct = "N/A";
@@ -35,7 +35,7 @@
                             document.getElementById("" + cellId).html(precinct.name);
                         });
                 }
-                tbody.innerHTML +=
+                tableBody.innerHTML +=
                     "<tr><td>"
                     + locations[i].locationId
                     + "</td><td>"

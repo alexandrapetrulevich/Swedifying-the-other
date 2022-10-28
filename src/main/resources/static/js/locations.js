@@ -34,32 +34,6 @@ function createOrEditLocation(callback, locationId) {
     }
 }
 
-function getQueryParamsAndHeaderTextAndSearchResource(origHeaderText, filterByName, filterByCode) {
-    var queryParams = "?projection=locationView";
-    var headerText = origHeaderText;
-    var searchResource = "findByLocationNameContains";
-    if (filterByName != "" && filterByCode != "") {
-        queryParams += "&locationNameFilter=" + filterByName + "&locationCodeFilter=" + filterByCode;
-        headerText += " location name " + filterByName + " and location code " + filterByCode;
-        searchResource += "AndLocationCodeContains";
-    } else if (filterByName != "") {
-        queryParams += "&locationNameFilter=" + filterByName;
-        headerText += " location name " + filterByName;
-        // searchResource as default
-    } else if (filterByCode != "") {
-        queryParams += "&locationCodeFilter=" + filterByCode;
-        headerText += " location code " + filterByName;
-        searchResource = "findByLocationCodeContains";
-    } else {
-        // none set, search by name with empty query
-        queryParams += "&locationNameFilter=" + filterByName;
-        headerText = "All locations";
-        // searchResource as default
-    }
-
-    return {queryParams:queryParams, headerText:headerText, searchResource:searchResource}
-}
-
 function doFilterLocations(newHeaderText, callback) {
     var filterByModernLookupForm = document.getElementById("filterByModernLookupForm").value;
 

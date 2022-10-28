@@ -41,25 +41,25 @@ function genericGetById(id, resource, callback, errorCallback, projection) {
 }
 
 function genericCreate(dataToSend, resource, callback) {
-    $.post({
-        url: "/api/" + resource
-        , data: JSON.stringify(dataToSend)
-        , contentType: "application/json; charset=utf-8"
-    }).done(function(returnedData) {
-        callback(returnedData);
-    });
+    fetch("/api/" + resource, {
+        method: 'POST'
+        , headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+        }
+        , body: JSON.stringify(dataToSend)})
+        .then((response) => response.json())
+        .then((result) => callback(result));
 }
 
 // We need to use PATCH sometimes due to the "problem" when updating referenced types mentioned in
 // https://stackoverflow.com/questions/45620195/spring-data-rest-put-request-does-not-work-properly-since-v-2-5-7
 function genericUpdate(dataToSend, resource, id, putOrPath, callback) {
-    $.ajax({
-       url: "/api/" + resource + "/" + id
-       , type: putOrPath
-       , data: JSON.stringify(dataToSend)
-       , contentType: "application/json; charset=utf-8"
-       , success: function(returnedData) {
-            callback(returnedData);
-       }
-    });
+    fetch("/api/" + resource + "/" + id, {
+        method: putOrPath
+        , headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+        }
+        , body: JSON.stringify(dataToSend)})
+        .then((response) => response.json())
+        .then((result) => callback(result));
 }

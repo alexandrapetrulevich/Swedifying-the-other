@@ -4,38 +4,36 @@
     <meta charset="UTF-8">
     <title>List adaptation types</title>
     <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/util.js"></script>
     <script src="./js/adaptation-types.js"></script>
     <script>
-        $(document).ready(function(){
+        document.addEventListener('DOMContentLoaded', function() {
             getAllAdaptationTypes(populateTable);
         });
 
         function setHeaderAndPopulateTable(headerText, adaptationTypes) {
-            $("#adaptationTypesTableHeader").text(headerText);
+            document.getElementById("adaptationTypesTableHeader").innerHTML = headerText;
             populateTable(adaptationTypes);
         }
 
         function populateTable(adaptationTypes) {
-            $("#adaptationTypesTable > tbody").empty();
-            for (let i = 0; i < adaptationTypes.length; i++)
-            {
-                $("#adaptationTypesTable > tbody").append(
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < adaptationTypes.length; i++) {
+                tableBody.innerHTML +=
                     "<tr><td>"
                     + adaptationTypes[i].adaptationTypeId
                     + "</td><td>"
                     + adaptationTypes[i].name
                     + "</td><td>"
                     + "<button type=\"button\" onclick=\"goToEditView(" + adaptationTypes[i].adaptationTypeId + ");\">Edit</button>"
-                    + "</td></tr>"
-                );
+                    + "</td></tr>";
             }
         }
 
         function goToEditView(adaptationTypeId) {
             location.href = "/adaptation-types-create-edit.html?adaptationTypeId=" + adaptationTypeId;
         }
-
 
     </script>
 </head>
@@ -66,7 +64,7 @@
         <th>Edit</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="tbodyid">
     </tbody>
 </table>
 <br/>
