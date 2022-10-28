@@ -4,24 +4,25 @@
     <meta charset="UTF-8">
     <title>List districts</title>
     <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/util.js"></script>
     <script src="./js/districts.js"></script>
     <script>
-        $(document).ready(function(){
+        document.addEventListener('DOMContentLoaded', function() {
             getAllDistricts(populateTable);
         });
 
         function setHeaderAndPopulateTable(headerText, districts) {
-            $("#districtsTableHeader").text(headerText);
+            document.getElementById("districtsTableHeader").innerHTML = headerText;
             populateTable(districts);
         }
 
         function populateTable(districts) {
             console.log("populateTable, no of districts " + districts.length);
-            $("#districtsTable > tbody").empty();
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
             for (let i = 0; i < districts.length; i++)
             {
-                $("#districtsTable > tbody").append(
+                tableBody.innerHTML +=
                     "<tr><td>"
                     + districts[i].subRegionId
                     + "</td><td>"
@@ -31,8 +32,7 @@
                     + districts[i].belongsToRegion.regionId + ")"
                     + "</td><td>"
                     + "<button type=\"button\" onclick=\"goToEditView(" + districts[i].subRegionId + ");\">Edit</button>"
-                    + "</td></tr>"
-                );
+                    + "</td></tr>";
             }
         }
 
@@ -71,7 +71,7 @@
         <th>Edit</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="tbodyid">
     </tbody>
 </table>
 <br/>

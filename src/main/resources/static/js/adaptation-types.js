@@ -26,8 +26,9 @@ function createOrEditAdaptationType(callback, adaptationTypeId) {
 function doFilterAdaptationTypes(newHeaderText, callback) {
     var filterText = document.getElementById("filterAdaptationTypesForm_filter").value;
     newHeaderText = newHeaderText + " \"" + filterText + "\"";
-    fetch("/api/adaptationTypes/search/findByNameContains?filter="
-        + encodeURIComponent(filterText) + "&projection=adaptationTypeView")
-        .then((response) => response.json())
-        .then((result) => callback(newHeaderText, result._embedded.adaptationTypes));
+    genericGet("/api/adaptationTypes/search/findByNameContains?filter="
+        + encodeURIComponent(filterText) + "&projection=adaptationTypeView"
+        , function(result) {
+            callback(newHeaderText, result._embedded.adaptationTypes);
+        });
 }

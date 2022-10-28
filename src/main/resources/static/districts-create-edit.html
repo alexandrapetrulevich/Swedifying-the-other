@@ -4,43 +4,43 @@
     <meta charset="UTF-8">
     <title>Create/edit districts</title>
     <link rel="stylesheet" href="./css/style.css">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/districts.js"></script>
     <script src="./js/regions.js"></script>
     <script>
     var globDistrictId = "";
-    $(document).ready(function(){
+    document.addEventListener('DOMContentLoaded', function() {
         init();
     });
 
-    function init() {
-        getAllRegions(populateAvailableRegions);
+    async function init() {
+        let data = await getAllRegionsAsync();
+        populateAvailableRegions(data._embedded.regions);
+        console.log("regions select populated");
         let searchParams = new URLSearchParams(window.location.search);
         if (searchParams.has("districtId")) {
             setUpForEdit(searchParams.get("districtId"));
-        }
+        };
     }
 
     function populateAvailableRegions(regions) {
         console.log("populateAvailableRegions, no regions: " + regions.length);
+        let select = document.getElementById("availableRegions");
         for (let i = 0; i < regions.length; i++) {
-            $("#availableRegions")
-                .append(
-                    new Option(
-                        regions[i].regionName
-                        + " (" + regions[i]._links.self.href + ")"
-                        , regions[i]._links.self.href));
+            select.add(
+                new Option(regions[i].regionName + " (" + regions[i]._links.self.href + ")"
+                , regions[i]._links.self.href));
         }
     }
 
     function setUpForEdit(districtId) {
+        console.log("Setting up for edit wth id " + districtId);
         globDistrictId = districtId;
         console.log("District id to edit " + globDistrictId);
         loadDistrict(globDistrictId);
-        $("#createEditDistrictHeader").text("Editing district " + globDistrictId);
-        $("#createEditButton").prop("value", "Update");
+        document.getElementById("createEditDistrictHeader").innerHTML =
+            "Editing district " + globDistrictId;
+        document.getElementById("createEditButton").value = "Update";
     }
 
     function loadDistrict(districtId) {
@@ -60,30 +60,32 @@
 
     function setUpForCreate() {
         globDistrictId = "";
-        $("#createEditDistrictHeader").text("Create new district");
-        $("#createEditButton").prop("value", "Create");
+        document.getElementById("createEditDistrictHeader").innerHTML = "Create new district";
+        document.getElementById("createEditButton").value = "Create";
     }
 
     function displayDistrict(district) {
-        $("#districtName").val(district.name);
-        $.get(removeTrialingProjection(district._links.belongsToRegion.href), function(data, status) {
-            console.log("Selecting region " + data._links.self.href);
-            $("#availableRegions").val(data._links.self.href);
-        }, "json");
+        document.getElementById("districtName").value = district.name;
+        var belongsToRegionUrl = removeTrialingProjection(
+            district._links.belongsToRegion.href);
+        genericGet(belongsToRegionUrl, function(data) {
+            document.getElementById("availableRegions").value = data._links.self.href;
+        });
     }
 
     function districtCreatedOrEdited(district) {
+        var format = " district " + district.name + " (ID " +  district.subRegionId + ")";
         if (globDistrictId === "") {
-            alert("Created district " + district.name + " (ID " +  district.subRegionId + ")");
+            alert("Created" + format);
         } else {
-            alert("Edited district " + district.name + " (ID " +  district.subRegionId + ")");
+            alert("Edited" + format);
         }
-        $("#districtName").val("");
+        document.getElementById("districtName").value = "";
         setUpForCreate();
     }
 
     function regionSelected() {
-        console.log("regionSelected: " + $("#availableRegions").val());
+        console.log("regionSelected: " + document.getElementById("availableRegions").value);
     }
 
     </script>

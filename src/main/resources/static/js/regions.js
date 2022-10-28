@@ -8,12 +8,16 @@ function getAllRegions(callback) {
         });
 }
 
+async function getAllRegionsAsync() {
+    return await genericGetAllAsync("regions", "regionView");
+}
+
 function getRegionById(id, callback, errorCallback) {
     genericGetById(id, "regions", callback, errorCallback);
 }
 
 function createOrEditRegion(callback, regionId) {
-    var regionNameValue = $("#regionName").val();
+    var regionNameValue = document.getElementById("regionName").value;
 
     if (regionId === "") {
         var regionData = {regionName:regionNameValue};
@@ -28,7 +32,7 @@ function createOrEditRegion(callback, regionId) {
 }
 
 function doFilterRegions(newHeaderText, callback) {
-    var filterByRegionName = $("#filterByRegionName").val();
+    var filterByRegionName = document.getElementById("filterByRegionName").value;
     var queryParams = "?projection=regionView"
         + "&regionNameFilter=" + encodeURIComponent(filterByRegionName);
     if (filterByRegionName != "") {
@@ -37,8 +41,9 @@ function doFilterRegions(newHeaderText, callback) {
         newHeaderText = "All regions";
     }
 
-    $.get("/api/regions/search/findByRegionNameContains"
-        + queryParams, function(data, status) {
-                callback(newHeaderText, data._embedded.regions);
-            }, "json");
+    genericGet("/api/regions/search/findByRegionNameContains"
+        + queryParams
+        , function(result) {
+            callback(newHeaderText, result._embedded.regions);
+        });
 }

@@ -10,6 +10,15 @@ function genericGetAll(resource, projection, callback) {
     genericGet("/api/" + resource + "?projection=" + projection, callback);
 }
 
+async function genericGetAllAsync(resource, projection) {
+    var url = "/api/" + resource;
+    if (projection != null) {
+        url += "?projection=" + projection;
+    }
+    const response = await fetch("/api/" + resource + "?projection=districtView");
+    return response.json();
+}
+
 function genericGet(url, callback) {
     fetch(url)
         .then((response) => response.json())
@@ -25,7 +34,7 @@ function genericGetById(id, resource, callback, errorCallback, projection) {
     fetch(url)
         .then(async function(response) {
             if (!response.ok) {
-                console.log("response nok, called GET " + url);
+                console.log("response nok, called GET " + url + ". Status: " + response.status);
                 throw new Error(response.status);
             } else {
                 console.log("response ok, called GET " + url);
@@ -36,7 +45,8 @@ function genericGetById(id, resource, callback, errorCallback, projection) {
         })
         .catch((error) => {
             console.log("Calling error callback...");
-            errorCallback(error);
+            console.log("error: " + error.message);
+            errorCallback(error.message);
         });
 }
 
