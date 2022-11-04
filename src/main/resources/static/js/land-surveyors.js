@@ -1,4 +1,3 @@
-
 function getAllLandSurveyors(callback) {
     genericGetAll(
         "landSurveyors"
@@ -13,22 +12,18 @@ function getLandSurveyorById(id, callback, errorCallback) {
 }
 
 function createOrEditLandSurveyor(callback, landSurveyorId) {
-    var landSurveyorNameValue = $("#landSurveyorName").val();
-
+    var landSurveyorNameValue = document.getElementById("landSurveyorName").value;
+	var landSurveyorData = {name:landSurveyorNameValue, landSurveyorId:null};
     if (landSurveyorId === "") {
-        var landSurveyorData = {name:landSurveyorNameValue};
         genericCreate(landSurveyorData, "landSurveyors", callback);
     } else {
-        var landSurveyorData = {
-            landSurveyorId:parseInt(landSurveyorId)
-            , name:landSurveyorNameValue
-            };
+        landSurveyorData.landSurveyorId = parseInt(landSurveyorId);
         genericUpdate(landSurveyorData, "landSurveyors", landSurveyorId, "PUT", callback);
     }
 }
 
 function doFilterLandSurveyors(newHeaderText, callback) {
-    var filterByName = $("#filterByName").val();
+    var filterByName = document.getElementById("filterByName").value;
     var queryParams = "?projection=landSurveyorView"
         + "&nameFilter=" + encodeURIComponent(filterByName);
     if (filterByName != "") {
@@ -36,9 +31,10 @@ function doFilterLandSurveyors(newHeaderText, callback) {
     } else {
         newHeaderText = "All land surveyors";
     }
-
-    $.get("/api/landSurveyors/search/findByNameContains"
-        + queryParams, function(data, status) {
-                callback(newHeaderText, data._embedded.landSurveyors);
-            }, "json");
+	
+	genericGet(
+		"/api/landSurveyors/search/findByNameContains" + queryParams
+        , function(result) {
+            callback(newHeaderText, result._embedded.landSurveyors);
+        });
 }

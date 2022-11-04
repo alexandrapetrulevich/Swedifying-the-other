@@ -5,12 +5,11 @@
     <title>Create/edit land surveyors</title>
     <link rel="stylesheet" href="./css/style.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/land-surveyors.js"></script>
     <script>
     var globLandSurveyorId = "";
-    $(document).ready(function(){
+    document.addEventListener('DOMContentLoaded', function() {
         init();
     });
 
@@ -25,8 +24,8 @@
         globLandSurveyorId = landSurveyorId;
         console.log("Land surveyor id to edit " + globLandSurveyorId);
         loadLandSurveyor(globLandSurveyorId);
-        $("#createEditLandSurveyorHeader").text("Editing land surveyor " + globLandSurveyorId);
-        $("#createEditButton").prop("value", "Update");
+        document.getElementById("createEditLandSurveyorHeader").innerHTML = "Editing land surveyor " + globLandSurveyorId;
+        document.getElementById("createEditButton").value = "Update";
     }
 
     function loadLandSurveyor(landSurveyorId) {
@@ -46,12 +45,12 @@
 
     function setUpForCreate() {
         globLandSurveyorId = "";
-        $("#createEditLandSurveyorHeader").text("Create new land surveyor");
-        $("#createEditButton").prop("value", "Create");
+        document.getElementById("createEditLandSurveyorHeader").innerHTML = "Create new land surveyor";
+        document.getElementById("createEditButton").value = "Create";
     }
 
     function displayLandSurveyor(landSurveyor) {
-        $("#landSurveyorName").val(landSurveyor.name);
+        document.getElementById("landSurveyorName").value = landSurveyor.name;
     }
 
     function landSurveyorCreatedOrEdited(landSurveyor) {
@@ -60,7 +59,7 @@
         } else {
             alert("Edited land-surveyor " + landSurveyor.name + " (ID " +  landSurveyor.landSurveyorId + ")");
         }
-        $("#landSurveyorName").val("");
+        document.getElementById("landSurveyorName").value = "";
         setUpForCreate();
     }
 

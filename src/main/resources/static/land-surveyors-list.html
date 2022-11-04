@@ -4,41 +4,38 @@
     <meta charset="UTF-8">
     <title>List land surveyors</title>
     <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/land-surveyors.js"></script>
     <script>
-        $(document).ready(function(){
+        document.addEventListener('DOMContentLoaded', function() {
             getAllLandSurveyors(populateTable);
         });
 
         function setHeaderAndPopulateTable(headerText, landSurveyors) {
-            $("#landSurveyorsTableHeader").text(headerText);
+            document.getElementById("landSurveyorsTableHeader").innerHTML = headerText;
             populateTable(landSurveyors);
         }
 
         function populateTable(landSurveyors) {
             console.log("populateTable, no of land surveyors " + landSurveyors.length);
-            $("#landSurveyorsTable > tbody").empty();
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
             for (let i = 0; i < landSurveyors.length; i++)
             {
-                $("#landSurveyorsTable > tbody").append(
+                tableBody.innerHTML +=
                     "<tr><td>"
                     + landSurveyors[i].landSurveyorId
                     + "</td><td>"
                     + landSurveyors[i].name
                     + "</td><td>"
                     + "<button type=\"button\" onclick=\"goToEditView(" + landSurveyors[i].landSurveyorId + ");\">Edit</button>"
-                    + "</td></tr>"
-                );
+                    + "</td></tr>";
             }
         }
 
         function goToEditView(landSurveyorId) {
             location.href = "/land-surveyors-create-edit.html?landSurveyorId=" + landSurveyorId;
         }
-
-
     </script>
 </head>
 <body>
@@ -68,7 +65,7 @@
         <th>Edit</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="tbodyid">
     </tbody>
 </table>
 <br/>
