@@ -22,12 +22,13 @@ function getLocalityTypeById(id, callback, errorCallback) {
 
 function createOrEditLocalityType(callback, localityTypeId) {
     var localityTypeNameValue = document.getElementById("localityTypeName").value;
-
+	var localityTypeData = {
+		localityTypeName:localityTypeNameValue
+		, localityTypeId:null};
     if (localityTypeId === "") {
-        var localityTypeData = {localityTypeName:localityTypeNameValue};
         genericCreate(localityTypeData, "localityTypes", callback);
     } else {
-        var localityTypeData = {localityTypeName:localityTypeNameValue, localityTypeId:parseInt(localityTypeId)};
+        localityTypeData.localityTypeId = parseInt(localityTypeId);
         genericUpdate(localityTypeData, "localityTypes", localityTypeId, "PUT", callback);
     }
 }
@@ -35,8 +36,10 @@ function createOrEditLocalityType(callback, localityTypeId) {
 function doFilterLocalityTypes(newHeaderText, callback) {
     var filterText = document.getElementById("filterLocalityTypesForm_filter").value;
     newHeaderText = newHeaderText + " \"" + filterText + "\"";
-    fetch("/api/localityTypes/search/findByLocalityTypeNameContains?filter="
-        + encodeURIComponent(filterText) + "&projection=localityTypeView")
-        .then((response) => response.json())
-        .then((result) => callback(newHeaderText, result._embedded.localityTypes));
+	
+	genericGet(
+		"/api/localityTypes/search/findByLocalityTypeNameContains?filter=" + encodeURIComponent(filterText) + "&projection=localityTypeView"
+        , function(result) {
+            callback(newHeaderText, result._embedded.localityTypes);
+        });
 }

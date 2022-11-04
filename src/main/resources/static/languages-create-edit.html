@@ -57,16 +57,14 @@
     }
 
     function languageCreatedOrEdited(language) {
-        if (globLanguageId === "") {
-            alert("Created language "
+        var format = " language "
                 + language.languageName
                 + " (Code: " + language.languageCode
-                + ", ID " +  language.languageId + ")");
+                + ", ID " +  language.languageId + ")";
+		if (globLanguageId === "") {
+            alert("Created" + format);
         } else {
-            alert("Edited language "
-                + language.languageName
-                + " (Code: " + language.languageCode
-                + ", ID " +  language.languageId + ")");
+            alert("Edited" + format);
         }
         setUpForCreate();
     }

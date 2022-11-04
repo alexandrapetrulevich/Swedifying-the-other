@@ -42,7 +42,9 @@ function doFilterLocations(newHeaderText, callback) {
         , headerText:newHeaderText + " modern lookup form " + filterByModernLookupForm
         , searchResource:"findByModernLookupFormContains"};
 
-    fetch("/api/locations/search/" + queryHeaderResource.searchResource + queryHeaderResource.queryParams)
-        .then((response) => response.json())
-        .then((result) => callback(queryHeaderResource.headerText, result._embedded.locations));
+    genericGet(
+		"/api/locations/search/" + queryHeaderResource.searchResource + queryHeaderResource.queryParams
+		, function(result) {
+            callback(queryHeaderResource.headerText, result._embedded.locations);
+        });
 }

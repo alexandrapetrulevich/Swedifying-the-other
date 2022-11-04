@@ -5,12 +5,11 @@
     <title>Create/edit locality types</title>
     <link rel="stylesheet" href="./css/style.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/locality-types.js"></script>
     <script>
     var globLocalityTypeId = "";
-    $(document).ready(function(){
+    document.addEventListener('DOMContentLoaded', function() {
         init();
     });
 
@@ -24,25 +23,41 @@
     }
 
     function loadLocalityType(localityTypeId) {
-        $.get(
-            "/api/localityTypes/" + localityTypeId, function(data, status) {
-                displayLocalityType(data);
-        }, "json");
+        getLocalityTypeById(localityTypeId, displayLocalityType, handleGetLocalityTypeError);
+    }
+	
+	function handleGetLocalityTypeError(httpErrorStatus) {
+        var errorText = "Could not get locality type " + globLocalityTypeId;
+        if (httpErrorStatus == 404) {
+            errorText += ", locality type not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+	
+	function setUpForCreate() {
+        globLanguageId = "";
+        document.getElementById("createEditLocalityTypeHeader").innerHTML = "Create new language";
+        document.getElementById("createEditButton").value = "Create";
+        document.getElementById("localityTypeName").value = "";
     }
 
     function displayLocalityType(localityType) {
-        $("#createEditLocalityTypeHeader").text("Editing locality type " + globLocalityTypeId);
-        $("#createEditButton").prop("value", "Update");
-        $("#localityTypeName").val(localityType.localityTypeName);
+        document.getElementById("createEditLocalityTypeHeader").innerHTML = "Editing locality type " + globLocalityTypeId;
+        document.getElementById("createEditButton").value = "Update";
+        document.getElementById("localityTypeName").value = localityType.localityTypeName;
     }
 
     function localityTypeCreatedOrEdited(localityType) {
-        if (globLocalityTypeId === "") {
-            alert("CREATED!");
+        var format = " locality type " + localityType.localityTypeName + " (ID: " + localityType.localityTypeId + ")";
+		if (globLocalityTypeId === "") {
+            alert("Created" + format);
         } else {
-            alert("EDITED " + globLocalityTypeId);
+            alert("Edited" + format);
         }
-        globLocalityTypeId = localityType.localityTypeId;
+        setUpForCreate();
     }
 
     </script>
