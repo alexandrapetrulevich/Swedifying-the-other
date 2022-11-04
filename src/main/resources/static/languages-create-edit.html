@@ -5,12 +5,11 @@
     <title>Create/edit languages</title>
     <link rel="stylesheet" href="./css/style.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/languages.js"></script>
     <script>
     var globLanguageId = "";
-    $(document).ready(function(){
+    document.addEventListener('DOMContentLoaded', function() {
         init();
     });
 
@@ -25,8 +24,8 @@
         globLanguageId = languageId;
         console.log("Language id to edit " + globLanguageId);
         loadLanguage(globLanguageId);
-        $("#createEditLanguageHeader").text("Editing language " + globLanguageId);
-        $("#createEditButton").prop("value", "Update");
+        document.getElementById("createEditLanguageHeader").innerHTML = "Editing language " + globLanguageId;
+        document.getElementById("createEditButton").value = "Update";
     }
 
     function loadLanguage(languageId) {
@@ -46,15 +45,15 @@
 
     function setUpForCreate() {
         globLanguageId = "";
-        $("#createEditLanguageHeader").text("Create new language");
-        $("#createEditButton").prop("value", "Create");
-        $("#languageName").val("");
-        $("#languageCode").val("");
+        document.getElementById("createEditLanguageHeader").innerHTML = "Create new language";
+        document.getElementById("createEditButton").value = "Create";
+        document.getElementById("languageName").value = "";
+        document.getElementById("languageCode").value = "";
     }
 
     function displayLanguage(language) {
-        $("#languageName").val(language.languageName);
-        $("#languageCode").val(language.languageCode);
+        document.getElementById("languageName").value = language.languageName;
+        document.getElementById("languageCode").value = language.languageCode;
     }
 
     function languageCreatedOrEdited(language) {

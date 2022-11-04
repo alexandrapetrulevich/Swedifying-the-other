@@ -12,18 +12,16 @@ function getLanguageById(id, callback, errorCallback) {
 }
 
 function createOrEditLanguage(callback, languageId) {
-    var languageNameValue = $("#languageName").val();
-    var languageCodeValue = $("#languageCode").val();
-
+    var languageNameValue = document.getElementById("languageName").value;
+    var languageCodeValue = document.getElementById("languageCode").value;
+	var languageData = {
+		languageId:null
+		, languageName:languageNameValue
+		, languageCode:languageCodeValue};
     if (languageId === "") {
-        var languageData = {languageName:languageNameValue, languageCode:languageCodeValue};
         genericCreate(languageData, "languages", callback);
     } else {
-        var languageData = {
-            languageId:parseInt(languageId)
-            , languageName:languageNameValue
-            , languageCode:languageCodeValue
-            };
+        languageData.languageId = parseInt(languageId);
         genericUpdate(languageData, "languages", languageId, "PUT", callback);
     }
 }
@@ -55,14 +53,14 @@ function getQueryParamsAndHeaderTextAndSearchResource(origHeaderText, filterByNa
 }
 
 function doFilterLanguages(newHeaderText, callback) {
-    var filterByName = $("#filterByLanguageName").val();
-    var filterByCode = $("#filterByLanguageCode").val();
+    var filterByName = document.getElementById("filterByLanguageName").value;
+    var filterByCode = document.getElementById("filterByLanguageCode").value;
 
     var queryHeaderResource = getQueryParamsAndHeaderTextAndSearchResource(newHeaderText, filterByName, filterByCode);
 
-    $.get("/api/languages/search/" + queryHeaderResource.searchResource + queryHeaderResource.queryParams
-        , function(data, status) {
-            callback(queryHeaderResource.headerText, data._embedded.languages);
-        }
-        , "json");
+	genericGet(
+		"/api/languages/search/" + queryHeaderResource.searchResource + queryHeaderResource.queryParams
+        , function(result) {
+            callback(queryHeaderResource.headerText, result._embedded.languages);
+        });
 }

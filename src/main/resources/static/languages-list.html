@@ -4,25 +4,25 @@
     <meta charset="UTF-8">
     <title>List languages</title>
     <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/languages.js"></script>
     <script>
-        $(document).ready(function(){
+        document.addEventListener('DOMContentLoaded', function() {
             getAllLanguages(populateTable);
         });
 
         function setHeaderAndPopulateTable(headerText, languages) {
-            $("#languagesTableHeader").text(headerText);
+            document.getElementById("languagesTableHeader").innerHTML = headerText;
             populateTable(languages);
         }
 
         function populateTable(languages) {
             console.log("populateTable, no of languages " + languages.length);
-            $("#languagesTable > tbody").empty();
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
             for (let i = 0; i < languages.length; i++)
             {
-                $("#languagesTable > tbody").append(
+                tableBody.innerHTML +=
                     "<tr><td>"
                     + languages[i].languageId
                     + "</td><td>"
@@ -31,8 +31,7 @@
                     + languages[i].languageCode
                     + "</td><td>"
                     + "<button type=\"button\" onclick=\"goToEditView(" + languages[i].languageId + ");\">Edit</button>"
-                    + "</td></tr>"
-                );
+                    + "</td></tr>";
             }
         }
 
@@ -74,7 +73,7 @@
         <th>Edit</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="tbodyid">
     </tbody>
 </table>
 <br/>
