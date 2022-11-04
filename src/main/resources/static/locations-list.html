@@ -32,7 +32,7 @@
                         , function(precinct) {
                             cellId = "belongsToPrecinctCell" + i;
                             console.log("Updating cell " + cellId + " with precinct " + precinct.name);
-                            document.getElementById("" + cellId).html(precinct.name);
+                            document.getElementById(cellId).innerHTML = precinct.name;
                         });
                 }
                 tableBody.innerHTML +=
