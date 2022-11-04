@@ -13,22 +13,21 @@ function getMapSignatureById(id, callback, errorCallback) {
 }
 
 function createOrEditMapSignature(callback, mapSignatureId) {
-    var mapSignatureNameValue = $("#mapSignatureName").val();
-
+    var mapSignatureNameValue = document.getElementById("mapSignatureName").value;
+	var mapSignatureData = {
+        mapSignatureId:null
+        , mapSignature:mapSignatureNameValue
+    };
     if (mapSignatureId === "") {
-        var mapSignatureData = {mapSignature:mapSignatureNameValue};
         genericCreate(mapSignatureData, "mapSignatures", callback);
     } else {
-        var mapSignatureData = {
-            mapSignatureId:parseInt(mapSignatureId)
-            , mapSignature:mapSignatureNameValue
-            };
+		mapSignatureData.mapSignatureId = parseInt(mapSignatureId);
         genericUpdate(mapSignatureData, "mapSignatures", mapSignatureId, "PUT", callback);
     }
 }
 
 function doFilterMapSignatures(newHeaderText, callback) {
-    var filterByMapSignature = $("#filterByMapSignature").val();
+    var filterByMapSignature = document.getElementById("filterByMapSignature").value;
     var queryParams = "?projection=mapSignatureView"
         + "&mapSignatureFilter=" + encodeURIComponent(filterByMapSignature);
     if (filterByMapSignature != "") {
@@ -36,9 +35,10 @@ function doFilterMapSignatures(newHeaderText, callback) {
     } else {
         newHeaderText = "All map signatures";
     }
-
-    $.get("/api/mapSignatures/search/findByMapSignatureContains"
-        + queryParams, function(data, status) {
-                callback(newHeaderText, data._embedded.mapSignatures);
-            }, "json");
+	
+	genericGet(
+		"/api/mapSignatures/search/findByMapSignatureContains" + queryParams
+        , function(result) {
+            callback(newHeaderText, result._embedded.mapSignatures);
+        });
 }

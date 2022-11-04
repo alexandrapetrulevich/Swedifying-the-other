@@ -4,33 +4,32 @@
     <meta charset="UTF-8">
     <title>List map signatures</title>
     <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/map-signatures.js"></script>
     <script>
-        $(document).ready(function(){
+        document.addEventListener('DOMContentLoaded', function() {
             getAllMapSignatures(populateTable);
         });
 
         function setHeaderAndPopulateTable(headerText, mapSignatures) {
-            $("#mapSignaturesTableHeader").text(headerText);
+            document.getElementById("mapSignaturesTableHeader").innerHTML = headerText;
             populateTable(mapSignatures);
         }
 
         function populateTable(mapSignatures) {
             console.log("populateTable, no of map signatures " + mapSignatures.length);
-            $("#mapSignaturesTable > tbody").empty();
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
             for (let i = 0; i < mapSignatures.length; i++)
             {
-                $("#mapSignaturesTable > tbody").append(
+                tableBody.innerHTML +=
                     "<tr><td>"
                     + mapSignatures[i].mapSignatureId
                     + "</td><td>"
                     + mapSignatures[i].mapSignature
                     + "</td><td>"
                     + "<button type=\"button\" onclick=\"goToEditView(" + mapSignatures[i].mapSignatureId + ");\">Edit</button>"
-                    + "</td></tr>"
-                );
+                    + "</td></tr>";
             }
         }
 
@@ -68,7 +67,7 @@
         <th>Edit</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="tbodyid">
     </tbody>
 </table>
 <br/>
