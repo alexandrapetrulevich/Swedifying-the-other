@@ -1,4 +1,3 @@
-
 function getAllPartOfSources(callback) {
     genericGetAll(
         "partOfSources"
@@ -13,22 +12,22 @@ function getPartOfSourceById(id, callback, errorCallback) {
 }
 
 function createOrEditPartOfSource(callback, partOfSourceId) {
-    var partOfSourceNameValue = $("#partOfSourceName").val();
+    var partOfSourceNameValue = document.getElementById("partOfSourceName").value;
 
+	var partOfSourceData = {
+		partOfSourceId:null
+		, partOfSourceName:partOfSourceNameValue
+	};
     if (partOfSourceId === "") {
-        var partOfSourceData = {partOfSourceName:partOfSourceNameValue};
         genericCreate(partOfSourceData, "partOfSources", callback);
     } else {
-        var partOfSourceData = {
-            partOfSourceId:parseInt(partOfSourceId)
-            , partOfSourceName:partOfSourceNameValue
-            };
+        partOfSourceData.partOfSourceId = parseInt(partOfSourceId);
         genericUpdate(partOfSourceData, "partOfSources", partOfSourceId, "PUT", callback);
     }
 }
 
 function doFilterPartOfSources(newHeaderText, callback) {
-    var filterByName = $("#filterByName").val();
+    var filterByName = document.getElementById("filterByName").value;
     var queryParams = "?projection=partOfSourceView"
         + "&partOfSourceNameFilter=" + encodeURIComponent(filterByName);
     if (filterByName != "") {
@@ -36,9 +35,9 @@ function doFilterPartOfSources(newHeaderText, callback) {
     } else {
         newHeaderText = "All part of sources";
     }
-
-    $.get("/api/partOfSources/search/findByPartOfSourceNameContains"
-        + queryParams, function(data, status) {
-                callback(newHeaderText, data._embedded.partOfSources);
-            }, "json");
+	genericGet(
+		"/api/partOfSources/search/findByPartOfSourceNameContains" + queryParams
+        , function(result) {
+            callback(newHeaderText, result._embedded.partOfSources);
+        });
 }

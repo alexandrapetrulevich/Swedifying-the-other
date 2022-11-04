@@ -5,12 +5,11 @@
     <title>Create/edit part of sources</title>
     <link rel="stylesheet" href="./css/style.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/part-of-sources.js"></script>
     <script>
     var globPartOfSourceId = "";
-    $(document).ready(function(){
+    document.addEventListener('DOMContentLoaded', function() {
         init();
     });
 
@@ -25,8 +24,8 @@
         globPartOfSourceId = partOfSourceId;
         console.log("Part of source id to edit " + globPartOfSourceId);
         loadPartOfSource(globPartOfSourceId);
-        $("#createEditPartOfSourceHeader").text("Editing part of source " + globPartOfSourceId);
-        $("#createEditButton").prop("value", "Update");
+        document.getElementById("createEditPartOfSourceHeader").innerHTML = "Editing part of source " + globPartOfSourceId;
+        document.getElementById("createEditButton").value = "Update";
     }
 
     function loadPartOfSource(partOfSourceId) {
@@ -46,21 +45,22 @@
 
     function setUpForCreate() {
         globPartOfSourceId = "";
-        $("#createEditPartOfSourceHeader").text("Create new part of source");
-        $("#createEditButton").prop("value", "Create");
+		document.getElementById("partOfSourceName").value = "";
+        document.getElementById("createEditPartOfSourceHeader").innerHTML = "Create new part of source";
+        document.getElementById("createEditButton").value = "Create";
     }
 
     function displayPartOfSource(partOfSource) {
-        $("#partOfSourceName").val(partOfSource.partOfSourceName);
+        document.getElementById("partOfSourceName").value = partOfSource.partOfSourceName;
     }
 
     function partOfSourceCreatedOrEdited(partOfSource) {
-        if (globPartOfSourceId === "") {
-            alert("Created part of source " + partOfSource.partOfSourceName + " (ID " +  partOfSource.partOfSourceId + ")");
+        var format =  " part of source " + partOfSource.partOfSourceName + " (ID " +  partOfSource.partOfSourceId + ")";
+		if (globPartOfSourceId === "") {
+            alert("Created" + format);
         } else {
-            alert("Edited part of source " + partOfSource.partOfSourceName + " (ID " +  partOfSource.partOfSourceId + ")");
+            alert("Edited" + format);
         }
-        $("#partOfSourceName").val("");
         setUpForCreate();
     }
 

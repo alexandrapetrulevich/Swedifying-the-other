@@ -4,33 +4,32 @@
     <meta charset="UTF-8">
     <title>List regions</title>
     <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/regions.js"></script>
     <script>
-        $(document).ready(function(){
+        document.addEventListener('DOMContentLoaded', function() {
             getAllRegions(populateTable);
         });
 
         function setHeaderAndPopulateTable(headerText, regions) {
-            $("#regionsTableHeader").text(headerText);
+            document.getElementById("regionsTableHeader").innerHTML = headerText;
             populateTable(regions);
         }
 
         function populateTable(regions) {
             console.log("populateTable, no of regions " + regions.length);
-            $("#regionsTable > tbody").empty();
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
             for (let i = 0; i < regions.length; i++)
             {
-                $("#regionsTable > tbody").append(
+                tableBody.innerHTML +=
                     "<tr><td>"
                     + regions[i].regionId
                     + "</td><td>"
                     + regions[i].regionName
                     + "</td><td>"
                     + "<button type=\"button\" onclick=\"goToEditView(" + regions[i].regionId + ");\">Edit</button>"
-                    + "</td></tr>"
-                );
+                    + "</td></tr>";
             }
         }
 
@@ -71,7 +70,7 @@
         <th>Edit</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="tbodyid">
     </tbody>
 </table>
 <br/>

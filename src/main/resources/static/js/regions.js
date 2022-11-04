@@ -19,14 +19,14 @@ function getRegionById(id, callback, errorCallback) {
 function createOrEditRegion(callback, regionId) {
     var regionNameValue = document.getElementById("regionName").value;
 
+	var regionData = {
+		regionId:null
+		, regionName:regionNameValue
+	};
     if (regionId === "") {
-        var regionData = {regionName:regionNameValue};
         genericCreate(regionData, "regions", callback);
     } else {
-        var regionData = {
-            regionId:parseInt(regionId)
-            , regionName:regionNameValue
-            };
+        regionData.regionId = parseInt(regionId);
         genericUpdate(regionData, "regions", regionId, "PUT", callback);
     }
 }

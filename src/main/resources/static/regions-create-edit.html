@@ -5,12 +5,11 @@
     <title>Create/edit regions</title>
     <link rel="stylesheet" href="./css/style.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/regions.js"></script>
     <script>
     var globRegionId = "";
-    $(document).ready(function(){
+    document.addEventListener('DOMContentLoaded', function() {
         init();
     });
 
@@ -25,8 +24,8 @@
         globRegionId = regionId;
         console.log("Region id to edit " + globRegionId);
         loadRegion(globRegionId);
-        $("#createEditRegionHeader").text("Editing region " + globRegionId);
-        $("#createEditButton").prop("value", "Update");
+        document.getElementById("createEditRegionHeader").innerHTML = "Editing region " + globRegionId;
+        document.getElementById("createEditButton").value = "Update";
     }
 
     function loadRegion(regionId) {
@@ -46,24 +45,23 @@
 
     function setUpForCreate() {
         globRegionId = "";
-        $("#createEditRegionHeader").text("Create new region");
-        $("#createEditButton").prop("value", "Create");
-        $("#regionName").val("");
+        document.getElementById("createEditRegionHeader").innerHTML = "Create new region";
+        document.getElementById("createEditButton").value = "Create";
+        document.getElementById("regionName").value = "";
     }
 
     function displayRegion(region) {
-        $("#regionName").val(region.regionName);
+        document.getElementById("regionName").value = region.regionName;
     }
 
     function regionCreatedOrEdited(region) {
+		var format =  " region "
+                + region.regionName
+                + " (ID " +  region.regionId + ")";
         if (globRegionId === "") {
-            alert("Created region "
-                + region.regionName
-                + " (ID " +  region.regionId + ")");
+            alert("Created" + format);
         } else {
-            alert("Edited region "
-                + region.regionName
-                + " (ID " +  region.regionId + ")");
+            alert("Edited" + format);
         }
         setUpForCreate();
     }

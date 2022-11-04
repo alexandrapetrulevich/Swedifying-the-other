@@ -4,33 +4,32 @@
     <meta charset="UTF-8">
     <title>List part of sources</title>
     <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./js/util.js"></script>
     <script src="./js/part-of-sources.js"></script>
     <script>
-        $(document).ready(function(){
+        document.addEventListener('DOMContentLoaded', function() {
             getAllPartOfSources(populateTable);
         });
 
         function setHeaderAndPopulateTable(headerText, partOfSources) {
-            $("#partOfSourcesTableHeader").text(headerText);
+            document.getElementById("partOfSourcesTableHeader").innerHTML = headerText;
             populateTable(partOfSources);
         }
 
         function populateTable(partOfSources) {
             console.log("populateTable, no of part of sources " + partOfSources.length);
-            $("#partOfSourcesTable > tbody").empty();
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
             for (let i = 0; i < partOfSources.length; i++)
             {
-                $("#partOfSourcesTable > tbody").append(
+                tableBody.innerHTML +=
                     "<tr><td>"
                     + partOfSources[i].partOfSourceId
                     + "</td><td>"
                     + partOfSources[i].partOfSourceName
                     + "</td><td>"
                     + "<button type=\"button\" onclick=\"goToEditView(" + partOfSources[i].partOfSourceId + ");\">Edit</button>"
-                    + "</td></tr>"
-                );
+                    + "</td></tr>";
             }
         }
 
@@ -68,7 +67,7 @@
         <th>Edit</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="tbodyid">
     </tbody>
 </table>
 <br/>
