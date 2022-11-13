@@ -1,27 +1,3 @@
-# Swedifying-the-other
-Place-name database for the project Swedifying the other https://www.vr.se/english/swecris.html#/project/P20-0105_RJ
-
-## Overview
-The application's database holds place-name data as needed in the project Swedifying the other. The 
-application is basically two parts, a database exposed with a REST API, and a (HTML/JavaScript) user 
-interface for adding data to and searching/filtering the database.
-
-## TODO as of 2022-11-13
-Currently, the following tasks is left to do for a (sort of) complete version of the application:
-
-- Finish the user interface for adding/editing/browsing the entities. Most are done, a couple still remain.
-- Improve the Attestations view, for creating/editing and searching/filtering. As this is the "main" view
-of the application, presentation of the data and searching/filtering needs to be improved here.
-- 
-
-## Example output from GET /api/v1/attestations?projection=attestationView
-
-Shown below is an example of the data returned when calling 
-GET http://localhost:8080/api/attestations?projection=attestationView. This will show all attestations in
-a flat structure (using query parameter ```projection=attestationView```, without projection query parameter
-the attestation would be shown only with links to the database entities it depends on/builds upon).
-
-```
 {
   "_embedded" : {
     "attestations" : [ {
@@ -651,4 +627,3 @@ the attestation would be shown only with links to the database entities it depen
     }
   }
 }
-```
