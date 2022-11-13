@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit languages</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="./js/util.js"></script>
+    <script src="./js/languages.js"></script>
+    <script>
+    var globLanguageId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    function init() {
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("languageId")) {
+            setUpForEdit(searchParams.get("languageId"));
+        }
+    }
+
+    function setUpForEdit(languageId) {
+        globLanguageId = languageId;
+        console.log("Language id to edit " + globLanguageId);
+        loadLanguage(globLanguageId);
+        document.getElementById("createEditLanguageHeader").innerHTML = "Editing language " + globLanguageId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadLanguage(languageId) {
+        getLanguageById(languageId, displayLanguage, handleGetLanguageError);
+    }
+
+    function handleGetLanguageError(httpErrorStatus) {
+        var errorText = "Could not get language " + globLanguageId;
+        if (httpErrorStatus == 404) {
+            errorText += ", language not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globLanguageId = "";
+        document.getElementById("createEditLanguageHeader").innerHTML = "Create new language";
+        document.getElementById("createEditButton").value = "Create";
+        document.getElementById("languageName").value = "";
+        document.getElementById("languageCode").value = "";
+    }
+
+    function displayLanguage(language) {
+        document.getElementById("languageName").value = language.languageName;
+        document.getElementById("languageCode").value = language.languageCode;
+    }
+
+    function languageCreatedOrEdited(language) {
+        var format = " language "
+                + language.languageName
+                + " (Code: " + language.languageCode
+                + ", ID " +  language.languageId + ")";
+		if (globLanguageId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit languages</a>
+<a href="./languages-list.html">List languages</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="createEditLanguageHeader">Create new language</h1>
+
+<form id="createEditLanguageForm" >
+    <label for="languageName" class="for-editable"><b>Language name:</b></label>
+    <input type="text" size="50" id="languageName"/><br/>
+
+    <label for="languageCode" class="for-editable"><b>Language code:</b></label>
+    <input type="text" size="50" id="languageCode"/><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditLanguage(languageCreatedOrEdited, globLanguageId)" value="Create">
+</form>
+
+</body>
+</html>

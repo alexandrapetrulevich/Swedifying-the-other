@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Locality types</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./js/attestations.js"></script>
+    <!-- TODO: REMOVE JQUERY! -->
+    <script>
+        $(document).ready(function(){
+            getAllAttestations(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, attestations) {
+            $("#attestationsTableHeader").text(headerText);
+            populateTable(attestations);
+        }
+
+        function populateTable(attestations) {
+            $("#attestationsTable > tbody").empty();
+            console.log("populate table...");
+            for (let i = 0; i < attestations.length; i++)
+            {
+                console.log(
+                    "Row no " + i + "... with attestation ID " + attestations[i].attestationId
+                    + " and original form " + attestations[i].originalForm);
+                $("#attestationsTable > tbody").append(
+                    "<tr>"
+                    + "<td>" + attestations[i].attestationId + "</td>"
+                    + "<td>" + attestations[i].originalForm + "</td>"
+                    + "<td>" + JSON.stringify(attestations[i].variantForm) + "</td>"
+                    + "<td>" + JSON.stringify(attestations[i].location) + "</td>"
+                    + "<td>" + JSON.stringify(attestations[i].sourceFinding) + "</td>"
+                    + "<td>" + attestations[i].notes + "</td>"
+                    + "</tr>"
+                );
+            }
+        }
+
+
+
+    </script>
+</head>
+<body>
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestation</a>
+<a href="#" class="current-page-in-menu">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="attestationsTableHeader">All attestations</h1>
+<table id="attestationsTable">
+    <thead>
+    <tr>
+        <th>Attestation ID</th>
+        <th>Original form (Belägg)</th>
+        <th>Variant Form (Variantform)</th>
+        <th>Location (-)</th>
+        <th>SourceFinding</th>
+        <th>Notes (Anteckningar)</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<br/>
+<form id="filterAttestationsForm">
+
+    <label for="filterAttestationsTextMorphNameType">Filter by Morphological Name Type:</label>
+    <input type="text" id="filterAttestationsTextMorphNameType">
+    <label for="filterAttestationsTextEtymology">Filter by etymology:</label>
+    <input type="text" id="filterAttestationsTextEtymology">
+
+    <input type="button" value="Do filter" onclick="doFilterAttestations('Filtered by', setHeaderAndPopulateTable)">
+</form>
+</body>
+</html>

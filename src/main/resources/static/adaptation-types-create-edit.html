@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit adaptation types</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="./js/util.js"></script>
+    <script src="./js/adaptation-types.js"></script>
+    <script>
+    var globAdaptationTypeId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    function init() {
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("adaptationTypeId")) {
+            globAdaptationTypeId = searchParams.get("adaptationTypeId");
+            console.log("Adaptation type id to edit " + globAdaptationTypeId);
+            loadAdaptationType(globAdaptationTypeId);
+        }
+    }
+
+    function loadAdaptationType(adaptationTypeId) {
+        getAdaptationTypeById(adaptationTypeId, displayAdaptationType, handleGetAdaptationTypeError);
+    }
+
+    function displayAdaptationType(adaptationType) {
+        document.getElementById("createEditAdaptationTypeHeader").innerHTML =
+            "Editing adaptation type " + globAdaptationTypeId;
+        document.getElementById("createEditButton").value = "Update";
+        document.getElementById("adaptationTypeName").value = adaptationType.name;
+    }
+
+    function adaptationTypeCreatedOrEdited(adaptationType) {
+        var format =
+            " adaptation type " + adaptationType.name
+            + " with ID " + adaptationType.adaptationTypeId;
+        if (globAdaptationTypeId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+
+    function handleGetAdaptationTypeError(httpErrorStatus) {
+        console.log("handleGetAdaptationTypeError() called");
+        var errorText = "Could not get adaptation type " + globAdaptationTypeId;
+        if (httpErrorStatus == 404) {
+            errorText += ", location not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globAdaptationTypeId = "";
+        document.getElementById("createEditAdaptationTypeHeader").innerHTML = "Create new adaptation type";
+        document.getElementById("createEditButton").value = "Create";
+        document.getElementById("adaptationTypeName").value = "";
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="#" class="current-page-in-menu">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="createEditAdaptationTypeHeader">Create new adaptation type</h1>
+
+<form id="createEditAdaptationTypeForm" >
+    <label for="adaptationTypeName"><b>Adaptation type name:</b></label>
+    <input type="text" size="50" id="adaptationTypeName"/><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditAdaptationType(adaptationTypeCreatedOrEdited, globAdaptationTypeId)" value="Create">
+</form>
+
+</body>
+</html>

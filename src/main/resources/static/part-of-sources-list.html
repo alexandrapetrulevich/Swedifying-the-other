@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List part of sources</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/util.js"></script>
+    <script src="./js/part-of-sources.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllPartOfSources(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, partOfSources) {
+            document.getElementById("partOfSourcesTableHeader").innerHTML = headerText;
+            populateTable(partOfSources);
+        }
+
+        function populateTable(partOfSources) {
+            console.log("populateTable, no of part of sources " + partOfSources.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < partOfSources.length; i++)
+            {
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + partOfSources[i].partOfSourceId
+                    + "</td><td>"
+                    + partOfSources[i].partOfSourceName
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + partOfSources[i].partOfSourceId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+
+        function goToEditView(partOfSourceId) {
+            location.href = "/part-of-sources-create-edit.html?partOfSourceId=" + partOfSourceId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./part-of-sources-create-edit.html">Create/edit part of sources</a>
+<a href="#" class="current-page-in-menu">List part of sources</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="partOfSourcesTableHeader">All part of sources</h1>
+<table id="partOfSourcesTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody id="tbodyid">
+    </tbody>
+</table>
+<br/>
+
+<form id="filterPartOfSourcesForm">
+    <label for="filterByName">Filter by name: </label>
+    <input type="text" id="filterByName"><br/>
+    <input type="button" value="Do filter" onclick="doFilterPartOfSources('Filtered by', setHeaderAndPopulateTable)">
+</form>
+
+</body>
+</html>

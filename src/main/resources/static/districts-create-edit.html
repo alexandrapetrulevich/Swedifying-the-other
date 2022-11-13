@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit districts</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/util.js"></script>
+    <script src="./js/districts.js"></script>
+    <script src="./js/regions.js"></script>
+    <script>
+    var globDistrictId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    async function init() {
+        let data = await getAllRegionsAsync();
+        populateAvailableRegions(data._embedded.regions);
+        console.log("regions select populated");
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("districtId")) {
+            setUpForEdit(searchParams.get("districtId"));
+        };
+    }
+
+    function populateAvailableRegions(regions) {
+        console.log("populateAvailableRegions, no regions: " + regions.length);
+        let select = document.getElementById("availableRegions");
+        for (let i = 0; i < regions.length; i++) {
+            select.add(
+                new Option(regions[i].regionName + " (" + regions[i]._links.self.href + ")"
+                , regions[i]._links.self.href));
+        }
+    }
+
+    function setUpForEdit(districtId) {
+        console.log("Setting up for edit wth id " + districtId);
+        globDistrictId = districtId;
+        console.log("District id to edit " + globDistrictId);
+        loadDistrict(globDistrictId);
+        document.getElementById("createEditDistrictHeader").innerHTML =
+            "Editing district " + globDistrictId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadDistrict(districtId) {
+        getDistrictById(districtId, displayDistrict, handleGetDistrictError);
+    }
+
+    function handleGetDistrictError(httpErrorStatus) {
+        var errorText = "Could not get district " + globDistrictId;
+        if (httpErrorStatus == 404) {
+            errorText += ", district not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globDistrictId = "";
+        document.getElementById("createEditDistrictHeader").innerHTML = "Create new district";
+        document.getElementById("createEditButton").value = "Create";
+    }
+
+    function displayDistrict(district) {
+        document.getElementById("districtName").value = district.name;
+        var belongsToRegionUrl = removeTrialingProjection(
+            district._links.belongsToRegion.href);
+        genericGet(belongsToRegionUrl, function(data) {
+            document.getElementById("availableRegions").value = data._links.self.href;
+        });
+    }
+
+    function districtCreatedOrEdited(district) {
+        var format = " district " + district.name + " (ID " +  district.subRegionId + ")";
+        if (globDistrictId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        document.getElementById("districtName").value = "";
+        setUpForCreate();
+    }
+
+    function regionSelected() {
+        console.log("regionSelected: " + document.getElementById("availableRegions").value);
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="createEditDistrictHeader">Create new district</h1>
+
+<form id="createEditDistrictForm" >
+    <label for="districtName" class="for-editable"><b>District name:</b></label>
+    <input type="text" size="50" id="districtName"/><br/>
+
+    <label for="availableRegions" class="for-editable">Region:</label>
+    <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
+    </select><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditDistrict(districtCreatedOrEdited, globDistrictId)" value="Create">
+</form>
+
+</body>
+</html>
