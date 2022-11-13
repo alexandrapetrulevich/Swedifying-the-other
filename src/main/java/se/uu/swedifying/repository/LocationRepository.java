@@ -10,4 +10,5 @@ public interface LocationRepository extends CrudRepository<Location, Long> {
   List<Location> findAll();
 
   Location findByModernLookupForm(String modernLookupForm);
+  List<Location> findByModernLookupFormContains(String filterByModernLookupForm);
 }

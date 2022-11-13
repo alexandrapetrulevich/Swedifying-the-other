@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit locality types</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="./js/util.js"></script>
+    <script src="./js/locality-types.js"></script>
+    <script>
+    var globLocalityTypeId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    function init() {
+        let searchParams = new URLSearchParams(window.location.search)
+        if (searchParams.has("localityTypeId")) {
+            globLocalityTypeId = searchParams.get("localityTypeId");
+            console.log("Locality type id to edit " + globLocalityTypeId);
+            loadLocalityType(globLocalityTypeId);
+        }
+    }
+
+    function loadLocalityType(localityTypeId) {
+        getLocalityTypeById(localityTypeId, displayLocalityType, handleGetLocalityTypeError);
+    }
+	
+	function handleGetLocalityTypeError(httpErrorStatus) {
+        var errorText = "Could not get locality type " + globLocalityTypeId;
+        if (httpErrorStatus == 404) {
+            errorText += ", locality type not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+	
+	function setUpForCreate() {
+        globLanguageId = "";
+        document.getElementById("createEditLocalityTypeHeader").innerHTML = "Create new language";
+        document.getElementById("createEditButton").value = "Create";
+        document.getElementById("localityTypeName").value = "";
+    }
+
+    function displayLocalityType(localityType) {
+        document.getElementById("createEditLocalityTypeHeader").innerHTML = "Editing locality type " + globLocalityTypeId;
+        document.getElementById("createEditButton").value = "Update";
+        document.getElementById("localityTypeName").value = localityType.localityTypeName;
+    }
+
+    function localityTypeCreatedOrEdited(localityType) {
+        var format = " locality type " + localityType.localityTypeName + " (ID: " + localityType.localityTypeId + ")";
+		if (globLocalityTypeId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestation</a>
+<a href="./attestations-list.html">List attestation</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="createEditLocalityTypeHeader">Create new locality type</h1>
+
+<form id="createEditLocalityTypeForm" >
+    <label for="localityTypeName"><b>Locality type name:</b></label>
+    <input type="text" size="50" id="localityTypeName"/><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditLocalityType(localityTypeCreatedOrEdited, globLocalityTypeId)" value="Create">
+</form>
+
+</body>
+</html>

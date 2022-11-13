@@ -1,0 +1,15 @@
+table, th, td {
+  border: 1px solid;
+}
+
+th {
+  text-align: left;
+}
+
+.current-page-in-menu {
+  font-weight: bold;
+}
+
+label.for-editable {
+  font-weight: bold;
+}

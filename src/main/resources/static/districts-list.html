@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List districts</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/util.js"></script>
+    <script src="./js/districts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllDistricts(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, districts) {
+            document.getElementById("districtsTableHeader").innerHTML = headerText;
+            populateTable(districts);
+        }
+
+        function populateTable(districts) {
+            console.log("populateTable, no of districts " + districts.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < districts.length; i++)
+            {
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + districts[i].subRegionId
+                    + "</td><td>"
+                    + districts[i].name
+                    + "</td><td>"
+                    + districts[i].belongsToRegion.regionName + " (ID: "
+                    + districts[i].belongsToRegion.regionId + ")"
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + districts[i].subRegionId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+
+        function goToEditView(districtId) {
+            location.href = "/districts-create-edit.html?districtId=" + districtId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="#" class="current-page-in-menu">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="districtsTableHeader">All districts</h1>
+<table id="districtsTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Belongs to region</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody id="tbodyid">
+    </tbody>
+</table>
+<br/>
+
+<form id="filterDistrictsForm">
+    <label for="filterByName">Filter by name: </label>
+    <input type="text" id="filterByName"><br/>
+    <label for="filterByBelongsToRegionName">Filter by belongs to region name: </label>
+    <input type="text" id="filterByBelongsToRegionName"><br/>
+    <input type="button" value="Do filter" onclick="doFilterDistricts('Filtered by', setHeaderAndPopulateTable)">
+</form>
+
+</body>
+</html>

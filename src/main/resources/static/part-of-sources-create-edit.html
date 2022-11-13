@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit part of sources</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="./js/util.js"></script>
+    <script src="./js/part-of-sources.js"></script>
+    <script>
+    var globPartOfSourceId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    function init() {
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("partOfSourceId")) {
+            setUpForEdit(searchParams.get("partOfSourceId"));
+        }
+    }
+
+    function setUpForEdit(partOfSourceId) {
+        globPartOfSourceId = partOfSourceId;
+        console.log("Part of source id to edit " + globPartOfSourceId);
+        loadPartOfSource(globPartOfSourceId);
+        document.getElementById("createEditPartOfSourceHeader").innerHTML = "Editing part of source " + globPartOfSourceId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadPartOfSource(partOfSourceId) {
+        getPartOfSourceById(partOfSourceId, displayPartOfSource, handleGetPartOfSourceError);
+    }
+
+    function handleGetPartOfSourceError(httpErrorStatus) {
+        var errorText = "Could not get part of source " + globPartOfSourceId;
+        if (httpErrorStatus == 404) {
+            errorText += ", part of source not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globPartOfSourceId = "";
+		document.getElementById("partOfSourceName").value = "";
+        document.getElementById("createEditPartOfSourceHeader").innerHTML = "Create new part of source";
+        document.getElementById("createEditButton").value = "Create";
+    }
+
+    function displayPartOfSource(partOfSource) {
+        document.getElementById("partOfSourceName").value = partOfSource.partOfSourceName;
+    }
+
+    function partOfSourceCreatedOrEdited(partOfSource) {
+        var format =  " part of source " + partOfSource.partOfSourceName + " (ID " +  partOfSource.partOfSourceId + ")";
+		if (globPartOfSourceId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit part of sources</a>
+<a href="./part-of-sources-list.html">List part of sources</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="createEditPartOfSourceHeader">Create new part of source</h1>
+
+<form id="createEditPartOfSourceForm" >
+    <label for="partOfSourceName" class="for-editable"><b>Part of source name:</b></label>
+    <input type="text" size="50" id="partOfSourceName"/><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditPartOfSource(partOfSourceCreatedOrEdited, globPartOfSourceId)" value="Create">
+</form>
+
+</body>
+</html>

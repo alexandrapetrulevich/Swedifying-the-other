@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List languages</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/util.js"></script>
+    <script src="./js/languages.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllLanguages(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, languages) {
+            document.getElementById("languagesTableHeader").innerHTML = headerText;
+            populateTable(languages);
+        }
+
+        function populateTable(languages) {
+            console.log("populateTable, no of languages " + languages.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < languages.length; i++)
+            {
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + languages[i].languageId
+                    + "</td><td>"
+                    + languages[i].languageName
+                    + "</td><td>"
+                    + languages[i].languageCode
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + languages[i].languageId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+
+        function goToEditView(languageId) {
+            location.href = "/languages-create-edit.html?languageId=" + languageId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
+<a href="./adaptation-types-list.html">List adaptation types</a>
+<br />
+<a href="./attestations-create-edit.html">Create/edit attestations</a>
+<a href="./attestations-list.html">List attestations</a>
+<br />
+<a href="./districts-create-edit.html">Create/edit districts</a>
+<a href="./districts-list.html">List districts</a>
+<br />
+<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
+<a href="./land-surveyors-list.html">List land surveyors</a>
+<br />
+<a href="./languages-create-edit.html">Create/edit languages</a>
+<a href="#" class="current-page-in-menu">List languages</a>
+<br />
+<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
+<a href="./locality-types-list.html">List locality types</a>
+<br />
+<a href="./locations.html">List locations</a>
+
+<h1 id="languagesTableHeader">All languages</h1>
+<table id="languagesTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Code</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody id="tbodyid">
+    </tbody>
+</table>
+<br/>
+
+<form id="filterLanguagesForm">
+    <label for="filterByLanguageName">Filter by language name: </label>
+    <input type="text" id="filterByLanguageName"><br/>
+    <label for="filterByLanguageCode">Filter by language code: </label>
+    <input type="text" id="filterByLanguageCode"><br/>
+    <input type="button" value="Do filter" onclick="doFilterLanguages('Filtered by', setHeaderAndPopulateTable)">
+</form>
+
+</body>
+</html>

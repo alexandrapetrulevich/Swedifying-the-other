@@ -1,25 +1,45 @@
 function getAllLocalityTypes(callback) {
-    $.get("/api/v1/localityTypes", function(data, status) {
-            callback(data);
-        }, "json");
+    console.log("getAllLocalityTypes with callback!");
+    genericGetAll(
+            "localityTypes"
+            , "localityTypeView"
+            , function(data) {
+                console.log("getAllLocalityTypes, calling callback");
+                callback(data._embedded.localityTypes);
+            });
 }
 
-function createLocalityType(callback) {
-    var localityTypeNameValue = $("#createLocalityTypeForm_localityTypeName").val();
-    var localityTypeData = {localityTypeName:localityTypeNameValue};
-    $.post({
-        url: "/api/v1/localityTypes"
-        , data: JSON.stringify(localityTypeData)
-        , contentType: "application/json; charset=utf-8"
-    }).done(function(data) {
-        getAllLocalityTypes(callback);
-    });
+async function getAllLocalityTypesAsync() {
+    console.log("getAllLocalityTypes no callback!");
+    const response = await fetch("/api/localityTypes?projection=localityTypeView");
+    return response.json();
+}
+
+function getLocalityTypeById(id, callback, errorCallback) {
+    genericGetById(id, "localityTypes", callback, errorCallback);
+}
+
+
+function createOrEditLocalityType(callback, localityTypeId) {
+    var localityTypeNameValue = document.getElementById("localityTypeName").value;
+	var localityTypeData = {
+		localityTypeName:localityTypeNameValue
+		, localityTypeId:null};
+    if (localityTypeId === "") {
+        genericCreate(localityTypeData, "localityTypes", callback);
+    } else {
+        localityTypeData.localityTypeId = parseInt(localityTypeId);
+        genericUpdate(localityTypeData, "localityTypes", localityTypeId, "PUT", callback);
+    }
 }
 
 function doFilterLocalityTypes(newHeaderText, callback) {
-    var filterText = $("#filterLocalityTypesForm_filter").val();
+    var filterText = document.getElementById("filterLocalityTypesForm_filter").value;
     newHeaderText = newHeaderText + " \"" + filterText + "\"";
-    $.get("/api/v1/localityTypes?filterText=" + encodeURIComponent(filterText), function(data, status) {
-                callback(newHeaderText, data);
-            }, "json");
+	
+	genericGet(
+		"/api/localityTypes/search/findByLocalityTypeNameContains?filter=" + encodeURIComponent(filterText) + "&projection=localityTypeView"
+        , function(result) {
+            callback(newHeaderText, result._embedded.localityTypes);
+        });
 }

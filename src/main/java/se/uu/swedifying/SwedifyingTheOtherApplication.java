@@ -81,7 +81,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
         .originalForm("Grosse Ernshoff[s] Åkermark Uthi Wolgasts District")
         .variantForm(variantFormRepository.findByVariantForm("Wolgasts distrikt"))
         .location(locationRepository.findByModernLookupForm(""))
-        .sourceFinding(sourceFindings.get(1))
+        .sourceFinding(sourceFindings.get(0))
         .notes("Distriktsnamnet är anpassat till sv dock ej bebyggelsenamnet Wolgast som har slavisk etymologi och som medierats via tyska. I notarum står inte sällan \"Wolgasts ampt\".")
         .build());
     attestationRepository.save(
@@ -90,7 +90,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
         .originalForm("Wolgasts Stadz Grentz")
         .variantForm(variantFormRepository.findByVariantForm("Wolgast"))
         .location(locationRepository.findByModernLookupForm("Wolgast"))
-        .sourceFinding(sourceFindings.get(2))
+        .sourceFinding(sourceFindings.get(1))
         .notes("Eichler & Walther 1988:300")
         .build());
   }
@@ -159,7 +159,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
     normalizedFormRepository.save(
       NormalizedForm
         .builder()
-        .normalizedForm("Wolgasts")
+        .normalizedForm("Wolgast")
         .morphologicalNameType(MorphologicalNameType.DERIVATION)
         .morphologicalNameTypeIsShaky(false)
         .morphologicalData(
@@ -209,13 +209,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
       , sourceFindingRepository.save(
         SourceFinding
           .builder()
-          .partOfSource(partOfSourceRepository.findByPartOfSourceName("Rubrik"))
-          .source(source)
-          .build())
-      , sourceFindingRepository.save(
-        SourceFinding
-          .builder()
-          .partOfSource(partOfSourceRepository.findByPartOfSourceName("Gräns"))
+          .partOfSource(partOfSourceRepository.findByPartOfSourceName("Gränsmarkering"))
           .source(source)
           .build()));
   }
@@ -280,6 +274,21 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
         .belongsToRegion(regionRepository.findByRegionName("Pommern"))
         .name("Wolgasts distrikt")
         .build());
+    Precinct nyland = subRegionRepository.save(
+      Precinct
+        .builder()
+        .belongsToRegion(regionRepository.findByRegionName("Finland"))
+        .name("Nyland")
+        .build()
+    );
+    subRegionRepository.save(
+      Parish
+        .builder()
+        .belongsToPrecinct(nyland)
+        .belongsToRegion(regionRepository.findByRegionName("Finland"))
+        .name("Helsingfors socken")
+        .build()
+    );
   }
 
   private void addRegions() {
