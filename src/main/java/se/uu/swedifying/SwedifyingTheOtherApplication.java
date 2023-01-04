@@ -10,8 +10,10 @@ import se.uu.swedifying.model.util.MorphologicalData;
 import se.uu.swedifying.model.util.MorphologicalNameType;
 import se.uu.swedifying.repository.*;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneId;
 import java.util.List;
 
 @SpringBootApplication
@@ -47,6 +49,9 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
   @Autowired
   MapSignatureRepository mapSignatureRepository;
 
+  @Autowired
+  MapSourceRepository mapSourceRepository;
+
   public static void main(String[] args) {
     SpringApplication.run(SwedifyingTheOtherApplication.class, args);
   }
@@ -65,6 +70,8 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
     addLocations();
     addNormalizedForms();
     addVariantForms();
+
+    List<MapSource> mapSources = mapSourceRepository.findAll();
 
     attestationRepository.save(
       Attestation
@@ -215,6 +222,8 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
   }
 
   private MapSource addSources() {
+    mapSignatureRepository
+      .save(MapSignature.builder().mapSignature("BU").build());
     MapSignature mapSignature = mapSignatureRepository
       .save(MapSignature.builder().mapSignature("BI").build());
     return sourceRepository.save(
@@ -222,7 +231,11 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
         .builder()
         .mapSignature(mapSignature)
         .mapSheet(1)
-        .dating(LocalDate.of(1694, Month.JUNE, 20))
+        .dating(Date.from(
+            LocalDate.of(1694, Month.JUNE, 20)
+            .atStartOfDay()
+            .atZone(ZoneId.systemDefault()).toInstant())
+        )
         .landSurveyor(landSurveyorRepository.findByName("Simon Skragge"))
         .build());
   }
@@ -265,6 +278,7 @@ public class SwedifyingTheOtherApplication implements CommandLineRunner {
 
   private void addLandSurveyors() {
     landSurveyorRepository.save(LandSurveyor.builder().name("Simon Skragge").build());
+    landSurveyorRepository.save(LandSurveyor.builder().name("Elisabet Hagman").build());
   }
 
   private void addSubRegions() {
