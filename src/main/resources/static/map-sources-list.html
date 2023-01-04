@@ -2,39 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>List map signatures</title>
+    <title>List map sources</title>
     <link rel="stylesheet" href="./css/style.css">
     <script src="./js/util.js"></script>
-    <script src="./js/map-signatures.js"></script>
+    <script src="./js/map-sources.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            getAllMapSignatures(populateTable);
+            getAllMapSources(populateTable);
         });
 
-        function setHeaderAndPopulateTable(headerText, mapSignatures) {
-            document.getElementById("mapSignaturesTableHeader").innerHTML = headerText;
-            populateTable(mapSignatures);
+        function setHeaderAndPopulateTable(headerText, mapSources) {
+            document.getElementById("mapSourcesTableHeader").innerHTML = headerText;
+            populateTable(mapSources);
         }
 
-        function populateTable(mapSignatures) {
-            console.log("populateTable, no of map signatures " + mapSignatures.length);
+        function populateTable(mapSources) {
+            console.log("populateTable, no of map sources " + mapSources.length);
             var tableBody = document.getElementById('tbodyid');
             tableBody.innerHTML = "";
-            for (let i = 0; i < mapSignatures.length; i++)
+            for (let i = 0; i < mapSources.length; i++)
             {
                 tableBody.innerHTML +=
                     "<tr><td>"
-                    + mapSignatures[i].mapSignatureId
+                    + mapSources[i].sourceId
                     + "</td><td>"
-                    + mapSignatures[i].mapSignature
+                    + mapSources[i].dating
                     + "</td><td>"
-                    + "<button type=\"button\" onclick=\"goToEditView(" + mapSignatures[i].mapSignatureId + ");\">Edit</button>"
+                    + mapSources[i].mapSheet
+                    + "</td><td>"
+                    + mapSources[i].landSurveyor.name + " (ID: " + mapSources[i].landSurveyor.landSurveyorId + ")"
+                    + "</td><td>"
+                    + mapSources[i].mapSignature.mapSignature + " (ID: " + mapSources[i].mapSignature.mapSignatureId + ")"
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + mapSources[i].sourceId + ");\">Edit</button>"
                     + "</td></tr>";
             }
         }
 
-        function goToEditView(mapSignatureId) {
-            location.href = "/map-signatures-create-edit.html?mapSignatureId=" + mapSignatureId;
+        function goToEditView(sourceId) {
+            location.href = "/map-sources-create-edit.html?mapSourceId=" + sourceId;
         }
 
 
@@ -50,19 +56,22 @@
 <a href="./districts-create-edit.html">Create/edit districts</a>
 <a href="./districts-list.html">List districts</a>
 <br />
-<a href="./map-signatures-create-edit.html">Create/edit map signatures</a>
-<a href="#" class="current-page-in-menu">List map signatures</a>
+<a href="./map-sources-create-edit.html">Create/edit map sources</a>
+<a href="#" class="current-page-in-menu">List map sources</a>
 <br />
 <a href="./locality-types-create-edit.html">Create/edit Locality types</a>
 <a href="./locality-types-list.html">List locality types</a>
 <br />
 <a href="./locations.html">List locations</a>
 
-<h1 id="mapSignaturesTableHeader">All map signatures</h1>
-<table id="mapSignaturesTable">
+<h1 id="mapSourcesTableHeader">All map sources</h1>
+<table id="mapSourcesTable">
     <thead>
     <tr>
-        <th>ID</th>
+        <th>Source ID</th>
+        <th>Dating</th>
+        <th>Map Sheet</th>
+        <th>Land Surveyor</th>
         <th>Map Signature</th>
         <th>Edit</th>
     </tr>
@@ -72,11 +81,13 @@
 </table>
 <br/>
 
-<form id="filterMapSignaturesForm">
-    <label for="filterByMapSignature">Filter by map signature: </label>
-    <input type="text" id="filterByMapSignature"><br/>
-    <input type="button" value="Do filter" onclick="doFilterMapSignatures('Filtered by', setHeaderAndPopulateTable)">
+<!--
+<form id="filterMapSourcesForm">
+    <label for="filterByMapSource">Filter by map source: </label>
+    <input type="text" id="filterByMapSource"><br/>
+    <input type="button" value="Do filter" onclick="doFilterMapSources('Filtered by', setHeaderAndPopulateTable)">
 </form>
+-->
 
 </body>
 </html>

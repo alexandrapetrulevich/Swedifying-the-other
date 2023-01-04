@@ -1,44 +1,51 @@
 
-function getAllMapSignatures(callback) {
+function getAllMapSources(callback) {
     genericGetAll(
-        "mapSignatures"
-        , "mapSignatureView"
+        "mapSources"
+        , "mapSourceView"
         , function(data) {
-            callback(data._embedded.mapSignatures);
+            callback(data._embedded.mapSources);
         });
 }
 
-function getMapSignatureById(id, callback, errorCallback) {
-    genericGetById(id, "mapSignatures", callback, errorCallback);
+function getMapSourceById(id, callback, errorCallback) {
+    genericGetById(id, "mapSources", callback, errorCallback, "mapSourceView");
 }
 
-function createOrEditMapSignature(callback, mapSignatureId) {
-    var mapSignatureNameValue = document.getElementById("mapSignatureName").value;
-	var mapSignatureData = {
-        mapSignatureId:null
-        , mapSignature:mapSignatureNameValue
+function createOrEditMapSource(callback, mapSourceId) {
+    var mapSourceDatingValue = document.getElementById("dating").value;
+	var mapSheetValue = document.getElementById("mapSheet").value;
+	var landSurveyorValue = document.getElementById("availableLandSurveyors").value;
+	var mapSignatureValue = document.getElementById("availableMapSignatures").value;
+	var mapSourceData = {
+        sourceId:null
+        , dating:mapSourceDatingValue
+		, landSurveyor: landSurveyorValue
+		, mapSheet: mapSheetValue
+		, mapSignature: mapSignatureValue
+		
     };
-    if (mapSignatureId === "") {
-        genericCreate(mapSignatureData, "mapSignatures", callback);
+    if (mapSourceId === "") {
+        genericCreate(mapSourceData, "mapSources", callback);
     } else {
-		mapSignatureData.mapSignatureId = parseInt(mapSignatureId);
-        genericUpdate(mapSignatureData, "mapSignatures", mapSignatureId, "PUT", callback);
+		mapSourceData.sourceId = parseInt(mapSourceId);
+        genericUpdate(mapSourceData, "mapSources", mapSourceId, "PATCH", callback);
     }
 }
 
-function doFilterMapSignatures(newHeaderText, callback) {
-    var filterByMapSignature = document.getElementById("filterByMapSignature").value;
-    var queryParams = "?projection=mapSignatureView"
-        + "&mapSignatureFilter=" + encodeURIComponent(filterByMapSignature);
-    if (filterByMapSignature != "") {
-        newHeaderText = newHeaderText + " map signature name " + filterByMapSignature;
+function doFilterMapSources(newHeaderText, callback) {
+    var filterByMapSource = document.getElementById("filterByMapSource").value;
+    var queryParams = "?projection=mapSourceView"
+        + "&mapSourceFilter=" + encodeURIComponent(filterByMapSource);
+    if (filterByMapSource != "") {
+        newHeaderText = newHeaderText + " map source name " + filterByMapSource;
     } else {
-        newHeaderText = "All map signatures";
+        newHeaderText = "All map sources";
     }
 	
 	genericGet(
-		"/api/mapSignatures/search/findByMapSignatureContains" + queryParams
+		"/api/mapSources/search/findByMapSourceContains" + queryParams
         , function(result) {
-            callback(newHeaderText, result._embedded.mapSignatures);
+            callback(newHeaderText, result._embedded.mapSources);
         });
 }

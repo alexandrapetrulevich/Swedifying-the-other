@@ -3,7 +3,6 @@ package se.uu.swedifying.model.projection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
 import se.uu.swedifying.model.entity.MapSource;
-import se.uu.swedifying.model.entity.TextSource;
 
 import java.time.LocalDate;
 

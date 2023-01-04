@@ -15,7 +15,7 @@ async function genericGetAllAsync(resource, projection) {
     if (projection != null) {
         url += "?projection=" + projection;
     }
-    const response = await fetch("/api/" + resource + "?projection=districtView");
+    const response = await fetch(url);
     return response.json();
 }
 

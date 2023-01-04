@@ -10,8 +10,7 @@ import java.util.List;
 public interface NormalizedFormRepository extends CrudRepository<NormalizedForm, Long> {
   List<NormalizedForm> findByMorphologicalNameTypeAndEtymologyIn(
     MorphologicalNameType morphologicalNameTypes
-    , List<Language> etymologies
-  );
+    , List<Language> etymologies);
 
   NormalizedForm findByNormalizedForm(String normalizedForm);
 }

@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Table(name = "SOURCE")
@@ -16,14 +17,16 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class Source {
+public abstract class Source {
   @Id
   @GeneratedValue
   @Column(name = "SOURCE_ID")
   private Long sourceId;
 
   @Column(name = "DATING")
-  private LocalDate dating;
+  // Have to use Date to get correct old dates apparently
+  // The SourceView converts to LocalDate
+  private Date dating;
 
   @ManyToOne
   @JoinColumn(name = "LAND_SURVEYOR_ID")
