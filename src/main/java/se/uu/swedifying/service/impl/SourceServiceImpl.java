@@ -10,9 +10,6 @@ import se.uu.swedifying.repository.MapSignatureRepository;
 import se.uu.swedifying.repository.SourceRepository;
 import se.uu.swedifying.service.SourceService;
 
-import java.sql.Date;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -41,10 +38,7 @@ class SourceServiceImpl implements SourceService {
   public Source createSource(CreateMapSourceRequest createMapSourceRequest) {
     MapSource mapSource = MapSource
       .builder()
-      .dating(Date.from(
-        createMapSourceRequest.dating()
-          .atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
-      )
+      .dating(createMapSourceRequest.dating())
       .mapSheet(createMapSourceRequest.mapSheet())
       .landSurveyor(landSurveyorRepository.findById(createMapSourceRequest.landSurveyorId()).orElseThrow())
       .mapSignature(mapSignatureRepository.findById(createMapSourceRequest.mapSignatureId()).orElseThrow())

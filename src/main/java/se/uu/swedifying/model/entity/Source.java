@@ -1,13 +1,9 @@
 package se.uu.swedifying.model.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -17,13 +13,15 @@ import java.util.Date;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public abstract class Source {
   @Id
   @GeneratedValue
   @Column(name = "SOURCE_ID")
   private Long sourceId;
 
-  @Column(name = "DATING")
+  @Column(name = "DATING", columnDefinition = "DATE")
+  @Temporal(TemporalType.DATE)
   // Have to use Date to get correct old dates apparently
   // The SourceView converts to LocalDate
   private Date dating;
