@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List source findings</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/util.js"></script>
+    <script src="./js/source-findings.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllSourceFindings(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, sourceFindings) {
+            document.getElementById("sourceFindingsTableHeader").innerHTML = headerText;
+            populateTable(sourceFindings);
+        }
+
+        function populateTable(sourceFindings) {
+            console.log("populateTable, no of sourceFindings " + sourceFindings.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < sourceFindings.length; i++)
+            {
+                let sourceText = sourceFindings[i].source.type
+                    + " (ID: " + sourceFindings[i].source.sourceId
+                    + ")";
+                let sourceHref =
+                    removeTrialingProjection(sourceFindings[i].source._links.self.href);
+                if (sourceFindings[i].source.type === "MapSource") {
+                    genericGet(
+                        sourceHref + "?projection=mapSourceView"
+                        , function(mapSource) {
+                            let mapSourceText =
+                                "Map Source: "
+                                + " ID: " + mapSource.sourceId
+                                + ", map sheet: " + mapSource.mapSheet
+                                + ", dating: " + mapSource.dating
+                                + ", map signature: " + mapSource.mapSignature.mapSignature
+                                + ", land surveyor: " + mapSource.landSurveyor.name;
+                            cellId = "sourceCell" + i;
+                            console.log("Updating cell " + cellId + " with mapSource text " + mapSourceText);
+                            document.getElementById(cellId).innerHTML = mapSourceText;
+                        });
+                } else if (sourceFindings[i].source.type === "TextSource") {
+                    // TODO
+                } else { // Unknown source type
+                    // TODO
+                }
+	            tableBody.innerHTML +=
+                    "<tr><td>"
+                    + sourceFindings[i].sourceFindingId
+                    + "</td><td id=\"sourceCell" + i + "\">"
+                    + sourceText
+					+ "</td><td>"
+					+ sourceFindings[i].partOfSource.partOfSourceName
+					+ "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + sourceFindings[i].subRegionId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+
+        function goToEditView(sourceFindingId) {
+            location.href = "/sourceFindings-create-edit.html?sourceFindingId=" + sourceFindingId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="./index.html">Main menu</a>
+<br />
+<a href="./sourceFindings-create-edit.html">Create/edit source findings</a>
+<a href="#" class="current-page-in-menu">List source findings</a>
+<br />
+
+<h1 id="sourceFindingsTableHeader">All sourceFindings</h1>
+<table id="sourceFindingsTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+		<th>In source</th>
+        <th>Part of source</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody id="tbodyid">
+    </tbody>
+</table>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit text sources</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="./js/util.js"></script>
+    <script src="./js/text-sources.js"></script>
+    <script src="./js/land-surveyors.js"></script>
+    
+    <script>
+    var globTextSourceId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    async function init() {
+        let landSurveyorsData = await getAllLandSurveyorsAsync();
+        populateAvailableLandSurveyors(landSurveyorsData._embedded.landSurveyors);
+        console.log("land surveyors select populated");
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("textSourceId")) {
+            setUpForEdit(searchParams.get("textSourceId"));
+        }
+    }
+    
+    function populateAvailableLandSurveyors(landSurveyors) {
+        console.log("populateAvailableLandSurveyors, no of land surveyors: " + landSurveyors.length);
+        let select = document.getElementById("availableLandSurveyors");
+        for (let i = 0; i < landSurveyors.length; i++) {
+            select.add(
+                new Option(landSurveyors[i].name + " (" + landSurveyors[i]._links.self.href + ")"
+                , landSurveyors[i]._links.self.href));
+        }
+    }
+
+    function setUpForEdit(textSourceId) {
+        globTextSourceId = textSourceId;
+        console.log("Map source id to edit " + globTextSourceId);
+        loadTextSource(globTextSourceId);
+        document.getElementById("createEditTextSourceHeader").innerHTML = "Editing map source " + globTextSourceId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadTextSource(textSourceId) {
+        getTextSourceById(textSourceId, displayTextSource, handleGetTextSourceError);
+    }
+
+    function handleGetTextSourceError(httpErrorStatus) {
+        var errorText = "Could not get map source " + globTextSourceId;
+        if (httpErrorStatus == 404) {
+            errorText += ", map source not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globTextSourceId = "";
+        document.getElementById("dating").value = "";
+        document.getElementById("name").value = "";
+		document.getElementById("subSection").value = "";
+		document.getElementById("page").value = "";
+        document.getElementById("createEditTextSourceHeader").innerHTML = "Create new map source";
+        document.getElementById("createEditButton").value = "Create";
+    }
+
+    function displayTextSource(textSource) {
+        document.getElementById("dating").value = textSource.dating;
+        var landSurveyorUrl = removeTrialingProjection(
+            textSource._links.landSurveyor.href);
+        genericGet(landSurveyorUrl, function(data) {
+            document.getElementById("availableLandSurveyors").value = data._links.self.href;
+        });
+		document.getElementById("name").value = textSource.name;
+		document.getElementById("subSection").value = textSource.subSection;
+		document.getElementById("page").value = textSource.page;
+    }
+
+    function textSourceCreatedOrEdited(textSource) {
+        var format =  " map source with ID " +  textSource.sourceId;
+        if (globTextSourceId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+
+    function landSurveyorSelected() {
+        console.log("Land surveyor selected: " + document.getElementById("availableLandSurveyors").value);
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="/index.html">Main menu</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit text sources</a>
+<a href="/text-sources-list.html">List text sources</a>
+<br />
+
+<h1 id="createEditTextSourceHeader">Create new text source</h1>
+
+<form id="createEditTextSourceForm" >
+    <label for="dating" class="for-editable"><b>Dating (YYYY-MM-DD):</b></label>
+    <input type="text" id="dating"/><br/>
+    <label for="availableLandSurveyors" class="for-editable">Land Surveyor:</label>
+    <select name="availableLandSurveyors" id="availableLandSurveyors" onchange="landSurveyorSelected()">
+    </select><br/>
+    <label for="name" class="for-editable"><b>Text name:</b></label>
+    <input type="text" id="name"/><br/>
+	<label for="subSection" class="for-editable"><b>In sub section:</b></label>
+    <input type="text" id="subSection"/><br/>
+	<label for="page" class="for-editable"><b>On page:</b></label>
+    <input type="text" id="page"/><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditTextSource(textSourceCreatedOrEdited, globTextSourceId)" value="Create">
+</form>
+
+</body>
+</html>

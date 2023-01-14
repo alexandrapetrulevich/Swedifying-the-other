@@ -22,7 +22,7 @@
         console.log("land surveyors select populated");
         let mapSignaturesData = await getAllMapSignaturesAsync();
         populateAvailableMapSignatures(mapSignaturesData._embedded.mapSignatures);
-        console.log("land surveyors select populated");
+        console.log("map signatures select populated");
         let searchParams = new URLSearchParams(window.location.search);
         if (searchParams.has("mapSourceId")) {
             setUpForEdit(searchParams.get("mapSourceId"));
@@ -138,7 +138,7 @@
 <h1 id="createEditMapSourceHeader">Create new map source</h1>
 
 <form id="createEditMapSourceForm" >
-    <label for="dating" class="for-editable"><b>Dating:</b></label>
+    <label for="dating" class="for-editable"><b>Dating (YYYY-MM-DD):</b></label>
     <input type="text" id="dating"/><br/>
     <label for="mapSheet" class="for-editable"><b>Map sheet:</b></label>
     <input type="text" id="mapSheet"/><br/>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit source findings</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="./js/util.js"></script>
+    <script src="./js/source-findings.js"></script>
+	<script src="./js/regions.js"></script>
+    <script>
+    var globSourceFindingId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    async function init() {
+		let regionsData = await getAllRegionsAsync();
+		populateAvailableRegions(regionsData._embedded.regions);
+	
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("sourceFindingId")) {
+            setUpForEdit(searchParams.get("sourceFindingId"));
+        }
+    }
+	
+	function populateAvailableRegions(regions) {
+        console.log("populateAvailableRegions, no of regions: " + regions.length);
+		let select = document.getElementById("availableRegions");
+        for (let i = 0; i < regions.length; i++) {
+            select.add(
+                new Option(regions[i].regionName + " (" + regions[i]._links.self.href + ")"
+                , regions[i]._links.self.href));
+        }
+    }
+
+    function setUpForEdit(sourceFindingId) {
+        globSourceFindingId = sourceFindingId;
+        console.log("SourceFinding id to edit " + globSourceFindingId);
+        loadSourceFinding(globSourceFindingId);
+        document.getElementById("createEditSourceFindingHeader").innerHTML = "Editing sourceFinding " + globSourceFindingId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadSourceFinding(sourceFindingId) {
+        getSourceFindingById(sourceFindingId, displaySourceFinding, handleGetSourceFindingError);
+    }
+
+    function handleGetSourceFindingError(httpErrorStatus) {
+        let errorText = "Could not get sourceFinding " + globSourceFindingId;
+        if (httpErrorStatus == 404) {
+            errorText += ", sourceFinding not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globSourceFindingId = "";
+        document.getElementById("createEditSourceFindingHeader").innerHTML = "Create new sourceFinding";
+        document.getElementById("createEditButton").value = "Create";
+        document.getElementById("sourceFindingName").value = "";
+		document.getElementById("availableRegions").selectedIndex = 0;
+    }
+
+    function displaySourceFinding(sourceFinding) {
+        document.getElementById("sourceFindingName").value = sourceFinding.name;
+		let regionUrl = removeTrialingProjection(
+            sourceFinding._links.belongsToRegion.href);
+        genericGet(regionUrl, function(data) {
+            document.getElementById("availableRegions").value = data._links.self.href;
+        });
+    }
+
+    function sourceFindingCreatedOrEdited(sourceFinding) {
+		var format =  " sourceFinding "
+                + sourceFinding.name
+                + " (ID " +  sourceFinding.subRegionId + ")";
+        if (globSourceFindingId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+	
+	function regionSelected() {
+        console.log("Region selected: " + document.getElementById("availableRegions").value);
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="./index.html">Main menu</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit source findings</a>
+<a href="./sourceFindings-list.html">List source findings</a>
+<br />
+
+<h1 id="createEditSourceFindingHeader">Create new sourceFinding</h1>
+
+<form id="createEditSourceFindingForm" >
+    <label for="sourceFindingName" class="for-editable"><b>Source finding name:</b></label>
+    <input type="text" size="50" id="sourceFindingName"/><br/>
+	<label for="availableRegions" class="for-editable">Belongs to region:</label>
+    <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
+    </select><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditSourceFinding(sourceFindingCreatedOrEdited, globSourceFindingId)" value="Create">
+</form>
+
+</body>
+</html>
