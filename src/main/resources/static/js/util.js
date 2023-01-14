@@ -6,8 +6,19 @@ function getIdFromHref(href) {
     return removeTrialingProjection(href).split("/").pop();
 }
 
-function genericGetAll(resource, projection, callback) {
-    genericGet("/api/" + resource + "?projection=" + projection, callback);
+function removeAllOptionsFromSelect(selectElement) {
+	let i, L = selectElement.options.length - 1;
+	for (i = L; i >= 0; i--) {
+		selectElement.remove(i);
+	}
+}
+
+function genericGetAll(resource, projection, callback, additionalParams) {
+	let params = "?projection=" + projection;
+	if (additionalParams) {
+		params += additionalParams;
+	}
+    genericGet("/api/" + resource + params, callback);
 }
 
 async function genericGetAllAsync(resource, projection) {

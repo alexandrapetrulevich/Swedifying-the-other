@@ -2,39 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>List regions</title>
+    <title>List parishes</title>
     <link rel="stylesheet" href="./css/style.css">
     <script src="./js/util.js"></script>
-    <script src="./js/regions.js"></script>
+    <script src="./js/parishes.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            getAllRegions(populateTable);
+            getAllParishes(populateTable);
         });
 
-        function setHeaderAndPopulateTable(headerText, regions) {
-            document.getElementById("regionsTableHeader").innerHTML = headerText;
-            populateTable(regions);
+        function setHeaderAndPopulateTable(headerText, parishes) {
+            document.getElementById("parishesTableHeader").innerHTML = headerText;
+            populateTable(parishes);
         }
 
-        function populateTable(regions) {
-            console.log("populateTable, no of regions " + regions.length);
+        function populateTable(parishes) {
+            console.log("populateTable, no of parishes " + parishes.length);
             var tableBody = document.getElementById('tbodyid');
             tableBody.innerHTML = "";
-            for (let i = 0; i < regions.length; i++)
+            for (let i = 0; i < parishes.length; i++)
             {
-                tableBody.innerHTML +=
+				if (parishes[i].belongsToPrecinct) {
+					var belongsToPrecinctValue = parishes[i].belongsToPrecinct.name + " (ID: " + parishes[i].belongsToPrecinct.subRegionId + ")";
+				} else {
+					var belongsToPrecinctValue = "N/A";
+				}
+	            tableBody.innerHTML +=
                     "<tr><td>"
-                    + regions[i].regionId
+                    + parishes[i].subRegionId
                     + "</td><td>"
-                    + regions[i].regionName
+                    + parishes[i].name
                     + "</td><td>"
-                    + "<button type=\"button\" onclick=\"goToEditView(" + regions[i].regionId + ");\">Edit</button>"
+					+ parishes[i].belongsToRegion.regionName + " (ID: " + parishes[i].belongsToRegion.regionId + ")"
+					+ "</td><td>"
+					+ belongsToPrecinctValue
+					+ "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + parishes[i].subRegionId + ");\">Edit</button>"
                     + "</td></tr>";
             }
         }
 
-        function goToEditView(regionId) {
-            location.href = "/regions-create-edit.html?regionId=" + regionId;
+        function goToEditView(parishId) {
+            location.href = "/parishes-create-edit.html?parishId=" + parishId;
         }
 
 
@@ -53,20 +62,22 @@
 <a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
 <a href="./land-surveyors-list.html">List land surveyors</a>
 <br />
-<a href="./regions-create-edit.html">Create/edit regions</a>
-<a href="#" class="current-page-in-menu">List regions</a>
+<a href="./parishes-create-edit.html">Create/edit parishes</a>
+<a href="#" class="current-page-in-menu">List parishes</a>
 <br />
 <a href="./locality-types-create-edit.html">Create/edit Locality types</a>
 <a href="./locality-types-list.html">List locality types</a>
 <br />
 <a href="./locations.html">List locations</a>
 
-<h1 id="regionsTableHeader">All regions</h1>
-<table id="regionsTable">
+<h1 id="parishesTableHeader">All parishes</h1>
+<table id="parishesTable">
     <thead>
     <tr>
         <th>ID</th>
         <th>Name</th>
+		<th>Belongs to region</th>
+		<th>Belongs to precinct</th>
         <th>Edit</th>
     </tr>
     </thead>
@@ -75,10 +86,10 @@
 </table>
 <br/>
 
-<form id="filterRegionsForm">
-    <label for="filterByRegionName">Filter by region name: </label>
-    <input type="text" id="filterByRegionName"><br/>
-    <input type="button" value="Do filter" onclick="doFilterRegions('Filtered by', setHeaderAndPopulateTable)">
+<form id="filterParishesForm">
+    <label for="filterByParishName">Filter by parish name: </label>
+    <input type="text" id="filterByParishName"><br/>
+    <input type="button" value="Do filter" onclick="doFilterParishes('Filtered by', setHeaderAndPopulateTable)">
 </form>
 
 </body>
