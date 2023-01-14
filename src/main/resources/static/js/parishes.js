@@ -34,3 +34,9 @@ function createOrEditParish(callback, parishId) {
         genericUpdate(parishData, "parishes", parishId, "PATCH", callback);
     }
 }
+
+function doFilterParishes(newHeaderText, callback) {
+    let errorMessage = "doFilterParishes(...) not implemented yet. Ignoring...";
+    console.log(errorMessage);
+    alert(errorMessage);
+}

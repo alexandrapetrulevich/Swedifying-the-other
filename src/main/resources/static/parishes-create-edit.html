@@ -17,19 +17,19 @@
 
     async function init() {
 		let regionsData = await getAllRegionsAsync();
-		populateAwailableRegions(regionsData._embedded.regions);
+		populateAvailableRegions(regionsData._embedded.regions);
 	
         let searchParams = new URLSearchParams(window.location.search);
         if (searchParams.has("parishId")) {
             setUpForEdit(searchParams.get("parishId"));
         } else {
 			let precinctsData = await getAllPrecinctsByBelongsToRegionIdAsync(regionsData._embedded.regions[0].regionId);
-			populateAwailablePrecincts(precinctsData._embedded.precincts);
+			populateAvailablePrecincts(precinctsData._embedded.precincts);
 		}
     }
 	
-	function populateAwailableRegions(regions) {
-        console.log("populateAwailableRegions, no of regions: " + regions.length);
+	function populateAvailableRegions(regions) {
+        console.log("populateAvailableRegions, no of regions: " + regions.length);
 		let select = document.getElementById("availableRegions");
         for (let i = 0; i < regions.length; i++) {
             select.add(
@@ -38,8 +38,8 @@
         }
     }
     
-    function populateAwailablePrecincts(precincts) {
-        console.log("populateAwailablePrecincts, no of precincts: " + precincts.length);
+    function populateAvailablePrecincts(precincts) {
+        console.log("populateAvailablePrecincts, no of precincts: " + precincts.length);
 		let select = document.getElementById("availablePrecincts");
         for (let i = 0; i < precincts.length; i++) {
             select.add(
@@ -93,7 +93,7 @@
 		getAllPrecinctsByBelongsToRegionId(
 			parish.belongsToRegion.regionId
 			, function(precincts) {
-				populateAwailablePrecincts(precincts);
+				populateAvailablePrecincts(precincts);
 				if (parish.belongsToPrecinct) {
 					let precinctUrl = removeTrialingProjection(
 						parish._links.belongsToPrecinct.href);
@@ -123,7 +123,7 @@
 		removeAllOptionsFromSelect(document.getElementById("availablePrecincts"));
 		getAllPrecinctsByBelongsToRegionId(
 			getIdFromHref(document.getElementById("availableRegions").value)
-			, populateAwailablePrecincts);
+			, populateAvailablePrecincts);
     }
 
     function precinctSelected() {

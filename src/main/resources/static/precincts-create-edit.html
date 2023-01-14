@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit precincts</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="./js/util.js"></script>
+    <script src="./js/precincts.js"></script>
+	<script src="./js/regions.js"></script>
+    <script>
+    var globPrecinctId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    async function init() {
+		let regionsData = await getAllRegionsAsync();
+		populateAvailableRegions(regionsData._embedded.regions);
+	
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("precinctId")) {
+            setUpForEdit(searchParams.get("precinctId"));
+        }
+    }
+	
+	function populateAvailableRegions(regions) {
+        console.log("populateAvailableRegions, no of regions: " + regions.length);
+		let select = document.getElementById("availableRegions");
+        for (let i = 0; i < regions.length; i++) {
+            select.add(
+                new Option(regions[i].regionName + " (" + regions[i]._links.self.href + ")"
+                , regions[i]._links.self.href));
+        }
+    }
+
+    function setUpForEdit(precinctId) {
+        globPrecinctId = precinctId;
+        console.log("Precinct id to edit " + globPrecinctId);
+        loadPrecinct(globPrecinctId);
+        document.getElementById("createEditPrecinctHeader").innerHTML = "Editing precinct " + globPrecinctId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadPrecinct(precinctId) {
+        getPrecinctById(precinctId, displayPrecinct, handleGetPrecinctError);
+    }
+
+    function handleGetPrecinctError(httpErrorStatus) {
+        let errorText = "Could not get precinct " + globPrecinctId;
+        if (httpErrorStatus == 404) {
+            errorText += ", precinct not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globPrecinctId = "";
+        document.getElementById("createEditPrecinctHeader").innerHTML = "Create new precinct";
+        document.getElementById("createEditButton").value = "Create";
+        document.getElementById("precinctName").value = "";
+		document.getElementById("availableRegions").selectedIndex = 0;
+    }
+
+    function displayPrecinct(precinct) {
+        document.getElementById("precinctName").value = precinct.name;
+		let regionUrl = removeTrialingProjection(
+            precinct._links.belongsToRegion.href);
+        genericGet(regionUrl, function(data) {
+            document.getElementById("availableRegions").value = data._links.self.href;
+        });
+    }
+
+    function precinctCreatedOrEdited(precinct) {
+		var format =  " precinct "
+                + precinct.name
+                + " (ID " +  precinct.subRegionId + ")";
+        if (globPrecinctId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+	
+	function regionSelected() {
+        console.log("Region selected: " + document.getElementById("availableRegions").value);
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="./index.html">Main menu</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit precincts</a>
+<a href="./precincts-list.html">List precincts</a>
+<br />
+
+<h1 id="createEditPrecinctHeader">Create new precinct</h1>
+
+<form id="createEditPrecinctForm" >
+    <label for="precinctName" class="for-editable"><b>Precinct name:</b></label>
+    <input type="text" size="50" id="precinctName"/><br/>
+	<label for="availableRegions" class="for-editable">Belongs to region:</label>
+    <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
+    </select><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditPrecinct(precinctCreatedOrEdited, globPrecinctId)" value="Create">
+</form>
+
+</body>
+</html>

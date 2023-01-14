@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List precincts</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/util.js"></script>
+    <script src="./js/precincts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllPrecincts(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, precincts) {
+            document.getElementById("precinctsTableHeader").innerHTML = headerText;
+            populateTable(precincts);
+        }
+
+        function populateTable(precincts) {
+            console.log("populateTable, no of precincts " + precincts.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < precincts.length; i++)
+            {
+	            tableBody.innerHTML +=
+                    "<tr><td>"
+                    + precincts[i].subRegionId
+                    + "</td><td>"
+                    + precincts[i].name
+                    + "</td><td>"
+					+ precincts[i].belongsToRegion.regionName + " (ID: " + precincts[i].belongsToRegion.regionId + ")"
+					+ "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + precincts[i].subRegionId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+
+        function goToEditView(precinctId) {
+            location.href = "/precincts-create-edit.html?precinctId=" + precinctId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="./index.html">Main menu</a>
+<br />
+<a href="./precincts-create-edit.html">Create/edit precincts</a>
+<a href="#" class="current-page-in-menu">List precincts</a>
+<br />
+
+<h1 id="precinctsTableHeader">All precincts</h1>
+<table id="precinctsTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+		<th>Belongs to region</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody id="tbodyid">
+    </tbody>
+</table>
+<br/>
+
+<form id="filterPrecinctsForm">
+    <label for="filterByPrecinctName">Filter by precinct name: </label>
+    <input type="text" id="filterByPrecinctName"><br/>
+    <input type="button" value="Do filter" onclick="doFilterPrecincts('Filtered by', setHeaderAndPopulateTable)">
+</form>
+
+</body>
+</html>
