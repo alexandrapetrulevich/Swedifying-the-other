@@ -7,38 +7,82 @@
 
     <script src="./js/util.js"></script>
     <script src="./js/source-findings.js"></script>
-	<script src="./js/regions.js"></script>
+	<script src="./js/map-sources.js"></script>
+	<script src="./js/text-sources.js"></script>
+	<script src="./js/part-of-sources.js"></script>
     <script>
     var globSourceFindingId = "";
+	var MAP_SOURCE_TYPE = "MS";
+	var TEXT_SOURCE_TYPE = "TS";
     document.addEventListener('DOMContentLoaded', function() {
         init();
     });
 
     async function init() {
-		let regionsData = await getAllRegionsAsync();
-		populateAvailableRegions(regionsData._embedded.regions);
-	
+		let mapSourcesData = await getAllMapSourcesAsync();
+		populateAvailableSources(mapSourcesData._embedded.mapSources, MAP_SOURCE_TYPE);
+		let textSourcesData = await getAllTextSourcesAsync();
+		populateAvailableSources(textSourcesData._embedded.textSources, TEXT_SOURCE_TYPE);
+		
+		let partsOfSourcesData = await getAllPartOfSourcesAsync();
+		populateAvailablePartsOfSources(partsOfSourcesData._embedded.partOfSources);
+		
         let searchParams = new URLSearchParams(window.location.search);
         if (searchParams.has("sourceFindingId")) {
             setUpForEdit(searchParams.get("sourceFindingId"));
         }
     }
 	
-	function populateAvailableRegions(regions) {
-        console.log("populateAvailableRegions, no of regions: " + regions.length);
-		let select = document.getElementById("availableRegions");
-        for (let i = 0; i < regions.length; i++) {
-            select.add(
-                new Option(regions[i].regionName + " (" + regions[i]._links.self.href + ")"
-                , regions[i]._links.self.href));
+	function populateAvailableSources(sources, sourceType) {
+        console.log("populateAvailableSources, no of sources: " + sources.length);
+		let select = document.getElementById("availableSources");
+        for (let i = 0; i < sources.length; i++) {
+            let sourceText = "";
+			if (sourceType === MAP_SOURCE_TYPE) {
+				sourceText = getMapSourceOptionText(sources[i]);
+			} else {
+				sourceText = getTextSourceOptionText(sources[i]);
+			}
+			select.add(
+                new Option(
+					sourceText
+					, sources[i]._links.self.href));
         }
     }
+	
+	function populateAvailablePartsOfSources(partsOfSources) {
+		console.log("populateAvailablePartsOfSources, no of parts of sources: " + partsOfSources.length);
+		let select = document.getElementById("availablePartsOfSources");
+        for (let i = 0; i < partsOfSources.length; i++) {
+			select.add(
+                new Option(
+					partsOfSources[i].partOfSourceName + " (" + partsOfSources[i]._links.self.href +")"
+					, partsOfSources[i]._links.self.href));
+        }
+	}
+	
+	function getMapSourceOptionText(mapSource) {
+		return "Map source " + mapSource.sourceId 
+			+ " sheet: " + mapSource.mapSheet 
+			+ " signature: " + mapSource.mapSignature.mapSignature
+			+ " dating: " + mapSource.dating
+			+ " land surveyor: " + mapSource.landSurveyor.name
+	}
+	
+	function getTextSourceOptionText(textSource) {
+		return "Text source " + textSource.sourceId 
+			+ " name: " + textSource.name 
+			+ " sub section: " + textSource.subSection
+			+ " page: " + textSource.page
+			+ " dating: " + textSource.dating
+			+ " land surveyor: " + textSource.landSurveyor.name
+	}
 
     function setUpForEdit(sourceFindingId) {
         globSourceFindingId = sourceFindingId;
         console.log("SourceFinding id to edit " + globSourceFindingId);
         loadSourceFinding(globSourceFindingId);
-        document.getElementById("createEditSourceFindingHeader").innerHTML = "Editing sourceFinding " + globSourceFindingId;
+        document.getElementById("createEditSourceFindingHeader").innerHTML = "Editing source finding " + globSourceFindingId;
         document.getElementById("createEditButton").value = "Update";
     }
 
@@ -59,25 +103,28 @@
 
     function setUpForCreate() {
         globSourceFindingId = "";
-        document.getElementById("createEditSourceFindingHeader").innerHTML = "Create new sourceFinding";
+        document.getElementById("createEditSourceFindingHeader").innerHTML = "Create new source finding";
         document.getElementById("createEditButton").value = "Create";
-        document.getElementById("sourceFindingName").value = "";
-		document.getElementById("availableRegions").selectedIndex = 0;
+		document.getElementById("availableSources").selectedIndex = 0;
+		document.getElementById("availablePartsOfSources").selectedIndex = 0;
     }
 
     function displaySourceFinding(sourceFinding) {
-        document.getElementById("sourceFindingName").value = sourceFinding.name;
-		let regionUrl = removeTrialingProjection(
-            sourceFinding._links.belongsToRegion.href);
-        genericGet(regionUrl, function(data) {
-            document.getElementById("availableRegions").value = data._links.self.href;
+		var sourceUrl = removeTrialingProjection(
+            sourceFinding._links.source.href);
+        var partOfSourceUrl = removeTrialingProjection(
+            sourceFinding._links.partOfSource.href);
+        genericGet(sourceUrl, function(data) {
+            document.getElementById("availableSources").value = data._links.self.href;
+        });
+        genericGet(partOfSourceUrl, function(data) {
+            document.getElementById("availablePartsOfSources").value = data._links.self.href;
         });
     }
 
     function sourceFindingCreatedOrEdited(sourceFinding) {
-		var format =  " sourceFinding "
-                + sourceFinding.name
-                + " (ID " +  sourceFinding.subRegionId + ")";
+		var format =  " source finding "
+                + sourceFinding.sourceFindingId;
         if (globSourceFindingId === "") {
             alert("Created" + format);
         } else {
@@ -86,8 +133,12 @@
         setUpForCreate();
     }
 	
-	function regionSelected() {
-        console.log("Region selected: " + document.getElementById("availableRegions").value);
+	function sourceSelected() {
+        console.log("source selected: " + document.getElementById("availableSources").value);
+    }
+	
+	function partOfSourceSelected() {
+        console.log("part of source selected: " + document.getElementById("availablePartsOfSources").value);
     }
 
     </script>
@@ -97,16 +148,17 @@
 <a href="./index.html">Main menu</a>
 <br />
 <a href="#" class="current-page-in-menu">Create/edit source findings</a>
-<a href="./sourceFindings-list.html">List source findings</a>
+<a href="./source-findings-list.html">List source findings</a>
 <br />
 
-<h1 id="createEditSourceFindingHeader">Create new sourceFinding</h1>
+<h1 id="createEditSourceFindingHeader">Create new source finding</h1>
 
 <form id="createEditSourceFindingForm" >
-    <label for="sourceFindingName" class="for-editable"><b>Source finding name:</b></label>
-    <input type="text" size="50" id="sourceFindingName"/><br/>
-	<label for="availableRegions" class="for-editable">Belongs to region:</label>
-    <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
+    <label for="availableSources" class="for-editable">Source:</label>
+    <select name="availableSources" id="availableSources" onchange="sourceSelected()">
+    </select><br/>
+	<label for="availablePartsOfSources" class="for-editable">Part of source:</label>
+    <select name="availablePartsOfSources" id="availablePartsOfSources" onchange="partOfSourceSelected()">
     </select><br/>
 
     <input id="createEditButton" type="button" onclick="createOrEditSourceFinding(sourceFindingCreatedOrEdited, globSourceFindingId)" value="Create">

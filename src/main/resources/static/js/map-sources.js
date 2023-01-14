@@ -8,6 +8,10 @@ function getAllMapSources(callback) {
         });
 }
 
+async function getAllMapSourcesAsync() {
+    return await genericGetAllAsync("mapSources", "mapSourceView");
+}
+
 function getMapSourceById(id, callback, errorCallback) {
     genericGetById(id, "mapSources", callback, errorCallback, "mapSourceView");
 }

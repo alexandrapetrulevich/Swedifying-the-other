@@ -18,19 +18,17 @@ function getSourceFindingById(id, callback, errorCallback) {
 }
 
 function createOrEditSourceFinding(callback, sourceFindingId) {
-	let sourceFindingNameValue = document.getElementById("sourceFindingName").value;
-	let belongsToRegionValue = document.getElementById("availableRegions").value;
-	let belongsToPrecinctValue = document.getElementById("availablePrecincts").value;
+	let sourceValue = document.getElementById("availableSources").value;
+	let partOfSourceValue = document.getElementById("availablePartsOfSources").value;
 	var sourceFindingData = {
-        subRegionId: null
-        , name: sourceFindingNameValue
-		, belongsToRegion: belongsToRegionValue
-		, belongsToPrecinct: belongsToPrecinctValue
+        sourceFindingId: null
+		, source: sourceValue
+		, partOfSource: partOfSourceValue
     };
     if (sourceFindingId === "") {
         genericCreate(sourceFindingData, "sourceFindings", callback);
     } else {
-		sourceFindingData.subRegionId = parseInt(sourceFindingId);
+		sourceFindingData.sourceFindingId = parseInt(sourceFindingId);
         genericUpdate(sourceFindingData, "sourceFindings", sourceFindingId, "PATCH", callback);
     }
 }

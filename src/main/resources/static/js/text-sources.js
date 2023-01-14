@@ -8,6 +8,10 @@ function getAllTextSources(callback) {
         });
 }
 
+async function getAllTextSourcesAsync() {
+    return await genericGetAllAsync("textSources", "textSourceView");
+}
+
 function getTextSourceById(id, callback, errorCallback) {
     genericGetById(id, "textSources", callback, errorCallback, "textSourceView");
 }
