@@ -17,7 +17,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Slf4j
-@Profile("testdata")
+@Profile("testdata & !postgresql")
 @Component
 class TestDataDatabaseInitializer implements DatabaseInitializer {
 

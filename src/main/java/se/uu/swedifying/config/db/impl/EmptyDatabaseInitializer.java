@@ -7,9 +7,10 @@ import se.uu.swedifying.config.db.DatabaseInitializer;
 
 
 @Component
-@Profile("!testdata")
+// Listing profiles means OR, hence true if "!testdata" OR "postgresql"
+@Profile({"!testdata", "postgresql"})
 @Slf4j
-public class EmptyDatabaseInitializer implements DatabaseInitializer {
+class EmptyDatabaseInitializer implements DatabaseInitializer {
   @Override
   public void initDatabase() {
     log.info("*** Starting with an empty database - no initial test data added");
