@@ -4,6 +4,11 @@ Place-name database for the project *Swedifying the other* https://www.vr.se/eng
 ## Overview
 The application consists of an SQL database holding place-name data as needed in the project *Swedifying the other* and a user interface to allow the user to interact with the database. The database exposed is exposed with a REST API through a web application (Java/Spring Boot), accesible to the user via a web browser user interface for adding data to and searching/filtering the database (HTML/JavaScript).
 
+## Database diagram
+Below is an Entity Relationship Diagram of the database.
+
+![er-diagram](./docs/img/swedifying-the-other-erd-detailed.png)
+
 ## TODO as of 2023-01-21
 Currently, the following tasks is left to do for a (sort of) complete version of the application:
 
