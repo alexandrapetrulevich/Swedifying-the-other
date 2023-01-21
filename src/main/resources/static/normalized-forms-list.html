@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List normalized forms</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/normalized-forms.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllNormalizedForms(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, normalizedForms) {
+            document.getElementById("normalizedFormsTableHeader").innerHTML = headerText;
+            populateTable(normalizedForms);
+        }
+
+        function populateTable(normalizedForms) {
+            console.log("populateTable, no of normalized forms " + normalizedForms.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+			for (let i = 0; i < normalizedForms.length; i++)
+            {
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + normalizedForms[i].normalizedFormId
+                    + "</td><td>"
+                    + normalizedForms[i].normalizedForm
+                    + "</td><td>"
+					+ normalizedForms[i].morphologicalNameType
+                    + "</td><td>"
+					+ getMorphTypeIsShakyText(normalizedForms[i])
+                    + "</td><td>"
+					+ getMorphologicalDataText(normalizedForms[i].morphologicalData)
+                    + "</td><td>"
+					+ normalizedForms[i].comparativeFormInformation
+                    + "</td><td>"
+					+ getLanguageText(normalizedForms[i].etymology)
+                    + "</td><td>"
+					+ getLanguageText(normalizedForms[i].mediatingLanguage)
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + normalizedForms[i].normalizedFormId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+		
+		function getMorphTypeIsShakyText(normalizedForm) {
+			if (normalizedForm.morphologicalNameTypeIsShaky) {
+				return "Yes";
+			}
+			return "No";
+		}
+		
+		function getLanguageText(language) {
+			if (language) {
+				return language.languageName + " (" + language.languageCode + ")";
+			}
+			return "N/A";
+		}
+		
+		function getMorphologicalDataText(morphologicalData) {
+			let morphologicalDataString = "";
+			let added = false;
+			if (morphologicalData.determinationClauseInPhrase) {
+				morphologicalDataString += "<b>Determination clause in phrase</b>: " + morphologicalData.determinationClauseInPhrase;
+				added = true;
+			}
+			if (morphologicalData.mainClauseInPhrase) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Main clause in phrase</b>: " + morphologicalData.mainClauseInPhrase;
+				added = true;
+			}
+			if (morphologicalData.simpleRootMorpheme) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Simple root morpheme</b>: " + morphologicalData.simpleRootMorpheme;
+				added = true;
+			}
+			if (morphologicalData.derivationBase) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Derivation base</b>: " + morphologicalData.derivationBase;
+				added = true;
+			}
+			if (morphologicalData.derivationMorpheme) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Derivation morpheme</b>: " + morphologicalData.derivationMorpheme;
+				added = true;
+			}
+			if (morphologicalData.determinationClauseInComposition) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Determination clause in composition</b>: " + morphologicalData.determinationClauseInComposition;
+				added = true;
+			}
+			if (morphologicalData.jointMorphemeInComposition) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Joint morpheme in composition</b>: " + morphologicalData.jointMorphemeInComposition;
+				added = true;
+			}
+			if (morphologicalData.mainClauseInComposition) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Main clause in composition</b>: " + morphologicalData.mainClauseInComposition;
+				added = true;
+			}
+			return morphologicalDataString;
+		}
+		
+		function prepareAddToMorphologicalDataString(added) {
+			if (added) {
+				return "<br>";
+			}
+			return "";
+		}
+
+        function goToEditView(normalizedFormId) {
+            location.href = "/normalized-forms-create-edit.html?normalizedFormId=" + normalizedFormId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="/index.html">Main menu</a>
+<br />
+<a href="/normalized-forms-create-edit.html">Create/edit normalized forms</a>
+<a href="#" class="current-page-in-menu">List normalized forms</a>
+
+<h1 id="normalizedFormsTableHeader">All normalized forms</h1>
+<table id="normalizedFormsTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Normalized Form</th>
+		<th>Morphological name type</th>
+		<th>Morphological name type is shaky</th>
+		<th>Morphological data</th>
+		<th>Comparative form information</th>
+		<th>Etymology language</th>
+		<th>Mediating language</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody id="tbodyid">
+    </tbody>
+</table>
+<br/>
+
+<form id="filterNormalizedFormsForm">
+    <label for="filterByNormalizedForm">Filter by normalized form: </label>
+    <input type="text" id="filterByNormalizedForm"><br/>
+    <input type="button" value="Do filter" onclick="doFilterNormalizedForms('Filtered by', setHeaderAndPopulateTable)">
+</form>
+
+</body>
+</html>

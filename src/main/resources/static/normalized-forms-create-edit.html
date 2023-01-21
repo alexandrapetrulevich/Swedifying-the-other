@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit normalized forms</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/js/util.js"></script>
+    <script src="/js/normalized-forms.js"></script>
+    <script>
+    var globNormalizedFormId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    function init() {
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("normalizedFormId")) {
+            setUpForEdit(searchParams.get("normalizedFormId"));
+        }
+    }
+
+    function setUpForEdit(normalizedFormId) {
+        globNormalizedFormId = normalizedFormId;
+        console.log("Normalized form id to edit " + globNormalizedFormId);
+        loadNormalizedForm(globNormalizedFormId);
+        document.getElementById("createEditNormalizedFormHeader").innerHTML = "Editing normalized form " + globNormalizedFormId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadNormalizedForm(normalizedFormId) {
+        getNormalizedFormById(normalizedFormId, displayNormalizedForm, handleGetNormalizedFormError);
+    }
+
+    function handleGetNormalizedFormError(httpErrorStatus) {
+        var errorText = "Could not get normalized form " + globNormalizedFormId;
+        if (httpErrorStatus == 404) {
+            errorText += ", normalized form not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globNormalizedFormId = "";
+		document.getElementById("normalizedFormName").value = "";
+        document.getElementById("createEditNormalizedFormHeader").innerHTML = "Create new normalized form";
+        document.getElementById("createEditButton").value = "Create";
+    }
+
+    function displayNormalizedForm(normalizedForm) {
+        document.getElementById("normalizedFormName").value = normalizedForm.normalizedForm;
+    }
+
+    function normalizedFormCreatedOrEdited(normalizedForm) {
+		var format =  " normalized form " + normalizedForm.normalizedForm + " (ID " +  normalizedForm.normalizedFormId + ")";
+        if (globNormalizedFormId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="/index.html">Main menu</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit normalized forms</a>
+<a href="/normalized-forms-list.html">List normalized forms</a>
+
+<h1 id="createEditNormalizedFormHeader">Create new normalized form</h1>
+
+<form id="createEditNormalizedFormForm" >
+    <label for="normalizedFormName" class="for-editable"><b>Normalized form name:</b></label>
+    <input type="text" size="50" id="normalizedFormName"/><br/>
+
+    <input id="createEditButton" type="button" onclick="createOrEditNormalizedForm(normalizedFormCreatedOrEdited, globNormalizedFormId)" value="Create">
+</form>
+
+</body>
+</html>

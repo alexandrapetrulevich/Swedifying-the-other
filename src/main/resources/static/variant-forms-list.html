@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List map signatures</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/map-signatures.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllMapSignatures(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, mapSignatures) {
+            document.getElementById("mapSignaturesTableHeader").innerHTML = headerText;
+            populateTable(mapSignatures);
+        }
+
+        function populateTable(mapSignatures) {
+            console.log("populateTable, no of map signatures " + mapSignatures.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < mapSignatures.length; i++)
+            {
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + mapSignatures[i].mapSignatureId
+                    + "</td><td>"
+                    + mapSignatures[i].mapSignature
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + mapSignatures[i].mapSignatureId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+
+        function goToEditView(mapSignatureId) {
+            location.href = "/map-signatures-create-edit.html?mapSignatureId=" + mapSignatureId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="/index.html">Main menu</a>
+<br />
+<a href="/map-signatures-create-edit.html">Create/edit map signatures</a>
+<a href="#" class="current-page-in-menu">List map signatures</a>
+
+<h1 id="mapSignaturesTableHeader">All map signatures</h1>
+<table id="mapSignaturesTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Map Signature</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody id="tbodyid">
+    </tbody>
+</table>
+<br/>
+
+<form id="filterMapSignaturesForm">
+    <label for="filterByMapSignature">Filter by map signature: </label>
+    <input type="text" id="filterByMapSignature"><br/>
+    <input type="button" value="Do filter" onclick="doFilterMapSignatures('Filtered by', setHeaderAndPopulateTable)">
+</form>
+
+</body>
+</html>
