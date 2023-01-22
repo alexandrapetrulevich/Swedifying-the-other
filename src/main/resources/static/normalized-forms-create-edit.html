@@ -7,18 +7,32 @@
 
     <script src="/js/util.js"></script>
     <script src="/js/normalized-forms.js"></script>
+    <script src="/js/morphological-name-types.js"></script>
     <script>
     var globNormalizedFormId = "";
     document.addEventListener('DOMContentLoaded', function() {
         init();
     });
 
-    function init() {
+    async function init() {
+		populateAvailableMorphologicalNameTypes(await getAllMorphologicalNameTypesAsync());
         let searchParams = new URLSearchParams(window.location.search);
         if (searchParams.has("normalizedFormId")) {
             setUpForEdit(searchParams.get("normalizedFormId"));
         }
     }
+	
+	function populateAvailableMorphologicalNameTypes(morphologicalNameTypes) {
+		console.log("morphologicalNameTypes: " + morphologicalNameTypes);
+		console.log("populateAvailableMorphologicalNameTypes, no of MorphologicalNameTypes: " + morphologicalNameTypes.length);
+		let select = document.getElementById("availableMorphologicalNameTypes");
+		for (let i = 0; i < morphologicalNameTypes.length; i++) {
+			select.add(
+                new Option(
+					morphologicalNameTypes[i]
+					, morphologicalNameTypes[i]));
+        }
+	}
 
     function setUpForEdit(normalizedFormId) {
         globNormalizedFormId = normalizedFormId;
@@ -63,6 +77,10 @@
         }
         setUpForCreate();
     }
+	
+	function morphologicalNameTypeSelected() {
+		console.log("morphologicalNameType selected: " + document.getElementById("availableMorphologicalNameTypes").value);
+	}
 
     </script>
 </head>
@@ -76,8 +94,11 @@
 <h1 id="createEditNormalizedFormHeader">Create new normalized form</h1>
 
 <form id="createEditNormalizedFormForm" >
-    <label for="normalizedFormName" class="for-editable"><b>Normalized form name:</b></label>
-    <input type="text" size="50" id="normalizedFormName"/><br/>
+    <label for="normalizedForm" class="for-editable"><b>Normalized form:</b></label>
+    <input type="text" size="50" id="normalizedForm"/><br/>
+	<label for="availableMorphologicalNameTypes" class="for-editable">Morphological name type:</label>
+    <select name="availableMorphologicalNameTypes" id="availableMorphologicalNameTypes" onchange="morphologicalNameTypeSelected()">
+    </select><br/>
 
     <input id="createEditButton" type="button" onclick="createOrEditNormalizedForm(normalizedFormCreatedOrEdited, globNormalizedFormId)" value="Create">
 </form>
