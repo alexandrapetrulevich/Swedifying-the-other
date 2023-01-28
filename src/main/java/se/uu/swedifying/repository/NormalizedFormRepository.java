@@ -13,4 +13,6 @@ public interface NormalizedFormRepository extends CrudRepository<NormalizedForm,
     , List<Language> etymologies);
 
   NormalizedForm findByNormalizedForm(String normalizedForm);
+
+  List<NormalizedForm> findByNormalizedFormContains(String normalizedFormFilter);
 }

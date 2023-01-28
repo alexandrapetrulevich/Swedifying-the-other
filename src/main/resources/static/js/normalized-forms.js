@@ -13,20 +13,51 @@ async function getAllNormalizedFormsAsync() {
 }
 
 function getNormalizedFormById(id, callback, errorCallback) {
-    genericGetById(id, "normalizedForms", callback, errorCallback);
+    genericGetById(id, "normalizedForms", callback, errorCallback, "normalizedFormView");
 }
 
-function createOrEditNormalizedForm(callback, normalizedFormId) {
-    var normalizedFormNameValue = document.getElementById("normalizedFormName").value;
-	var normalizedFormData = {
+function getMorphologicalDataValueForTextValue(textValue) {
+	if (!textValue) {
+		console.log("getMorphologicalDataValueForTextValue returns null, textValue: " + textValue);
+		return null;
+	}
+	return textValue;
+}
+
+function getLanguageValueForSelectValue(selectValue, noLanguageSelectValue) {
+	if (selectValue === noLanguageSelectValue) {
+		console.log("getLanguageValueForSelectValue returns null, selectValue: " + selectValue + ", noLanguageSelectValue: " + noLanguageSelectValue);
+		return null;
+	}
+	return selectValue;
+}
+
+function createOrEditNormalizedForm(callback, normalizedFormId, noLanguageSelectValue) {
+	let morphologicalDataValue = {
+		determinationClauseInPhrase: getMorphologicalDataValueForTextValue(document.getElementById("determinationClauseInPhrase").value)
+		, mainClauseInPhrase: getMorphologicalDataValueForTextValue(document.getElementById("mainClauseInPhrase").value)
+		, simpleRootMorpheme: getMorphologicalDataValueForTextValue(document.getElementById("simpleRootMorpheme").value)
+		, derivationBase: getMorphologicalDataValueForTextValue(document.getElementById("derivationBase").value)
+		, derivationMorpheme: getMorphologicalDataValueForTextValue(document.getElementById("derivationMorpheme").value)
+		, determinationClauseInComposition: getMorphologicalDataValueForTextValue(document.getElementById("determinationClauseInComposition").value)
+		, jointMorphemeInComposition: getMorphologicalDataValueForTextValue(document.getElementById("jointMorphemeInComposition").value)
+		, mainClauseInComposition: getMorphologicalDataValueForTextValue(document.getElementById("mainClauseInComposition").value)
+	};
+	let normalizedFormData = {
         normalizedFormId:null
-        , normalizedForm:normalizedFormNameValue
+        , normalizedForm: document.getElementById("normalizedForm").value
+		, morphologicalNameType: document.getElementById("availableMorphologicalNameTypes").value
+		, morphologicalNameTypeIsShaky: document.getElementById("morphologicalNameTypeIsShaky").checked
+		, morphologicalData: morphologicalDataValue
+		, comparativeFormInformation: document.getElementById("comparativeFormInformation").value
+		, etymology: getLanguageValueForSelectValue(document.getElementById("availableEtymologyLanguages").value)
+		, mediatingLanguage: getLanguageValueForSelectValue(document.getElementById("availableMediatingLanguages").value)
     };
     if (normalizedFormId === "") {
         genericCreate(normalizedFormData, "normalizedForms", callback);
     } else {
 		normalizedFormData.normalizedFormId = parseInt(normalizedFormId);
-        genericUpdate(normalizedFormData, "normalizedForms", normalizedFormId, "PUT", callback);
+        genericUpdate(normalizedFormData, "normalizedForms", normalizedFormId, "PATCH", callback);
     }
 }
 
@@ -35,7 +66,7 @@ function doFilterNormalizedForms(newHeaderText, callback) {
     var queryParams = "?projection=normalizedFormView"
         + "&normalizedFormFilter=" + encodeURIComponent(filterByNormalizedForm);
     if (filterByNormalizedForm != "") {
-        newHeaderText = newHeaderText + " normalized form name " + filterByNormalizedForm;
+        newHeaderText = newHeaderText + " normalized form " + filterByNormalizedForm;
     } else {
         newHeaderText = "All normalized forms";
     }

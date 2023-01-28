@@ -15,7 +15,7 @@ Currently, the following tasks is left to do for a (sort of) complete version of
 - Finish the user interface for adding/editing/browsing the entities. Most are done, a couple still remain.
   - Attestation
   - ~~Map Source~~
-  - Normalized Form
+  - ~~Normalized Form~~
   - ~~Parish~~
   - ~~Precinct~~
   - ~~Source Finding~~
