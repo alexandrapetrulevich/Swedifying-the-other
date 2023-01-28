@@ -1,0 +1,1 @@
+ALTER TABLE normalized_form ALTER COLUMN morphological_name_type TYPE VARCHAR(255);
