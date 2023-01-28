@@ -1,0 +1,1 @@
+ALTER TABLE variant_form ALTER COLUMN is_adapted_to_swedish TYPE VARCHAR(255);
