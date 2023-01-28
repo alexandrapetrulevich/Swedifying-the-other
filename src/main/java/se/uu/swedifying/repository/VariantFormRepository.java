@@ -11,5 +11,7 @@ public interface VariantFormRepository extends CrudRepository<VariantForm, Long>
   List<VariantForm> findAll();
   List<VariantForm> findByNormalizedFormIn(List<NormalizedForm> normalizedForms);
 
+  List<VariantForm> findByVariantFormContains(String variantFormFilter);
+
   VariantForm findByVariantForm(String variantForm);
 }

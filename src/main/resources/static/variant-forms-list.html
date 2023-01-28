@@ -2,39 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>List map signatures</title>
+    <title>List variant forms</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/util.js"></script>
-    <script src="/js/map-signatures.js"></script>
+    <script src="/js/variant-forms.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            getAllMapSignatures(populateTable);
+            getAllVariantForms(populateTable);
         });
 
-        function setHeaderAndPopulateTable(headerText, mapSignatures) {
-            document.getElementById("mapSignaturesTableHeader").innerHTML = headerText;
-            populateTable(mapSignatures);
+        function setHeaderAndPopulateTable(headerText, variantForms) {
+            document.getElementById("variantFormsTableHeader").innerHTML = headerText;
+            populateTable(variantForms);
         }
 
-        function populateTable(mapSignatures) {
-            console.log("populateTable, no of map signatures " + mapSignatures.length);
+        function populateTable(variantForms) {
+            console.log("populateTable, no of variant forms " + variantForms.length);
             var tableBody = document.getElementById('tbodyid');
             tableBody.innerHTML = "";
-            for (let i = 0; i < mapSignatures.length; i++)
+            for (let i = 0; i < variantForms.length; i++)
             {
                 tableBody.innerHTML +=
                     "<tr><td>"
-                    + mapSignatures[i].mapSignatureId
+                    + variantForms[i].variantFormId
                     + "</td><td>"
-                    + mapSignatures[i].mapSignature
+                    + variantForms[i].variantForm
                     + "</td><td>"
-                    + "<button type=\"button\" onclick=\"goToEditView(" + mapSignatures[i].mapSignatureId + ");\">Edit</button>"
+                    + variantForms[i].isAdaptedToSwedish
+                    + "</td><td>"
+                    + getAdaptationTypesText(variantForms[i].adaptationTypes)
+                    + "</td><td><a href=\"/normalized-forms-create-edit.html?normalizedFormId=" + variantForms[i].normalizedForm.normalizedFormId + "\">"
+                    + variantForms[i].normalizedForm.normalizedForm + " (ID: " + variantForms[i].normalizedForm.normalizedFormId + ")</a>"
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + variantForms[i].variantFormId + ");\">Edit</button>"
                     + "</td></tr>";
             }
         }
+        
+        function getAdaptationTypesText(adaptationTypes) {
+            if (!adaptationTypes || adaptationTypes.length == 0) {
+                return "N/A";
+            }
+            let adaptationTypeLinkStart = "<a href=\"/adaptation-types-create-edit.html?adaptationTypeId=";
+            let ret = adaptationTypeLinkStart
+                + adaptationTypes[0].adaptationTypeId 
+                + "\">" 
+                + adaptationTypes[0].name 
+                + "</a>";
+            for (let i = 1; i < adaptationTypes.length; i++) {
+                ret += "\n" + adaptationTypeLinkStart + adaptationTypes[i].adaptationTypeId + "\">" + adaptationTypes[i].name + "</a>";
+            }
+            return ret;
+        }
 
-        function goToEditView(mapSignatureId) {
-            location.href = "/map-signatures-create-edit.html?mapSignatureId=" + mapSignatureId;
+        function goToEditView(variantFormId) {
+            location.href = "/variant-forms-create-edit.html?variantFormId=" + variantFormId;
         }
 
 
@@ -43,15 +65,18 @@
 <body>
 <a href="/index.html">Main menu</a>
 <br />
-<a href="/map-signatures-create-edit.html">Create/edit map signatures</a>
-<a href="#" class="current-page-in-menu">List map signatures</a>
+<a href="/variant-forms-create-edit.html">Create/edit variant forms</a>
+<a href="#" class="current-page-in-menu">List variant forms</a>
 
-<h1 id="mapSignaturesTableHeader">All map signatures</h1>
-<table id="mapSignaturesTable">
+<h1 id="variantFormsTableHeader">All variant forms</h1>
+<table id="variantFormsTable">
     <thead>
     <tr>
         <th>ID</th>
-        <th>Map Signature</th>
+        <th>Variant Form</th>
+        <th>Adapted to Swedish?</th>
+        <th>Adaptation Types</th>
+        <th>Normalized Form</th>
         <th>Edit</th>
     </tr>
     </thead>
@@ -60,10 +85,10 @@
 </table>
 <br/>
 
-<form id="filterMapSignaturesForm">
-    <label for="filterByMapSignature">Filter by map signature: </label>
-    <input type="text" id="filterByMapSignature"><br/>
-    <input type="button" value="Do filter" onclick="doFilterMapSignatures('Filtered by', setHeaderAndPopulateTable)">
+<form id="filterVariantFormsForm">
+    <label for="filterByVariantForm">Filter by variant form: </label>
+    <input type="text" id="filterByVariantForm"><br/>
+    <input type="button" value="Do filter" onclick="doFilterVariantForms('Filtered by', setHeaderAndPopulateTable)">
 </form>
 
 </body>

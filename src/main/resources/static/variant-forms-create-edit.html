@@ -2,40 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create/edit map signatures</title>
+    <title>Create/edit variant forms</title>
     <link rel="stylesheet" href="/css/style.css">
 
     <script src="/js/util.js"></script>
-    <script src="/js/map-signatures.js"></script>
+    <script src="/js/variant-forms.js"></script>
+    <script src="/js/is-adapted-to-swedish-types.js"></script>
+    <script src="/js/normalized-forms.js"></script>
+    <script src="/js/adaptation-types.js"></script>
     <script>
-    var globMapSignatureId = "";
+    var globVariantFormId = "";
+    var addedAdaptationTypes = [];
+    
     document.addEventListener('DOMContentLoaded', function() {
         init();
     });
 
-    function init() {
+    async function init() {
+        populateAvailableIsAdaptedToSwedishTypes(await getAllIsAdaptedToSwedishTypesAsync());
+        let adapationTypes = await getAllAdaptationTypesAsync();
+        populateAvailableAdaptationTypes(adapationTypes._embedded.adaptationTypes);
+        let normalizedForms = await getAllNormalizedFormsAsync();
+        populateAvailableNormalizedForms(normalizedForms._embedded.normalizedForms);
         let searchParams = new URLSearchParams(window.location.search);
-        if (searchParams.has("mapSignatureId")) {
-            setUpForEdit(searchParams.get("mapSignatureId"));
+        if (searchParams.has("variantFormId")) {
+            setUpForEdit(searchParams.get("variantFormId"));
         }
     }
+    
+    
+    function populateAvailableIsAdaptedToSwedishTypes(isAdaptedToSwedishTypes) {
+        console.log("isAdaptedToSwedishTypes: " + isAdaptedToSwedishTypes);
+        console.log("populateAvailableIsAdaptedToSwedishTypes, no of IsAdaptedToSwedishTypes: " + isAdaptedToSwedishTypes.length);
+        let select = document.getElementById("availableIsAdaptedToSwedishTypes");
+        for (let i = 0; i < isAdaptedToSwedishTypes.length; i++) {
+            select.add(
+                new Option(
+                    isAdaptedToSwedishTypes[i]
+                    , isAdaptedToSwedishTypes[i]));
+        }
+    }
+    
+    
+    function populateAvailableAdaptationTypes(adapationTypes) {
+        console.log("No of adapationTypes: " + adapationTypes.length);
+        let selectForAdaptationTypes = document.getElementById("availableAdaptationTypes");
+        for (let i = 0; i < adapationTypes.length; i++) {
+            selectForAdaptationTypes.add(
+                new Option(
+                    adapationTypes[i].name
+                    , adapationTypes[i]._links.self.href));
+        }
+    }
+    
+    function populateAvailableNormalizedForms(normalizedForms) {
+        console.log("No of normalized forms: " + normalizedForms.length);
+        let selectForNormalizedForms = document.getElementById("availableNormalizedForms");
+        for (let i = 0; i < normalizedForms.length; i++) {
+            selectForNormalizedForms.add(
+                new Option(
+                    normalizedForms[i].normalizedForm
+                    , normalizedForms[i]._links.self.href));
+        }
+    }
+    
 
-    function setUpForEdit(mapSignatureId) {
-        globMapSignatureId = mapSignatureId;
-        console.log("Map signature id to edit " + globMapSignatureId);
-        loadMapSignature(globMapSignatureId);
-        document.getElementById("createEditMapSignatureHeader").innerHTML = "Editing map signature " + globMapSignatureId;
+    function setUpForEdit(variantFormId) {
+        globVariantFormId = variantFormId;
+        console.log("Variant form id to edit " + globVariantFormId);
+        loadVariantForm(globVariantFormId);
+        document.getElementById("createEditVariantFormHeader").innerHTML = "Editing variant form " + globVariantFormId;
         document.getElementById("createEditButton").value = "Update";
     }
 
-    function loadMapSignature(mapSignatureId) {
-        getMapSignatureById(mapSignatureId, displayMapSignature, handleGetMapSignatureError);
+    function loadVariantForm(variantFormId) {
+        getVariantFormById(variantFormId, displayVariantForm, handleGetVariantFormError);
     }
 
-    function handleGetMapSignatureError(httpErrorStatus) {
-        var errorText = "Could not get map signature " + globMapSignatureId;
+    function handleGetVariantFormError(httpErrorStatus) {
+        var errorText = "Could not get variant form " + globVariantFormId;
         if (httpErrorStatus == 404) {
-            errorText += ", map signature not found";
+            errorText += ", variant form not found";
         } else {
             errorText += " due to status " + httpErrorStatus;
         }
@@ -44,24 +91,94 @@
     }
 
     function setUpForCreate() {
-        globMapSignatureId = "";
-		document.getElementById("mapSignatureName").value = "";
-        document.getElementById("createEditMapSignatureHeader").innerHTML = "Create new map signature";
+        globVariantFormId = "";
+		document.getElementById("variantFormName").value = "";
+        document.getElementById("createEditVariantFormHeader").innerHTML = "Create new variant form";
         document.getElementById("createEditButton").value = "Create";
     }
 
-    function displayMapSignature(mapSignature) {
-        document.getElementById("mapSignatureName").value = mapSignature.mapSignature;
+    function displayVariantForm(variantForm) {
+        document.getElementById("variantFormName").value = variantForm.variantForm;
     }
 
-    function mapSignatureCreatedOrEdited(mapSignature) {
-		var format =  " map signature " + mapSignature.mapSignature + " (ID " +  mapSignature.mapSignatureId + ")";
-        if (globMapSignatureId === "") {
-            alert("Created" + format);
+    function variantFormCreatedOrEdited(variantForm) {
+        let confirmText =  " variant form " + variantForm.variantForm + " (ID " +  variantForm.variantFormId + "). ";
+        if (globVariantFormId === "") {
+            confirmText = "Created" + confirmText;
         } else {
-            alert("Edited" + format);
+            confirmText = "Edited" + confirmText;
         }
-        setUpForCreate();
+        confirmText += " OK to continue editing this variant form, CANCEL to create a new one.";
+        if (!confirm(confirmText)) {
+            globVariantFormId = "";
+            setUpForCreate();
+        }
+    }
+    
+    function isAdaptedToSwedishSelected() {
+        let selectedIsAdaptedToSwedishType = document.getElementById("availableIsAdaptedToSwedishTypes").value;
+        console.log("selectedIsAdaptedToSwedishType: " + selectedIsAdaptedToSwedishType);
+    }
+    
+    function adaptationTypeSelected() {
+        let selectedAdaptationType = document.getElementById("availableAdaptationTypes").value;
+        console.log("selectedAdaptationType: " + selectedAdaptationType);
+    }
+    
+    function normalizedFormSelected() {
+        let selectedNormalizedForm = document.getElementById("availableNormalizedForms").value;
+        console.log("selectedNormalizedForm: " + selectedNormalizedForm);
+        let id = getIdFromHref(selectedNormalizedForm);
+        getNormalizedFormById(id, displayNormalizedForm)
+    }
+    
+    function displayNormalizedForm(normalizedForm) {
+        document.getElementById("normalizedForm_morphologicalNameType").value = normalizedForm.morphologicalNameType;
+        document.getElementById("normalizedForm_morphologicalNameTypeIsShaky").value = normalizedForm.morphologicalNameTypeIsShaky;
+        document.getElementById("normalizedForm_morphologicalData").value = JSON.stringify(normalizedForm.morphologicalData, (k, v) => v ?? undefined, 2);
+        if (normalizedForm.etymology) {
+            document.getElementById("normalizedForm_etymology").value = normalizedForm.etymology.languageName;
+        } else {
+            document.getElementById("normalizedForm_etymology").value = "N/A";
+        }
+        if (normalizedForm.mediatingLanguage) {
+            document.getElementById("normalizedForm_mediatingLanguage").value = normalizedForm.mediatingLanguage.languageName;
+        } else {
+            document.getElementById("normalizedForm_mediatingLanguage").value = "N/A";
+        }
+    }
+    
+    function addSelectedAdaptationType() {
+        let availableAdaptationTypesSelect = document.getElementById("availableAdaptationTypes");
+        let selectedAdaptationType = availableAdaptationTypesSelect.value;
+        let selectedAdaptationTypeText = availableAdaptationTypesSelect.options[availableAdaptationTypesSelect.selectedIndex].text;
+        console.log("Add " + selectedAdaptationType);
+        if (!addedAdaptationTypes.includes(selectedAdaptationType)) {
+            addedAdaptationTypes.push(selectedAdaptationType);
+            if (addedAdaptationTypes.length === 1) {
+                document.getElementById("addedAdaptationTypes").value = selectedAdaptationTypeText;
+            } else {
+                document.getElementById("addedAdaptationTypes").value += "\n" + selectedAdaptationTypeText;
+            }            
+        }
+        console.log("addedAdaptationTypes after add: " + addedAdaptationTypes);
+    }
+    
+    function removeSelectedAdaptationType() {
+        let availableAdaptationTypesSelect = document.getElementById("availableAdaptationTypes");
+        let selectedAdaptationType = availableAdaptationTypesSelect.value;
+        let selectedAdaptationTypeText = availableAdaptationTypesSelect.options[availableAdaptationTypesSelect.selectedIndex].text;
+        console.log("Remove " + selectedAdaptationType);
+        if (addedAdaptationTypes.includes(selectedAdaptationType)) {
+            addedAdaptationTypes = addedAdaptationTypes.filter(item => item != selectedAdaptationType);
+            if (addedAdaptationTypes.length === 0) {
+                document.getElementById("addedAdaptationTypes").value = "";
+            } else {
+                document.getElementById("addedAdaptationTypes").value = 
+                    document.getElementById("addedAdaptationTypes").value.replaceAll(selectedAdaptationTypeText, "");
+            }            
+        }
+        console.log("addedAdaptationTypes after remove: " + addedAdaptationTypes);
     }
 
     </script>
@@ -70,16 +187,70 @@
 
 <a href="/index.html">Main menu</a>
 <br />
-<a href="#" class="current-page-in-menu">Create/edit map signatures</a>
-<a href="/map-signatures-list.html">List map signatures</a>
+<a href="#" class="current-page-in-menu">Create/edit variant forms</a>
+<a href="/variant-forms-list.html">List variant forms</a>
 
-<h1 id="createEditMapSignatureHeader">Create new map signature</h1>
+<h1 id="createEditVariantFormHeader">Create new variant form</h1>
 
-<form id="createEditMapSignatureForm" >
-    <label for="mapSignatureName" class="for-editable"><b>Map signature name:</b></label>
-    <input type="text" size="50" id="mapSignatureName"/><br/>
-
-    <input id="createEditButton" type="button" onclick="createOrEditMapSignature(mapSignatureCreatedOrEdited, globMapSignatureId)" value="Create">
+<form id="createEditVariantFormForm" >
+    <p>
+        <label for="variantForm" class="for-editable"><b>Variant form:</b></label>
+        <input type="text" size="50" id="variantForm"/>
+    </p>
+    <p>
+        <label for="availableIsAdaptedToSwedishTypes" class="for-editable">Is adapted to Swedish:</label>
+        <select name="availableIsAdaptedToSwedishTypes" id="availableIsAdaptedToSwedishTypes" onchange="isAdaptedToSwedishSelected()">
+        </select>
+    </p>
+    <fieldset>
+        <legend><b><i>Add adaptation types (one or more)</i></b></legend>
+        <p>
+            <label for="availableAdaptationTypes" class="for-editable">Adaptation types:</label>
+            <select name="availableAdaptationTypes" id="availableAdaptationTypes" onchange="adaptationTypeSelected()">
+            </select>
+        </p>
+        <p>
+            <button type="button" onclick="addSelectedAdaptationType()">Add adaptation type</button>
+            <button type="button" onclick="removeSelectedAdaptationType()">Remove adaptation type</button>
+        </p>
+        <p>
+            <label for="addedAdaptationTypes" class="disabled">Added adapation types:</label><br/>
+            <textarea disabled name="addedAdaptationTypes" form="createEditVariantFormForm" id="addedAdaptationTypes" rows="5" cols="50">
+            </textarea>
+        </p>
+    </fieldset>
+    
+    <p>
+        <label for="availableNormalizedForms" class="for-editable">Normalized form:</label>
+        <select name="availableNormalizedForms" id="availableNormalizedForms" onchange="normalizedFormSelected()">
+        </select>
+    </p>
+    <fieldset>
+        <legend><b><i>Selected normalized form information</i></b></legend>
+        <p>
+            <label for="normalizedForm_morphologicalNameType" class="disabled">Morphological name type:</label>
+            <input type="text" size="50" id="normalizedForm_morphologicalNameType" disabled/>
+        </p>
+        <p>
+            <label for="normalizedForm_morphologicalNameTypeIsShaky" class="disabled">Morphological name type is shaky:</label>
+            <input type="text" size="50" id="normalizedForm_morphologicalNameTypeIsShaky" disabled/>
+        </p>
+        <p>
+            <label for="normalizedForm_morphologicalData" class="disabled">Morphological data:</label><br/>
+            <textarea disabled name="normalizedForm_morphologicalData" form="createEditVariantFormForm" id="normalizedForm_morphologicalData" rows="4" cols="50">
+            </textarea>
+        </p>
+        <p>
+            <label for="normalizedForm_etymology" class="disabled">Etymology:</label>
+            <input type="text" size="50" id="normalizedForm_etymology" disabled/>
+        </p>
+        <p>
+            <label for="normalizedForm_mediatingLanguage" class="disabled">Mediating language:</label>
+            <input type="text" size="50" id="normalizedForm_mediatingLanguage" disabled/>
+        </p>
+    </fieldset>
+    
+    <input id="createEditButton" type="button" onclick="createOrEditVariantForm(variantFormCreatedOrEdited, globVariantFormId)" value="Create">
 </form>
 
 </body>
