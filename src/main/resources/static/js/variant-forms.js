@@ -13,7 +13,7 @@ async function getAllVariantFormsAsync() {
 }
 
 function getVariantFormById(id, callback, errorCallback) {
-    genericGetById(id, "variantForms", callback, errorCallback);
+    genericGetById(id, "variantForms", callback, errorCallback, "variantFormView");
 }
 
 function createOrEditVariantForm(callback, variantFormId, addedAdaptationTypes) {

@@ -112,16 +112,19 @@
     }
 
     function displayVariantForm(variantForm) {
-    
-        //
-        // TODO: continue
-        //
-        document.getElementById("variantFormName").value = variantForm.variantForm;
-        addedAdaptationTypes = variantForm.adaptationTypes;
+        document.getElementById("variantForm").value = variantForm.variantForm;
+        for (let i = 0; i < variantForm.adaptationTypes.length; i++) {
+            addAdaptationType(removeTrialingProjection(variantForm.adaptationTypes[i]._links.self.href), variantForm.adaptationTypes[i].name);
+        }
+        
+        let normalizedFormUrl = removeTrialingProjection(variantForm._links.normalizedForm.href);
+        genericGet(normalizedFormUrl, function(data) {
+            document.getElementById("availableNormalizedForms").value = data._links.self.href;
+            normalizedFormSelected();
+        });
         
         isAdaptedToSwedishSelected();
         adaptationTypeSelected();
-        normalizedFormSelected();
     }
 
     function variantFormCreatedOrEdited(variantForm) {
@@ -189,6 +192,7 @@
     }
     
     function displayNormalizedForm(normalizedForm) {
+        document.getElementById("editSelectedNormalizedForm").href = "/normalized-forms-create-edit.html?normalizedFormId=" + normalizedForm.normalizedFormId;
         document.getElementById("normalizedForm_morphologicalNameType").value = normalizedForm.morphologicalNameType;
         document.getElementById("normalizedForm_morphologicalNameTypeIsShaky").value = normalizedForm.morphologicalNameTypeIsShaky;
         // 2 means that two spaces are used as indention
@@ -209,13 +213,17 @@
         let availableAdaptationTypesSelect = document.getElementById("availableAdaptationTypes");
         let selectedAdaptationType = availableAdaptationTypesSelect.value;
         let selectedAdaptationTypeText = availableAdaptationTypesSelect.options[availableAdaptationTypesSelect.selectedIndex].text;
-        console.log("Add " + selectedAdaptationType);
-        if (!addedAdaptationTypes.includes(selectedAdaptationType)) {
-            addedAdaptationTypes.push(selectedAdaptationType);
+        addAdaptationType(selectedAdaptationType, selectedAdaptationTypeText)
+    }
+    
+    function addAdaptationType(adaptationType, adaptationTypeText) {
+        console.log("Add " + adaptationType);
+        if (!addedAdaptationTypes.includes(adaptationType)) {
+            addedAdaptationTypes.push(adaptationType);
             if (addedAdaptationTypes.length === 1) {
-                document.getElementById("addedAdaptationTypes").value = selectedAdaptationTypeText;
+                document.getElementById("addedAdaptationTypes").value = adaptationTypeText;
             } else {
-                document.getElementById("addedAdaptationTypes").value += "\n" + selectedAdaptationTypeText;
+                document.getElementById("addedAdaptationTypes").value += "\n" + adaptationTypeText;
             }            
         }
         console.log("addedAdaptationTypes after add: " + addedAdaptationTypes);
@@ -231,7 +239,7 @@
             if (addedAdaptationTypes.length === 0) {
                 document.getElementById("addedAdaptationTypes").value = "";
             } else {
-                const rmRegExp = availableAdaptationTypesSelect.selectedIndex === 0 ? 
+                const rmRegExp = document.getElementById("addedAdaptationTypes").value.startsWith(selectedAdaptationTypeText) ? 
                     new RegExp(selectedAdaptationTypeText + "\n") :
                     new RegExp("\n" + selectedAdaptationTypeText);
                 console.log(rmRegExp);
@@ -290,6 +298,9 @@
     </p>
     <fieldset>
         <legend><b><i>Selected normalized form information</i></b></legend>
+        <p>
+            <a href="#" id="editSelectedNormalizedForm">Edit selected normalized form</a>
+        </p>
         <p>
             <label for="normalizedForm_morphologicalNameType" class="disabled">Morphological name type:</label>
             <input type="text" size="50" id="normalizedForm_morphologicalNameType" disabled/>
