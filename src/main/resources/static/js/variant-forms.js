@@ -16,17 +16,22 @@ function getVariantFormById(id, callback, errorCallback) {
     genericGetById(id, "variantForms", callback, errorCallback);
 }
 
-function createOrEditVariantForm(callback, variantFormId) {
-    var variantFormValue = document.getElementById("variantForm").value;
+function createOrEditVariantForm(callback, variantFormId, addedAdaptationTypes) {
+    const variantFormValue = document.getElementById("variantForm").value;
+	const isAdaptedToSwedishValue = document.getElementById("availableIsAdaptedToSwedishTypes").value;
+	const normalizedFormValue = document.getElementById("availableNormalizedForms").value;
 	var variantFormData = {
-        variantFormId:null
-        , variantForm:variantFormValue
+        variantFormId: null
+        , variantForm: variantFormValue
+		, isAdaptedToSwedish: isAdaptedToSwedishValue
+		, adaptationTypes: addedAdaptationTypes
+		, normalizedForm: normalizedFormValue
     };
     if (variantFormId === "") {
         genericCreate(variantFormData, "variantForms", callback);
     } else {
 		variantFormData.variantFormId = parseInt(variantFormId);
-        genericUpdate(variantFormData, "variantForms", variantFormId, "PUT", callback);
+        genericUpdate(variantFormData, "variantForms", variantFormId, "PATCH", callback);
     }
 }
 

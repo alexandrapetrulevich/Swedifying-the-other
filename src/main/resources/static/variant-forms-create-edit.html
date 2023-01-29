@@ -13,6 +13,7 @@
     <script>
     var globVariantFormId = "";
     var addedAdaptationTypes = [];
+    const IS_ADAPTED_TO_SWEDISH_NO_VALUE = "NO";
     
     document.addEventListener('DOMContentLoaded', function() {
         init();
@@ -27,6 +28,10 @@
         let searchParams = new URLSearchParams(window.location.search);
         if (searchParams.has("variantFormId")) {
             setUpForEdit(searchParams.get("variantFormId"));
+        } else {
+            isAdaptedToSwedishSelected();
+            adaptationTypeSelected();
+            normalizedFormSelected();
         }
     }
     
@@ -93,12 +98,30 @@
     function setUpForCreate() {
         globVariantFormId = "";
 		document.getElementById("variantFormName").value = "";
+        addedAdaptationTypes.length = 0;
+        document.getElementById("addedAdaptationTypes").value = "";
+        document.getElementById("availableIsAdaptedToSwedishTypes").selectedIndex = 0;
+        isAdaptedToSwedishSelected();
+        document.getElementById("availableAdaptationTypes").selectedIndex = 0;
+        adaptationTypeSelected();
+        document.getElementById("availableNormalizedForms").selectedIndex = 0;
+        normalizedFormSelected();
+        
         document.getElementById("createEditVariantFormHeader").innerHTML = "Create new variant form";
         document.getElementById("createEditButton").value = "Create";
     }
 
     function displayVariantForm(variantForm) {
+    
+        //
+        // TODO: continue
+        //
         document.getElementById("variantFormName").value = variantForm.variantForm;
+        addedAdaptationTypes = variantForm.adaptationTypes;
+        
+        isAdaptedToSwedishSelected();
+        adaptationTypeSelected();
+        normalizedFormSelected();
     }
 
     function variantFormCreatedOrEdited(variantForm) {
@@ -118,11 +141,44 @@
     function isAdaptedToSwedishSelected() {
         let selectedIsAdaptedToSwedishType = document.getElementById("availableIsAdaptedToSwedishTypes").value;
         console.log("selectedIsAdaptedToSwedishType: " + selectedIsAdaptedToSwedishType);
+        if (selectedIsAdaptedToSwedishType === IS_ADAPTED_TO_SWEDISH_NO_VALUE) {
+            disableAndEmptyAddAdaptationTypes();
+        } else {
+            enableAddAdaptationTypes();
+        }
     }
     
     function adaptationTypeSelected() {
         let selectedAdaptationType = document.getElementById("availableAdaptationTypes").value;
         console.log("selectedAdaptationType: " + selectedAdaptationType);
+    }
+    
+    function disableAndEmptyAddAdaptationTypes() {
+        console.log("disableAndEmptyAddAdaptationTypes()");
+        // empty array
+        addedAdaptationTypes.length = 0;
+        // empty text box
+        document.getElementById("addedAdaptationTypes").value = "";
+        
+        // Disable label
+        document.getElementById("availableAdaptationTypesLabel").classList.remove("for-editable");
+        document.getElementById("availableAdaptationTypesLabel").classList.add("disabled");
+        // Disable select box and buttons
+        document.getElementById("availableAdaptationTypes").disabled = true;
+        document.getElementById("addSelectedAdaptationTypeButton").disabled = true;
+        document.getElementById("removeSelectedAdaptationTypeButton").disabled = true;
+        
+    }
+    
+    function enableAddAdaptationTypes() {
+        console.log("enableAddAdaptationTypes()");
+        // Enable label
+        document.getElementById("availableAdaptationTypesLabel").classList.add("for-editable");
+        document.getElementById("availableAdaptationTypesLabel").classList.remove("disabled");
+        // Disable select box and buttons
+        document.getElementById("availableAdaptationTypes").disabled = false;
+        document.getElementById("addSelectedAdaptationTypeButton").disabled = false;
+        document.getElementById("removeSelectedAdaptationTypeButton").disabled = false;
     }
     
     function normalizedFormSelected() {
@@ -135,6 +191,7 @@
     function displayNormalizedForm(normalizedForm) {
         document.getElementById("normalizedForm_morphologicalNameType").value = normalizedForm.morphologicalNameType;
         document.getElementById("normalizedForm_morphologicalNameTypeIsShaky").value = normalizedForm.morphologicalNameTypeIsShaky;
+        // 2 means that two spaces are used as indention
         document.getElementById("normalizedForm_morphologicalData").value = JSON.stringify(normalizedForm.morphologicalData, (k, v) => v ?? undefined, 2);
         if (normalizedForm.etymology) {
             document.getElementById("normalizedForm_etymology").value = normalizedForm.etymology.languageName;
@@ -174,8 +231,14 @@
             if (addedAdaptationTypes.length === 0) {
                 document.getElementById("addedAdaptationTypes").value = "";
             } else {
+                const rmRegExp = availableAdaptationTypesSelect.selectedIndex === 0 ? 
+                    new RegExp(selectedAdaptationTypeText + "\n") :
+                    new RegExp("\n" + selectedAdaptationTypeText);
+                console.log(rmRegExp);
+                console.log("Before replace: " + document.getElementById("addedAdaptationTypes").value);
                 document.getElementById("addedAdaptationTypes").value = 
-                    document.getElementById("addedAdaptationTypes").value.replaceAll(selectedAdaptationTypeText, "");
+                    document.getElementById("addedAdaptationTypes").value.replace(rmRegExp, "");
+                console.log("After replace: " + document.getElementById("addedAdaptationTypes").value);
             }            
         }
         console.log("addedAdaptationTypes after remove: " + addedAdaptationTypes);
@@ -205,13 +268,13 @@
     <fieldset>
         <legend><b><i>Add adaptation types (one or more)</i></b></legend>
         <p>
-            <label for="availableAdaptationTypes" class="for-editable">Adaptation types:</label>
+            <label for="availableAdaptationTypes" class="for-editable" id="availableAdaptationTypesLabel">Adaptation types:</label>
             <select name="availableAdaptationTypes" id="availableAdaptationTypes" onchange="adaptationTypeSelected()">
             </select>
         </p>
         <p>
-            <button type="button" onclick="addSelectedAdaptationType()">Add adaptation type</button>
-            <button type="button" onclick="removeSelectedAdaptationType()">Remove adaptation type</button>
+            <button type="button" onclick="addSelectedAdaptationType()" id="addSelectedAdaptationTypeButton">Add selected adaptation type</button>
+            <button type="button" onclick="removeSelectedAdaptationType()" id= "removeSelectedAdaptationTypeButton">Remove selected adaptation type</button>
         </p>
         <p>
             <label for="addedAdaptationTypes" class="disabled">Added adapation types:</label><br/>
@@ -250,7 +313,7 @@
         </p>
     </fieldset>
     
-    <input id="createEditButton" type="button" onclick="createOrEditVariantForm(variantFormCreatedOrEdited, globVariantFormId)" value="Create">
+    <input id="createEditButton" type="button" onclick="createOrEditVariantForm(variantFormCreatedOrEdited, globVariantFormId, addedAdaptationTypes)" value="Create">
 </form>
 
 </body>
