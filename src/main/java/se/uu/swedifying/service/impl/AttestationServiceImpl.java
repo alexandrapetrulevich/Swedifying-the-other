@@ -1,6 +1,8 @@
 package se.uu.swedifying.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import se.uu.swedifying.model.api.CreateAttestationRequest;
 import se.uu.swedifying.model.api.LocationDto;
@@ -86,10 +88,10 @@ class AttestationServiceImpl implements AttestationService {
     List<Language> etymologies = languageRepository.findByLanguageNameContains(etymologyFilter);
     List<NormalizedForm> normalizedForms = normalizedFormRepository
       .findByMorphologicalNameTypeAndEtymologyIn(morphologicalNameType, etymologies);
-    List<VariantForm> variantForms = variantFormRepository
-      .findByNormalizedFormIn(normalizedForms);
+    Page<VariantForm> variantForms = variantFormRepository
+      .findByNormalizedFormIn(normalizedForms, PageRequest.of(0, 50));
     return attestationRepository
-      .findByVariantFormIn(variantForms);
+      .findByVariantFormIn(variantForms.toList());
       //.stream()
       //.map(AttestationConversionHelper::attestationToAttestationDto).toList();
   }

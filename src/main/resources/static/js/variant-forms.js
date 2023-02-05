@@ -1,11 +1,12 @@
 
-function getAllVariantForms(callback) {
+function getAllVariantForms(callback, page, size) {
     genericGetAll(
         "variantForms"
         , "variantFormView"
         , function(data) {
-            callback(data._embedded.variantForms);
-        });
+            callback(data);
+        }
+		, typeof page !== "undefined" ? "&page=" + page + "&size=" + size : null);
 }
 
 async function getAllVariantFormsAsync() {
@@ -24,7 +25,7 @@ function createOrEditVariantForm(callback, variantFormId, addedAdaptationTypes) 
         variantFormId: null
         , variantForm: variantFormValue
 		, isAdaptedToSwedish: isAdaptedToSwedishValue
-		, adaptationTypes: addedAdaptationTypes
+		, adaptationTypes: Array.from(addedAdaptationTypes)
 		, normalizedForm: normalizedFormValue
     };
     if (variantFormId === "") {
@@ -48,6 +49,6 @@ function doFilterVariantForms(newHeaderText, callback) {
 	genericGet(
 		"/api/variantForms/search/findByVariantFormContains" + queryParams
         , function(result) {
-            callback(newHeaderText, result._embedded.variantForms);
+            callback(newHeaderText, result);
         });
 }

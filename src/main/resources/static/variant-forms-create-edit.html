@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <title>Create/edit variant forms</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .no-border {
+            border-style: none;
+        }
+    </style>
 
     <script src="/js/util.js"></script>
     <script src="/js/variant-forms.js"></script>
@@ -12,7 +17,7 @@
     <script src="/js/adaptation-types.js"></script>
     <script>
     var globVariantFormId = "";
-    var addedAdaptationTypes = [];
+    var addedAdaptationTypesSet = new Set();
     const IS_ADAPTED_TO_SWEDISH_NO_VALUE = "NO";
     
     document.addEventListener('DOMContentLoaded', function() {
@@ -97,9 +102,9 @@
 
     function setUpForCreate() {
         globVariantFormId = "";
-		document.getElementById("variantFormName").value = "";
-        addedAdaptationTypes.length = 0;
-        document.getElementById("addedAdaptationTypes").value = "";
+		document.getElementById("variantForm").value = "";
+        addedAdaptationTypesSet.length = 0;
+        document.getElementById("addedAdaptationTypes").length = 0;
         document.getElementById("availableIsAdaptedToSwedishTypes").selectedIndex = 0;
         isAdaptedToSwedishSelected();
         document.getElementById("availableAdaptationTypes").selectedIndex = 0;
@@ -113,9 +118,11 @@
 
     function displayVariantForm(variantForm) {
         document.getElementById("variantForm").value = variantForm.variantForm;
-        for (let i = 0; i < variantForm.adaptationTypes.length; i++) {
-            addAdaptationType(removeTrialingProjection(variantForm.adaptationTypes[i]._links.self.href), variantForm.adaptationTypes[i].name);
-        }
+        
+        let options = Array.from(document.getElementById("availableAdaptationTypes").selectedOptions);
+        addAdaptationTypes(
+            new Map(variantForm.adaptationTypes.map((adaptationType) => [removeTrialingProjection(adaptationType._links.self.href), adaptationType.name])));
+        
         
         let normalizedFormUrl = removeTrialingProjection(variantForm._links.normalizedForm.href);
         genericGet(normalizedFormUrl, function(data) {
@@ -151,26 +158,41 @@
         }
     }
     
+    function getAllSelectedAdaptationTypesToAdd() {
+        let options = Array.from(document.getElementById("availableAdaptationTypes").selectedOptions);
+        return new Map(options.map((opt) => [opt.value, opt.text]));
+    }
+    
     function adaptationTypeSelected() {
-        let selectedAdaptationType = document.getElementById("availableAdaptationTypes").value;
-        console.log("selectedAdaptationType: " + selectedAdaptationType);
+        console.log("selectedAdaptationType: " + getAllSelectedAdaptationTypesToAdd());
+    }
+    
+    function getAllSelectedAddedAdaptationTypes() {
+        let options = Array.from(document.getElementById("addedAdaptationTypes").selectedOptions);
+        return new Map(options.map((opt) => [opt.value, opt.text]));
+    }
+    
+    function addedAdaptationTypeSelected() {
+        console.log("selectedAdaptationType: " + getAllSelectedAddedAdaptationTypes());
     }
     
     function disableAndEmptyAddAdaptationTypes() {
         console.log("disableAndEmptyAddAdaptationTypes()");
         // empty array
-        addedAdaptationTypes.length = 0;
-        // empty text box
-        document.getElementById("addedAdaptationTypes").value = "";
+        addedAdaptationTypesSet.length = 0;
+        // empty added values
+        document.getElementById("addedAdaptationTypes").length = 0;
         
-        // Disable label
+        // Disable labels
         document.getElementById("availableAdaptationTypesLabel").classList.remove("for-editable");
         document.getElementById("availableAdaptationTypesLabel").classList.add("disabled");
+        document.getElementById("addedAdaptationTypesLabel").classList.remove("for-editable");
+        document.getElementById("addedAdaptationTypesLabel").classList.add("disabled");
         // Disable select box and buttons
         document.getElementById("availableAdaptationTypes").disabled = true;
         document.getElementById("addSelectedAdaptationTypeButton").disabled = true;
         document.getElementById("removeSelectedAdaptationTypeButton").disabled = true;
-        
+        document.getElementById("addedAdaptationTypes").disabled = true;
     }
     
     function enableAddAdaptationTypes() {
@@ -178,10 +200,13 @@
         // Enable label
         document.getElementById("availableAdaptationTypesLabel").classList.add("for-editable");
         document.getElementById("availableAdaptationTypesLabel").classList.remove("disabled");
+        document.getElementById("addedAdaptationTypesLabel").classList.add("for-editable");
+        document.getElementById("addedAdaptationTypesLabel").classList.remove("disabled");
         // Disable select box and buttons
         document.getElementById("availableAdaptationTypes").disabled = false;
         document.getElementById("addSelectedAdaptationTypeButton").disabled = false;
         document.getElementById("removeSelectedAdaptationTypeButton").disabled = false;
+        document.getElementById("addedAdaptationTypes").disabled = false;
     }
     
     function normalizedFormSelected() {
@@ -210,46 +235,47 @@
     }
     
     function addSelectedAdaptationType() {
-        let availableAdaptationTypesSelect = document.getElementById("availableAdaptationTypes");
-        let selectedAdaptationType = availableAdaptationTypesSelect.value;
-        let selectedAdaptationTypeText = availableAdaptationTypesSelect.options[availableAdaptationTypesSelect.selectedIndex].text;
-        addAdaptationType(selectedAdaptationType, selectedAdaptationTypeText)
+        addAdaptationTypes(getAllSelectedAdaptationTypesToAdd())
     }
     
-    function addAdaptationType(adaptationType, adaptationTypeText) {
-        console.log("Add " + adaptationType);
-        if (!addedAdaptationTypes.includes(adaptationType)) {
-            addedAdaptationTypes.push(adaptationType);
-            if (addedAdaptationTypes.length === 1) {
-                document.getElementById("addedAdaptationTypes").value = adaptationTypeText;
-            } else {
-                document.getElementById("addedAdaptationTypes").value += "\n" + adaptationTypeText;
-            }            
+    function addAdaptationTypes(adaptationTypesToAddMap) {
+        console.log("Add " + adaptationTypesToAddMap.keys());
+        if (adaptationTypesToAddMap.size == 0) {
+            console.log("addAdaptationType, size 0, nothing to add");
         }
-        console.log("addedAdaptationTypes after add: " + addedAdaptationTypes);
+        
+        for (const k of adaptationTypesToAddMap.keys()) {
+            addedAdaptationTypesSet.add(k);
+        }
+        var addedAdaptationTypesSelect = document.getElementById("addedAdaptationTypes");
+        var addedAdaptationTypesSelectOptionValues = Array.from(addedAdaptationTypesSelect.options).map((opt) => opt.value);
+        adaptationTypesToAddMap.forEach((v, k) => {
+            if(!addedAdaptationTypesSelectOptionValues.includes(k)) {
+                console.log("addedAdaptationTypesSelectOptionValues (" + addedAdaptationTypesSelectOptionValues + ") does not include " + k);
+                addedAdaptationTypesSelect.add(new Option(v, k));
+            }
+        });
+    
+        console.log("addedAdaptationTypes after add: " + addedAdaptationTypesSet.values());
     }
     
-    function removeSelectedAdaptationType() {
-        let availableAdaptationTypesSelect = document.getElementById("availableAdaptationTypes");
-        let selectedAdaptationType = availableAdaptationTypesSelect.value;
-        let selectedAdaptationTypeText = availableAdaptationTypesSelect.options[availableAdaptationTypesSelect.selectedIndex].text;
-        console.log("Remove " + selectedAdaptationType);
-        if (addedAdaptationTypes.includes(selectedAdaptationType)) {
-            addedAdaptationTypes = addedAdaptationTypes.filter(item => item != selectedAdaptationType);
-            if (addedAdaptationTypes.length === 0) {
-                document.getElementById("addedAdaptationTypes").value = "";
-            } else {
-                const rmRegExp = document.getElementById("addedAdaptationTypes").value.startsWith(selectedAdaptationTypeText) ? 
-                    new RegExp(selectedAdaptationTypeText + "\n") :
-                    new RegExp("\n" + selectedAdaptationTypeText);
-                console.log(rmRegExp);
-                console.log("Before replace: " + document.getElementById("addedAdaptationTypes").value);
-                document.getElementById("addedAdaptationTypes").value = 
-                    document.getElementById("addedAdaptationTypes").value.replace(rmRegExp, "");
-                console.log("After replace: " + document.getElementById("addedAdaptationTypes").value);
-            }            
+    function removeSelectedAdaptationTypes() {
+        let selectedToRemove = getAllSelectedAddedAdaptationTypes();
+        
+        // Remove from select box
+        let addedAdaptationTypesSelect = document.getElementById("addedAdaptationTypes");
+        for (let i = 0; i < selectedToRemove.size; i++) {
+            addedAdaptationTypesSelect.remove(addedAdaptationTypesSelect.selectedIndex);
         }
-        console.log("addedAdaptationTypes after remove: " + addedAdaptationTypes);
+        
+        // Remove from set
+        selectedToRemove.forEach((v, k) => addedAdaptationTypesSet.delete(k));
+        
+        console.log("addedAdaptationTypes after remove: " + addedAdaptationTypesSet);
+    }
+    
+    function removeAllAddedAdaptationType() {
+        console.log("Remove all");
     }
 
     </script>
@@ -275,20 +301,29 @@
     </p>
     <fieldset>
         <legend><b><i>Add adaptation types (one or more)</i></b></legend>
-        <p>
-            <label for="availableAdaptationTypes" class="for-editable" id="availableAdaptationTypesLabel">Adaptation types:</label>
-            <select name="availableAdaptationTypes" id="availableAdaptationTypes" onchange="adaptationTypeSelected()">
-            </select>
-        </p>
-        <p>
-            <button type="button" onclick="addSelectedAdaptationType()" id="addSelectedAdaptationTypeButton">Add selected adaptation type</button>
-            <button type="button" onclick="removeSelectedAdaptationType()" id= "removeSelectedAdaptationTypeButton">Remove selected adaptation type</button>
-        </p>
-        <p>
-            <label for="addedAdaptationTypes" class="disabled">Added adapation types:</label><br/>
-            <textarea disabled name="addedAdaptationTypes" form="createEditVariantFormForm" id="addedAdaptationTypes" rows="5" cols="50">
-            </textarea>
-        </p>
+        <table class="no-border">
+            <tr class="no-border">
+                <td class="no-border">
+                    <label for="availableAdaptationTypes" class="for-editable" id="availableAdaptationTypesLabel">To add:</label><br/>
+                    <select name="availableAdaptationTypes" id="availableAdaptationTypes" size=5 multiple onchange="adaptationTypeSelected()" style="width: 250px;">
+                    </select>
+                </td>
+                <td class="no-border" style="text-align: center;">
+                    <button type="button" onclick="addSelectedAdaptationType()" id="addSelectedAdaptationTypeButton">Add &gt;&gt;</button>
+                    <br /><br />
+                    <button type="button" onclick="removeSelectedAdaptationTypes()" id="removeSelectedAdaptationTypeButton">&lt;&lt; Remove </button>
+                    <!--
+                    <br /><br />
+                    <button type="button" onclick="removeAllAddedAdaptationType()" id="removeAllAddedAdaptationTypeButton">Remove all</button>
+                    -->
+                </td>
+                <td class="no-border">
+                    <label for="addedAdaptationTypes" class="for-editable" id="addedAdaptationTypesLabel">Added:</label><br/>
+                    <select name="addedAdaptationTypes" form="createEditVariantFormForm" id="addedAdaptationTypes" size=5 multiple onchange="addedAdaptationTypeSelected()" style="width: 250px;">
+                    </select>
+                </td>
+            </tr>
+        </table>
     </fieldset>
     
     <p>
@@ -324,7 +359,7 @@
         </p>
     </fieldset>
     
-    <input id="createEditButton" type="button" onclick="createOrEditVariantForm(variantFormCreatedOrEdited, globVariantFormId, addedAdaptationTypes)" value="Create">
+    <input id="createEditButton" type="button" onclick="createOrEditVariantForm(variantFormCreatedOrEdited, globVariantFormId, addedAdaptationTypesSet)" value="Create">
 </form>
 
 </body>

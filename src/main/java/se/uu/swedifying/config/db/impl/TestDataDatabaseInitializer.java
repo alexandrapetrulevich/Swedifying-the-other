@@ -3,6 +3,7 @@ package se.uu.swedifying.config.db.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import se.uu.swedifying.config.db.DatabaseInitializer;
 import se.uu.swedifying.model.entity.*;
