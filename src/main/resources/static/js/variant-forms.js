@@ -1,12 +1,12 @@
 
-function getAllVariantForms(callback, page, size) {
+function getAllVariantForms(callback, page, pageSize) {
     genericGetAll(
         "variantForms"
         , "variantFormView"
         , function(data) {
             callback(data);
         }
-		, typeof page !== "undefined" ? "&page=" + page + "&size=" + size : null);
+		, typeof page !== "undefined" ? "&page=" + page + "&size=" + pageSize : null);
 }
 
 async function getAllVariantFormsAsync() {

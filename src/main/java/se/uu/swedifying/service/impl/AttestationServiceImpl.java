@@ -65,7 +65,7 @@ class AttestationServiceImpl implements AttestationService {
 
   @Override
   public List<Attestation> getAllAttestations() {
-    List<Attestation> allAttestations = attestationRepository.findAll();
+    List<Attestation> allAttestations = attestationRepository.findAll().toList();
     return allAttestations;
       //.stream()
       //.map(AttestationConversionHelper::attestationToAttestationDto)
@@ -91,7 +91,8 @@ class AttestationServiceImpl implements AttestationService {
     Page<VariantForm> variantForms = variantFormRepository
       .findByNormalizedFormIn(normalizedForms, PageRequest.of(0, 50));
     return attestationRepository
-      .findByVariantFormIn(variantForms.toList());
+      .findByVariantFormIn(variantForms.toList(), PageRequest.of(0, 50))
+      .toList();
       //.stream()
       //.map(AttestationConversionHelper::attestationToAttestationDto).toList();
   }

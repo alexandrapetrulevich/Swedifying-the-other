@@ -1,9 +1,14 @@
-function getAllAttestations(callback) {
-    $.get("/api/v1/attestations", function(data, status) {
+function getAllAttestations(callback, page, pageSize) {
+    genericGetAll(
+        "attestations"
+        , "attestationView"
+        , function(data) {
             callback(data);
-        }, "json");
+        }
+		, typeof page !== "undefined" ? "&page=" + page + "&size=" + pageSize : null);
 }
 
+/*
 function doFilterAttestations(newHeaderText, callback) {
     var morphNameTypeFilter = $("#filterAttestationsTextMorphNameType").val();
     var etymologyFilter = $("#filterAttestationsTextEtymology").val();
@@ -17,3 +22,4 @@ function doFilterAttestations(newHeaderText, callback) {
             callback(newHeaderText, data);
         }, "json");
 }
+*/
