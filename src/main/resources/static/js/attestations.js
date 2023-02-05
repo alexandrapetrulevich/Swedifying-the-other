@@ -1,3 +1,6 @@
+
+
+
 function getAllAttestations(callback, page, pageSize) {
     genericGetAll(
         "attestations"
@@ -6,6 +9,11 @@ function getAllAttestations(callback, page, pageSize) {
             callback(data);
         }
 		, typeof page !== "undefined" ? "&page=" + page + "&size=" + pageSize : null);
+}
+
+
+function getAttestationById(id, callback, errorCallback) {
+    genericGetById(id, "attestations", callback, errorCallback, "attestationView");
 }
 
 /*
