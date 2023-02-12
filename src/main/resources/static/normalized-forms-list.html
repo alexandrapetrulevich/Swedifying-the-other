@@ -7,13 +7,36 @@
     <script src="/js/util.js"></script>
     <script src="/js/normalized-forms.js"></script>
     <script>
+        
+        const defaultPageSize = 20;
+        let firstLink = "";
+        let nextLink = "";
+        let prevLink = "";
+        let lastLink = "";
+    
         document.addEventListener('DOMContentLoaded', function() {
-            getAllNormalizedForms(populateTable);
+            getAllNormalizedForms(function(data) {
+                populateTable(data._embedded.normalizedForms);
+                addPagingLinks(data._links);
+                document.getElementById("pageSize").value = defaultPageSize;
+            }, 0, defaultPageSize);
         });
 
         function setHeaderAndPopulateTable(headerText, normalizedForms) {
             document.getElementById("normalizedFormsTableHeader").innerHTML = headerText;
-            populateTable(normalizedForms);
+            populateTable(normalizedForms._embedded.normalizedForms);
+            addPagingLinks(normalizedForms._links);
+        }
+        
+        function addPagingLinks(links) {
+            firstLink = links.first ? links.first.href : "";
+            nextLink = links.next ? links.next.href : "";
+            prevLink = links.prev ? links.prev.href : "";
+            lastLink = links.last ? links.last.href : "";
+            document.getElementById('nextLink').disabled = nextLink === "";
+            document.getElementById('prevLink').disabled = prevLink === "";
+            document.getElementById('firstLink').disabled = firstLink === "";
+            document.getElementById('lastLink').disabled = lastLink === "";
         }
 
         function populateTable(normalizedForms) {
@@ -107,6 +130,40 @@
         function goToEditView(normalizedFormId) {
             location.href = "/normalized-forms-create-edit.html?normalizedFormId=" + normalizedFormId;
         }
+        
+        function next() {
+            if (nextLink !== "") {
+                genericGet(nextLink, function(data) {
+                    populateTable(data._embedded.normalizedForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function prev() {
+            if (prevLink !== "") {
+                genericGet(prevLink, function(data) {
+                    populateTable(data._embedded.normalizedForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function last() {
+            if (lastLink !== "") {
+                genericGet(lastLink, function(data) {
+                    populateTable(data._embedded.normalizedForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function updatePageSize() {
+            getAllNormalizedForms(function(data) {
+                populateTable(data._embedded.normalizedForms);
+                addPagingLinks(data._links);
+            }, 0, parseInt(document.getElementById("pageSize").value));
+        }
 
 
     </script>
@@ -135,6 +192,23 @@
     <tbody id="tbodyid">
     </tbody>
 </table>
+
+<fieldset>
+    <legend>Paging</legend>
+    <p>
+        <button type="button" id="firstLink" onclick="first()">&lt;&lt; First</button>
+        <button type="button" id="prevLink" onclick="prev()">&lt; Prev</button>
+        <button type="button" id="nextLink" onclick="next()">Next &gt;</button>
+        <button type="button" id="lastLink" onclick="last()">Last &gt;&gt;</button>
+    </p>
+    <p>
+        <form id="paging">
+            <label for="pageSize">Page size: </label>
+            <input type="text" id="pageSize">
+            <input type="button" value="Update" onclick="updatePageSize()">
+        </form>
+    </p>
+</fieldset>
 <br/>
 
 <form id="filterNormalizedFormsForm">

@@ -86,10 +86,10 @@ class AttestationServiceImpl implements AttestationService {
         MorphologicalNameType.valueOf(morphologicalNameTypeFilter)
         : null;
     List<Language> etymologies = languageRepository.findByLanguageNameContains(etymologyFilter);
-    List<NormalizedForm> normalizedForms = normalizedFormRepository
-      .findByMorphologicalNameTypeAndEtymologyIn(morphologicalNameType, etymologies);
+    Page<NormalizedForm> normalizedForms = normalizedFormRepository
+      .findByMorphologicalNameTypeAndEtymologyIn(morphologicalNameType, etymologies, PageRequest.of(0, 50));
     Page<VariantForm> variantForms = variantFormRepository
-      .findByNormalizedFormIn(normalizedForms, PageRequest.of(0, 50));
+      .findByNormalizedFormIn(normalizedForms.toList(), PageRequest.of(0, 50));
     return attestationRepository
       .findByVariantFormIn(variantForms.toList(), PageRequest.of(0, 50))
       .toList();

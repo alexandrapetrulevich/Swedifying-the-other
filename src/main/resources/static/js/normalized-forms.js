@@ -1,11 +1,12 @@
 
-function getAllNormalizedForms(callback) {
+function getAllNormalizedForms(callback, page, pageSize) {
     genericGetAll(
         "normalizedForms"
         , "normalizedFormView"
         , function(data) {
-            callback(data._embedded.normalizedForms);
-        });
+            callback(data);
+        }
+		, typeof page !== "undefined" ? "&page=" + page + "&size=" + pageSize : null);
 }
 
 async function getAllNormalizedFormsAsync() {
@@ -74,6 +75,6 @@ function doFilterNormalizedForms(newHeaderText, callback) {
 	genericGet(
 		"/api/normalizedForms/search/findByNormalizedFormContains" + queryParams
         , function(result) {
-            callback(newHeaderText, result._embedded.normalizedForms);
+            callback(newHeaderText, result);
         });
 }
