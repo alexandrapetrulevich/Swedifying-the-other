@@ -4,28 +4,35 @@
     <meta charset="UTF-8">
     <title>Attestation create/edit</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
     <script src="/js/attestations.js"></script>
     <script src="/js/locations.js"></script>
     <script src="/js/variant-forms.js"></script>
     <script src="/js/source-findings.js"></script>
-    <script src="/js/util.js"></script>
     <script>
+    var globAttestationId = "";
 
     document.addEventListener('DOMContentLoaded', function() {
-        getAllLocations(populateAvailableLocations);
+        init();
+    });
+    
+    async function init() {
+        populateAvailableLocations(await getAllLocationsAsync());
         populateVariantForms(await getAllVariantFormsAsync());
-        populateSourceFindings(await loadSourceFindings());
+        populateSourceFindings(await getAllSourceFindingsAsync());
         let searchParams = new URLSearchParams(window.location.search)
         if (searchParams.has("attestationId")) {
             let attestationId = searchParams.get("attestationId");
             console.log("Editing attestation " + attestationId);
             setUpForEdit(attestationId);
         }
-    });
+    }
     
     function setUpForEdit(attestationId) {
-        loadAttestation(attestationId);
-        document.getElementById("createEditHeader").innerHTML = "Editing variant form " + attestationId;
+        globAttestationId = attestationId;
+        console.log("Attestation id to edit " + globAttestationId);
+        loadAttestation(globAttestationId);
+        document.getElementById("createEditHeader").innerHTML = "Editing attestation form " + globAttestationId;
         document.getElementById("createEditButton").value = "Update";
     }
 
@@ -34,14 +41,30 @@
     }
     
     function handleGetAttestationError(httpErrorStatus) {
-        var errorText = "Could not get variant form " + globVariantFormId;
+        var errorText = "Could not get attestation " + globAttestationId;
         if (httpErrorStatus == 404) {
-            errorText += ", variant form not found";
+            errorText += ", attestation not found";
         } else {
             errorText += " due to status " + httpErrorStatus;
         }
         alert(errorText + ". Setting up for create...");
         setUpForCreate();
+    }
+    
+    function setUpForCreate() {
+        globAttestationId = "";
+        document.getElementById("createEditHeader").innerHTML = "Create new attestation";
+        document.getElementById("createEditButton").value = "Create";
+        
+        document.getElementById("originalForm").value = "";
+        document.getElementById("notes").value = "";
+        
+        document.getElementById("availableVariantForms").selectedIndex = 0;
+        document.getElementById("availableLocations").selectedIndex = 0;
+        document.getElementById("availableSourceFindings").selectedIndex = 0;
+        variantFormSelected();
+        locationSelected();
+        sourceFindingSelected();
     }
 
     function displayAttestation(attestation) {
@@ -57,10 +80,6 @@
         sourceFindingSelected();
     }
 
-    async function loadVariantForms() {
-        return await getAllVariantFormsAsync();
-    }
-
     function populateVariantForms(variantForms) {
         let selectForAvailableVariantForms = document.getElementById("availableVariantForms");
         for (let i = 0; i < variantForms.length; i++) {
@@ -69,6 +88,7 @@
                     variantForms[i].variantForm
                     , variantForms[i]._links.self.href));
         }
+        variantFormSelected();
     }
 
     function variantFormSelected() {
@@ -88,7 +108,7 @@
             document.getElementById("variantFormAdaptationType").value = "N/A";
         } else {
             var adaptationTypesString = variantForm.adaptationTypes[0].name
-                + "(ID "
+                + " (ID "
                 + variantForm.adaptationTypes[0].adaptationTypeId
                 + ")";
             for (let i = 1; i < variantForm.adaptationTypes.length; i++) {
@@ -183,13 +203,6 @@
         }
     }
 
-
-
-
-    async function loadSourceFindings() {
-        return getAllSourceFindingsAsync();
-    }
-
     function populateSourceFindings(sourceFindings) {
         for (let i = 0; i < sourceFindings.length; i++)
         {
@@ -205,7 +218,7 @@
 
     function sourceFindingSelected() {
         console.log("sourceFindingSelected");
-        var selectedSourceFinding = document.getElementById("availableSourceFindings").value;   
+        var selectedSourceFinding = document.getElementById("availableSourceFindings").value;
         genericGet(selectedSourceFinding + "?projection=sourceFindingView", function(data) {
             displaySelectedSourceFinding(data);
         });
@@ -232,7 +245,7 @@
         } else if (sourceFinding.source.type.startsWith("Text")) {
             urlToGet = urlToGet + "?projection=textSourceView";
         }
-        genericGet(selectedSourceFinding + "?projection=sourceFindingView", function(data) {
+        genericGet(urlToGet, function(data) {
             displaySourceTypeSpecific(data, sourceFinding.source.type);
         });
     }
@@ -273,24 +286,19 @@
         locationSelected();
     }
 
-    function adaptedToSwedishClicked() {
-        console.log("adaptedToSwedishClicked");
-        //$("#adaptationType").prop("disabled", !$("#adaptedToSwedish").is(':checked'));
-    }
-
     function displayLocalityType(localityType) {
         document.getElementById("locationLocalityType").value = localityType.localityTypeName;
-        document.getElementById("locationLocalityTypeId").value = localityType._links.self.href.split("/").pop();
+        document.getElementById("locationLocalityTypeId").value = removeTrialingProjection(localityType._links.self.href).split("/").pop();
     }
 
     function displayRegion(region) {
         document.getElementById("locationRegion").value = region.regionName;
-        document.getElementById("locationRegionId").value = region._links.self.href.split("/").pop();
+        document.getElementById("locationRegionId").value = removeTrialingProjection(region._links.self.href).split("/").pop();
     }
 
     function displayDistrictOrParish(districtOrParish) {
         document.getElementById("locationDistrictOrParish").value = districtOrParish.name;
-        document.getElementById("locationDistrictOrParishId").value = districtOrParish._links.self.href.split("/").pop();
+        document.getElementById("locationDistrictOrParishId").value = removeTrialingProjection(districtOrParish._links.self.href).split("/").pop();
 
         displayRegion(districtOrParish.belongsToRegion);
     }
@@ -299,7 +307,7 @@
         document.getElementById("locationId").value = location._links.self.href.split("/").pop();
         document.getElementById("locationLongitude").value = location.longitude;
         document.getElementById("locationLatitude").value = location.latitude;
-        document.getElementById("locationModernLookupForm").value = location.modernLookupForm;
+        document.getElementById("locationModernLookupForm").value = location.modernLookupForm ? location.modernLookupForm : "-";
 
         displayLocalityType(location.localityType);
         displayDistrictOrParish(location.districtOrParish);
@@ -313,11 +321,39 @@
             displaySelectedLocation(data);
         });
     }
-
-
-
-
-
+    
+    function goToEditLocation() {
+        window.open("/locations-create-edit.html?locationId=" + document.getElementById("locationId").value, "_blank").focus();
+    }
+    
+    function goToEditVariantForm() {
+        window.open("/variant-forms-create-edit.html?variantFormId=" + document.getElementById("variantFormId").value, "_blank").focus();
+    }
+    
+    function goToEditSourceFinding() {
+        window.open(
+            "/source-findings-create-edit.html?sourceFindingId=" + document.getElementById("availableSourceFindings").value.split("/").pop()
+            , "_blank")
+                .focus();
+    }
+    
+    function attestationCreatedOrEdited(attestation) {
+        let confirmText =  " attestation form " + attestation.originalForm + " (ID " +  attestation.attestationId + "). ";
+        if (globAttestationId === "") {
+            confirmText = "Created" + confirmText;
+        } else {
+            confirmText = "Edited" + confirmText;
+        }
+        confirmText += " OK to continue editing this attestation, CANCEL to create a new one.";
+        if (!confirm(confirmText)) {
+            globAttestationId = "";
+            setUpForCreate();
+        } else {
+            globAttestationId = attestation.attestationId;
+            document.getElementById("createEditHeader").innerHTML = "Editing attestation form " + globAttestationId;
+            document.getElementById("createEditButton").value = "Update";
+        }
+    }
 
     </script>
 </head>
@@ -330,149 +366,231 @@
 
 <h1 id="createEditHeader">Create new attestation</h1>
 <form id="createEditAttestationForm">
-    <label for="originalForm"><b>Original form:</b></label>
-    <input type="text" size="100" id="originalForm"/><br/>
-
-    <label for="notes"><b>Notes:</b></label>
-    <textarea name="notes" form="createEditAttestationForm" id="notes">Notes...</textarea> <br/>
-
+    <p>
+        <label for="originalForm"><b>Original form:</b></label>
+        <input type="text" size="100" id="originalForm"/><br/>
+    </p>
+    <p>
+        <label for="notes"><b>Notes:</b></label>
+        <textarea name="notes" rows="5" cols="100" form="createEditAttestationForm" id="notes">Notes...</textarea> <br/>
+    </p>
 
     <fieldset>
         <legend><b><i>Locations</i></b></legend>
-        <label for="availableLocations"><b>Location:</b></label>
-        <select name="availableLocations" id="availableLocations" onchange="locationSelected()">
-        </select><br/>
+        <p>
+            <button type="button" onclick="goToEditLocation();">Edit Source Finding</button>
+        </p>
+        
+        <p>
+            <label for="availableLocations"><b>Location:</b></label>
+            <select name="availableLocations" id="availableLocations" onchange="locationSelected()">
+            </select>
+        </p>
 
-        <label for="locationId">Location id:</label>
-        <input type="text" name="locationId" id="locationId" disabled><br/>
+        <p>
+            <label for="locationId">Location id:</label>
+            <input type="text" name="locationId" id="locationId" disabled>
+        </p>
+        
+        <p>
+            <label for="locationLongitude">Location longitude:</label>
+            <input type="text" name="locationLongitude" id="locationLongitude" disabled>
+        </p>
+        
+        <p>
+            <label for="locationLatitude">Location latitude:</label>
+            <input type="text" name="locationLatitude" id="locationLatitude" disabled>
+        </p>
+        
+        <p>
+            <label for="locationModernLookupForm">Modern Lookup Form:</label>
+            <input type="text" name="locationModernLookupForm" id="locationModernLookupForm" disabled>
+        </p>
+        
+        <p>
+            <label for="locationLocalityTypeId">Location locality type ID:</label>
+            <input type="text" name="locationLocalityTypeId" id="locationLocalityTypeId" disabled>
+        </p>
+        
+        <p>
+            <label for="locationLocalityType">Location locality type:</label>
+            <input type="text" name="locationLocalityType" id="locationLocalityType" disabled>
+        </p>
+        
+        <p>
+            <label for="locationDistrictOrParishId">District or parish ID:</label>
+            <input type="text" name="locationDistrictOrParishId" id="locationDistrictOrParishId" disabled>
+        </p>
+        
+        <p>
+            <label for="locationDistrictOrParish">District or parish:</label>
+            <input type="text" name="locationDistrictOrParish" id="locationDistrictOrParish" disabled>
+        </p>
 
-        <label for="locationLongitude">Location longitude:</label>
-        <input type="text" name="locationLongitude" id="locationLongitude" disabled><br/>
-
-        <label for="locationLatitude">Location latitude:</label>
-        <input type="text" name="locationLatitude" id="locationLatitude" disabled><br/>
-
-        <label for="locationModernLookupForm">Modern Lookup Form:</label>
-        <input type="text" name="locationModernLookupForm" id="locationModernLookupForm" disabled><br/>
-
-        <label for="locationLocalityTypeId">Location locality type ID:</label>
-        <input type="text" name="locationLocalityTypeId" id="locationLocalityTypeId" disabled><br/>
-
-        <label for="locationLocalityType">Location locality type:</label>
-        <input type="text" name="locationLocalityType" id="locationLocalityType" disabled><br/>
-
-        <label for="locationDistrictOrParishId">District or parish ID:</label>
-        <input type="text" name="locationDistrictOrParishId" id="locationDistrictOrParishId" disabled><br/>
-
-        <label for="locationDistrictOrParish">District or parish:</label>
-        <input type="text" name="locationDistrictOrParish" id="locationDistrictOrParish" disabled><br/>
-
-        <label for="locationRegionId">Region ID:</label>
-        <input type="text" name="locationRegionId" id="locationRegionId" disabled><br/>
-
-        <label for="locationRegion">Region:</label>
-        <input type="text" name="locationRegion" id="locationRegion" disabled><br/>
+        <p>
+            <label for="locationRegionId">Region ID:</label>
+            <input type="text" name="locationRegionId" id="locationRegionId" disabled>
+        </p>
+        
+        <p>
+            <label for="locationRegion">Region:</label>
+            <input type="text" name="locationRegion" id="locationRegion" disabled>
+        </p>
     </fieldset>
     
     
     <fieldset>
         <legend><b><i>Variant form</i></b></legend>
-    
-        <label for="availableVariantForms"><b>Variant form:</b></label>
-        <select name="availableVariantForms" id="availableVariantForms" onchange="variantFormSelected()"></select><br/>
+        
+        <p>
+            <button type="button" onclick="goToEditVariantForm();">Edit Variant Form</button>
+        </p>
+        
+        <p>
+            <label for="availableVariantForms"><b>Variant form:</b></label>
+            <select name="availableVariantForms" id="availableVariantForms" onchange="variantFormSelected()"></select><br/>
+        </p>
 
-        <label for="variantFormId">Variant form ID:</label>
-        <input type="text" id="variantFormId" disabled /><br/>
-
-        <label for="variantFormIsAdaptedToSwedish">Is adapted to Swedish:</label>
-        <input type="text" id="variantFormIsAdaptedToSwedish" disabled /><br/>
-
-        <label for="variantFormAdaptationType">Adaptation type:</label>
-        <input type="text" size="100" id="variantFormAdaptationType" disabled /><br/>
-
-        <label for="normalizedFormNormalizedFormId">Normalized form ID:</label>
-        <input type="text" id="normalizedFormNormalizedFormId" disabled /><br/>
-
-        <label for="normalizedFormNormalizedForm">Normalized form:</label>
-        <input type="text" id="normalizedFormNormalizedForm" disabled /><br/>
-
-        <label for="normalizedFormMorphologicalNameType">Morphological name type:</label>
-        <input type="text" id="normalizedFormMorphologicalNameType" disabled /><br/>
-
-        <label for="normalizedFormComparativeFormInformation">Comparative form information:</label>
-        <input type="text" id="normalizedFormComparativeFormInformation" disabled /><br/>
-
-        <label for="normalizedFormEtymology">Etymology:</label>
-        <input type="text" id="normalizedFormEtymology" disabled /><br/>
-
-        <label for="normalizedFormMediatingLanguage">Mediating language:</label>
-        <input type="text" id="normalizedFormMediatingLanguage" disabled /><br/>
-
-        <label for="normalizedFormMainClauseInPhrase">Main clause in phrase:</label>
-        <input type="text" id="normalizedFormMainClauseInPhrase" disabled /><br/>
-
-        <label for="normalizedFormSimpleRootMorpheme">Simple root morpheme:</label>
-        <input type="text" id="normalizedFormSimpleRootMorpheme" disabled /><br/>
-
-        <label for="normalizedFormDerivationMorpheme">Derivation morpheme:</label>
-        <input type="text" id="normalizedFormDerivationMorpheme" disabled /><br/>
-
-        <label for="normalizedFormDeterminationClauseInPhrase">Determination clause in phrase:</label>
-        <input type="text" id="normalizedFormDeterminationClauseInPhrase" disabled /><br/>
-
-        <label for="normalizedFormJointMorphemeInComposition">Joint morpheme in composition:</label>
-        <input type="text" id="normalizedFormJointMorphemeInComposition" disabled /><br/>
-
-        <label for="normalizedFormMainClauseInComposition">Main clause in composition:</label>
-        <input type="text" id="normalizedFormMainClauseInComposition" disabled /><br/>
-
-        <label for="normalizedFormDeterminationClauseInComposition">Determination clause in composition:</label>
-        <input type="text" id="normalizedFormDeterminationClauseInComposition" disabled /><br/>
-
-        <label for="normalizedFormDerivationBase">Derivation base:</label>
-        <input type="text" id="normalizedFormDerivationBase" disabled /><br/>
+        <p>
+            <label for="variantFormId">Variant form ID:</label>
+            <input type="text" id="variantFormId" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="variantFormIsAdaptedToSwedish">Is adapted to Swedish:</label>
+            <input type="text" id="variantFormIsAdaptedToSwedish" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="variantFormAdaptationType">Adaptation type:</label>
+            <input type="text" size="100" id="variantFormAdaptationType" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormNormalizedFormId">Normalized form ID:</label>
+            <input type="text" id="normalizedFormNormalizedFormId" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormNormalizedForm">Normalized form:</label>
+            <input type="text" id="normalizedFormNormalizedForm" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormMorphologicalNameType">Morphological name type:</label>
+            <input type="text" id="normalizedFormMorphologicalNameType" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormComparativeFormInformation">Comparative form information:</label>
+            <input type="text" size=100 id="normalizedFormComparativeFormInformation" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormEtymology">Etymology:</label>
+            <input type="text" id="normalizedFormEtymology" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormMediatingLanguage">Mediating language:</label>
+            <input type="text" id="normalizedFormMediatingLanguage" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormMainClauseInPhrase">Main clause in phrase:</label>
+            <input type="text" id="normalizedFormMainClauseInPhrase" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormSimpleRootMorpheme">Simple root morpheme:</label>
+            <input type="text" id="normalizedFormSimpleRootMorpheme" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormDerivationMorpheme">Derivation morpheme:</label>
+            <input type="text" id="normalizedFormDerivationMorpheme" disabled /><br/>
+        </p>
+        <p>
+            <label for="normalizedFormDeterminationClauseInPhrase">Determination clause in phrase:</label>
+            <input type="text" id="normalizedFormDeterminationClauseInPhrase" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormJointMorphemeInComposition">Joint morpheme in composition:</label>
+            <input type="text" id="normalizedFormJointMorphemeInComposition" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormMainClauseInComposition">Main clause in composition:</label>
+            <input type="text" id="normalizedFormMainClauseInComposition" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormDeterminationClauseInComposition">Determination clause in composition:</label>
+            <input type="text" id="normalizedFormDeterminationClauseInComposition" disabled /><br/>
+        </p>
+        <p>
+            <label for="normalizedFormDerivationBase">Derivation base:</label>
+            <input type="text" id="normalizedFormDerivationBase" disabled /><br/>
+        </p>
     </fieldset>
     
     
     <fieldset>
         <legend><b><i>Source finding</i></b></legend>
-
-        <label for="availableSourceFindings"><b>Source finding:</b></label>
-        <select name="availableSourceFindings" id="availableSourceFindings" onchange="sourceFindingSelected()"></select><br/>
-
-        <label for="sourceFindingSourceId">Source ID:</label>
-        <input type="text" id="sourceFindingSourceId" disabled /><br/>
-
-        <label for="sourceFindingSourceType">Source type:</label>
-        <input type="text" id="sourceFindingSourceType" disabled /><br/>
-
-        <label for="sourceFindingMapSourceMapSignature">Map signature:</label>
-        <input type="text" id="sourceFindingMapSourceMapSignature" disabled /><br/>
-
-        <label for="sourceFindingMapSourceMapSheet">Map sheet:</label>
-        <input type="text" id="sourceFindingMapSourceMapSheet" disabled /><br/>
-
-        <label for="sourceFindingTextSourceName">Text source name:</label>
-        <input type="text" id="sourceFindingTextSourceName" disabled /><br/>
-
-        <label for="sourceFindingTextSourceSubsection">Text source subsection:</label>
-        <input type="text" id="sourceFindingTextSourceSubsection" disabled /><br/>
-
-        <label for="sourceFindingTextSourcePage">Text source page:</label>
-        <input type="text" id="sourceFindingTextSourcePage" disabled /><br/>
-
-        <label for="sourceFindingSourceDating">Source dating:</label>
-        <input type="text" id="sourceFindingSourceDating" disabled /><br/>
-
-        <label for="sourceFindingSourceLandSurveyor">Land surveyor (name and ID):</label>
-        <input type="text" id="sourceFindingSourceLandSurveyor" disabled /><br/>
-
-        <label for="sourceFindingPartOfSource">Part of source:</label>
-        <input type="text" id="sourceFindingPartOfSource" disabled /><br/>
+        
+        <p>
+            <button type="button" onclick="goToEditSourceFinding();">Edit Source Finding</button>
+        </p>
+        
+        <p>
+            <label for="availableSourceFindings"><b>Source finding:</b></label>
+            <select name="availableSourceFindings" id="availableSourceFindings" onchange="sourceFindingSelected()"></select><br/>
+        </p>
+        <p>
+            <label for="sourceFindingSourceId">Source ID:</label>
+            <input type="text" id="sourceFindingSourceId" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingSourceType">Source type:</label>
+            <input type="text" id="sourceFindingSourceType" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingMapSourceMapSignature">Map signature:</label>
+            <input type="text" id="sourceFindingMapSourceMapSignature" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingMapSourceMapSheet">Map sheet:</label>
+            <input type="text" id="sourceFindingMapSourceMapSheet" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingTextSourceName">Text source name:</label>
+            <input type="text" id="sourceFindingTextSourceName" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingTextSourceSubsection">Text source subsection:</label>
+            <input type="text" id="sourceFindingTextSourceSubsection" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingTextSourcePage">Text source page:</label>
+            <input type="text" id="sourceFindingTextSourcePage" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingSourceDating">Source dating:</label>
+            <input type="text" id="sourceFindingSourceDating" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingSourceLandSurveyor">Land surveyor (name and ID):</label>
+            <input type="text" id="sourceFindingSourceLandSurveyor" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingPartOfSource">Part of source:</label>
+            <input type="text" id="sourceFindingPartOfSource" disabled /><br/>
+        </p>    
     </fieldset>
 
 
-    <input id="createEditButton" type="button" onclick="createLocalityType(populateTable)" value="Create">
+    <input id="createEditButton" type="button" onclick="createOrEditAttestation(attestationCreatedOrEdited, globAttestationId)" value="Create">
 </form>
 
 </body>

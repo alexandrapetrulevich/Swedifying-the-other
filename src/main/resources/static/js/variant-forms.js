@@ -10,7 +10,8 @@ function getAllVariantForms(callback, page, pageSize) {
 }
 
 async function getAllVariantFormsAsync() {
-    return await genericGetAllAsync("variantForms", "variantFormView");
+    let returnedData = await genericGetAllAsync("variantForms", "variantFormView");
+	return returnedData._embedded.variantForms;
 }
 
 function getVariantFormById(id, callback, errorCallback) {

@@ -80,11 +80,12 @@
             if (!location) {
                 return "N/A";
             }
+            let modernLookupForm = location.modernLookupForm ? location.modernLookupForm : "- (No modern lookup form)"; 
             let locationLinkStart = "<a href=\"/locations-create-edit.html?locationId=";
             let ret = locationLinkStart
                 + location.locationId 
                 + "\">" 
-                + location.modernLookupForm 
+                + modernLookupForm
                 + "</a>";
             return ret;
         }
@@ -204,7 +205,9 @@
     <label for="filterAttestationsTextEtymology">Filter by etymology:</label>
     <input type="text" id="filterAttestationsTextEtymology">
 
+    <!--
     <input type="button" value="Do filter" onclick="doFilterAttestations('Filtered by', setHeaderAndPopulateTable)">
+    -->
 </form>
 </body>
 </html>

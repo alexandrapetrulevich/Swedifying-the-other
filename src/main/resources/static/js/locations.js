@@ -7,6 +7,11 @@ function getAllLocations(callback) {
         });
 }
 
+async function getAllLocationsAsync() {
+    let returnedData = await genericGetAllAsync("locations", "locationView");
+	return returnedData._embedded.locations;
+}
+
 function getLocationById(id, callback, errorCallback) {
     genericGetById(id, "locations", callback, errorCallback, "locationView");
 }

@@ -9,8 +9,8 @@ function getAllSourceFindings(callback) {
 }
 
 async function getAllSourceFindingsAsync() {
-    const response = await fetch("/api/sourceFindings?projection=sourceFindingView");
-    return response.json();
+	let returnedData = await genericGetAllAsync("sourceFindings", "sourceFindingView");
+	return returnedData._embedded.sourceFindings;
 }
 
 function getSourceFindingById(id, callback, errorCallback) {
