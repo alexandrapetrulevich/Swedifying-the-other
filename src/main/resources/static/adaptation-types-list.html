@@ -44,6 +44,7 @@
 <a href="#" class="current-page-in-menu">List adaptation types</a>
 
 <h1 id="adaptationTypesTableHeader">All adaptation types</h1>
+<p>
 <table id="adaptationTypesTable">
     <thead>
     <tr>
@@ -55,13 +56,20 @@
     <tbody id="tbodyid">
     </tbody>
 </table>
-<br/>
+</p>
 
-<form id="filterAdaptationTypesForm">
-    <label for="filterAdaptationTypesForm_filter">Filter by name: </label>
-    <input type="text" id="filterAdaptationTypesForm_filter">
-    <input type="button" value="Do filter" onclick="doFilterAdaptationTypes('Filtered by', setHeaderAndPopulateTable)">
-</form>
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterAdaptationTypesForm">
+            <p>
+                <label for="filterAdaptationTypesForm_filter">Filter by name:</label>
+                <input type="text" id="filterAdaptationTypesForm_filter">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterAdaptationTypes('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
 
 </body>
 </html>

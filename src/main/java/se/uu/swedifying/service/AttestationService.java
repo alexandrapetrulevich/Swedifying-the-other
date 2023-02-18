@@ -11,7 +11,11 @@ public interface AttestationService {
   Attestation createAttestation(CreateAttestationRequest createAttestationRequest);
 
   List<Attestation> getAllAttestations();
-  List<Attestation> getAllFiltered(String morphologicalNameTypeFilter, String etymologyFilter);
+  List<Attestation> getAllFiltered(
+    String morphologicalNameTypeFilter
+    , String etymologyFilter
+    , int page
+    , int pageSize);
 
   Attestation getAttestationById(long id);
 }

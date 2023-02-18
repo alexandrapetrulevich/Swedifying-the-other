@@ -80,15 +80,19 @@
 
 <h1 id="createEditLanguageHeader">Create new language</h1>
 
-<form id="createEditLanguageForm" >
-    <label for="languageName" class="for-editable"><b>Language name:</b></label>
-    <input type="text" size="50" id="languageName"/><br/>
-
-    <label for="languageCode" class="for-editable"><b>Language code:</b></label>
-    <input type="text" size="50" id="languageCode"/><br/>
-
-    <input id="createEditButton" type="button" onclick="createOrEditLanguage(languageCreatedOrEdited, globLanguageId)" value="Create">
-</form>
+<p>
+    <form id="createEditLanguageForm" >
+        <p>
+            <label for="languageName" class="for-editable">Language name:</label>
+            <input type="text" size="50" id="languageName"/>
+        </p>
+        <p>
+            <label for="languageCode" class="for-editable">Language code:</label>
+            <input type="text" size="50" id="languageCode"/>
+        </p>
+        <input id="createEditButton" type="button" onclick="createOrEditLanguage(languageCreatedOrEdited, globLanguageId)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>

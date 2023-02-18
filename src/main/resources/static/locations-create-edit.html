@@ -187,29 +187,41 @@
 
 <h1 id="createEditLocationHeader">Create new location</h1>
 
-<form id="createEditLocationForm" >
-    <label for="modernLookupForm" class="for-editable"><b>Modern lookup form:</b></label>
-    <input type="text" size="50" id="modernLookupForm"/><br/>
+<p>
+    <form id="createEditLocationForm" >
+        <p>
+            <label for="modernLookupForm" class="for-editable">Modern lookup form:</label>
+            <input type="text" size="50" id="modernLookupForm"/>
+        </p>
+        <p>
+            <label for="longitude" class="for-editable">Longitude:</label>
+            <input type="text" id="longitude"/>
+        </p>
 
-    <label for="longitude" class="for-editable"><b>Longitude:</b></label>
-    <input type="text" id="longitude"/><br/>
+        <p>
+            <label for="latitude" class="for-editable">Latitude:</label>
+            <input type="text" id="latitude"/>
+        </p>
+        
+        <p>
+            <label for="districtOrParish" class="for-editable">District or parish:</label>
+            <select name="districtOrParish" id="districtOrParish" onchange="districtOrParishSelected()">
+            </select>
+        </p>
+        
+        <p>
+            <label for="locationRegion">Region:</label>
+            <input type="text" id="locationRegion" disabled/><br/>
+        </p>
+        <p>
+            <label for="localityType" class="for-editable">Locality type:</label>
+            <select name="localityType" id="localityType" onchange="localityTypeSelected()">
+            </select>
+        </p>
 
-    <label for="latitude" class="for-editable"><b>Latitude:</b></label>
-    <input type="text" id="latitude"/><br/>
-
-    <label for="districtOrParish" class="for-editable">District or parish:</label>
-    <select name="districtOrParish" id="districtOrParish" onchange="districtOrParishSelected()">
-    </select><br/>
-
-    <label for="locationRegion">Region:</label>
-    <input type="text" id="locationRegion" disabled/><br/>
-
-    <label for="localityType" class="for-editable">Locality type:</label>
-    <select name="localityType" id="localityType" onchange="localityTypeSelected()">
-    </select><br/>
-
-    <input id="createEditButton" type="button" onclick="createOrEditLocation(locationCreatedOrEdited, globLocationId)" value="Create">
-</form>
+        <input id="createEditButton" type="button" onclick="createOrEditLocation(locationCreatedOrEdited, globLocationId)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>

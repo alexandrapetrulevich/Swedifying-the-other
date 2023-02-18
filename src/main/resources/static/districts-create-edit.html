@@ -99,16 +99,21 @@
 
 <h1 id="createEditDistrictHeader">Create new district</h1>
 
-<form id="createEditDistrictForm" >
-    <label for="districtName" class="for-editable"><b>District name:</b></label>
-    <input type="text" size="50" id="districtName"/><br/>
+<p>
+    <form id="createEditDistrictForm" >
+        <p>
+            <label for="districtName" class="for-editable"><b>District name:</b></label>
+            <input type="text" size="50" id="districtName"/>
+        </p>
+        <p>
+            <label for="availableRegions" class="for-editable">Region:</label>
+            <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
+            </select>
+        </p>
 
-    <label for="availableRegions" class="for-editable">Region:</label>
-    <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
-    </select><br/>
-
-    <input id="createEditButton" type="button" onclick="createOrEditDistrict(districtCreatedOrEdited, globDistrictId)" value="Create">
-</form>
+        <input id="createEditButton" type="button" onclick="createOrEditDistrict(districtCreatedOrEdited, globDistrictId)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>

@@ -45,24 +45,32 @@
 <a href="#" class="current-page-in-menu">List land surveyors</a>
 
 <h1 id="landSurveyorsTableHeader">All land surveyors</h1>
-<table id="landSurveyorsTable">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody id="tbodyid">
-    </tbody>
-</table>
-<br/>
+<p>
+    <table id="landSurveyorsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
 
-<form id="filterlandSurveyorsForm">
-    <label for="filterByName">Filter by name: </label>
-    <input type="text" id="filterByName"><br/>
-    <input type="button" value="Do filter" onclick="doFilterLandSurveyors('Filtered by', setHeaderAndPopulateTable)">
-</form>
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterlandSurveyorsForm">
+            <p>
+                <label for="filterByName">Filter by name:</label>
+                <input type="text" id="filterByName">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterLandSurveyors('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
 
 </body>
 </html>

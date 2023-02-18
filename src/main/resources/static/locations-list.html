@@ -70,30 +70,38 @@
 <a href="/locations-create-edit.html">Create/edit locations</a>
 
 <h1 id="locationsTableHeader">All locations</h1>
-<table id="locationsTable">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Modern lookup form</th>
-        <th>Longitude</th>
-        <th>Latitude</th>
-        <th>District/parish</th>
-        <th>Belongs to precinct (parish)</th>
-        <th>Belongs to region (district/parish)</th>
-        <th>Locality type</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody id="tbodyid">
-    </tbody>
-</table>
-<br/>
+<p>
+    <table id="locationsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Modern lookup form</th>
+            <th>Longitude</th>
+            <th>Latitude</th>
+            <th>District/parish</th>
+            <th>Belongs to precinct (parish)</th>
+            <th>Belongs to region (district/parish)</th>
+            <th>Locality type</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
 
-<form id="filterLocationsForm">
-    <label for="filterByModernLookupForm">Filter by modern lookup form: </label>
-    <input type="text" id="filterByModernLookupForm">
-    <input type="button" value="Do filter" onclick="doFilterLocations('Filtered by', setHeaderAndPopulateTable)">
-</form>
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterLocationsForm">
+            <p>
+                <label for="filterByModernLookupForm">Filter by modern lookup form:</label>
+                <input type="text" id="filterByModernLookupForm">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterLocations('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
 
 </body>
 </html>

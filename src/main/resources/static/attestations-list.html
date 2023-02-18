@@ -80,7 +80,7 @@
             if (!location) {
                 return "N/A";
             }
-            let modernLookupForm = location.modernLookupForm ? location.modernLookupForm : "- (No modern lookup form)"; 
+            let modernLookupForm = location.modernLookupForm ? location.modernLookupForm : "- <i>(No modern lookup form)</i>"; 
             let locationLinkStart = "<a href=\"/locations-create-edit.html?locationId=";
             let ret = locationLinkStart
                 + location.locationId 
@@ -164,22 +164,23 @@
 <a href="#" class="current-page-in-menu">List attestations</a>
 
 <h1 id="attestationsTableHeader">All attestations</h1>
-<table id="attestationsTable">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Original form (Belägg)</th>
-        <th>Variant form (Variantform)</th>
-        <th>Location (-)</th>
-        <th>Source finding</th>
-        <th>Notes (Anteckningar)</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody id="tbodyid">
-    </tbody>
-</table>
-
+<p>
+    <table id="attestationsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Original form (Belägg)</th>
+            <th>Variant form (Variantform)</th>
+            <th>Location (-)</th>
+            <th>Source finding</th>
+            <th>Notes (Anteckningar)</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
 <fieldset>
     <legend>Paging</legend>
     <p>
@@ -197,17 +198,23 @@
     </p>
 </fieldset>
 
-<br/>
-<form id="filterAttestationsForm">
-
-    <label for="filterAttestationsTextMorphNameType">Filter by Morphological Name Type:</label>
-    <input type="text" id="filterAttestationsTextMorphNameType">
-    <label for="filterAttestationsTextEtymology">Filter by etymology:</label>
-    <input type="text" id="filterAttestationsTextEtymology">
-
-    <!--
-    <input type="button" value="Do filter" onclick="doFilterAttestations('Filtered by', setHeaderAndPopulateTable)">
-    -->
-</form>
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterAttestationsForm">
+            <p>
+                <label for="filterAttestationsTextMorphNameType" class="disabled">Filter by Morphological Name Type:</label>
+                <input type="text" id="filterAttestationsTextMorphNameType" disabled>
+            </p>
+            <p>
+                <label for="filterAttestationsTextEtymology" class="disabled">Filter by etymology:</label>
+                <input type="text" id="filterAttestationsTextEtymology" disabled>
+            </p>
+            <p>
+                <input type="button" value="Do filter" onclick="doFilterAttestations('Filtered by', setHeaderAndPopulateTable)" disabled>
+            </p>
+        </form>
+    </p>
+</fieldset>
 </body>
 </html>

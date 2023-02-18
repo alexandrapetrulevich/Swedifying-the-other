@@ -13,7 +13,7 @@ import java.util.List;
 @RepositoryRestResource(excerptProjection = AttestationView.class)
 public interface AttestationRepository extends PagingAndSortingRepository<Attestation, Long> {
     @Override
-    Page<Attestation> findAll();
+    Page<Attestation> findAll(Pageable pageable);
 
     Page<Attestation> findByVariantFormIn(
       List<VariantForm> variantForms, Pageable pageable);

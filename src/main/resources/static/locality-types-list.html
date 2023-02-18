@@ -47,24 +47,31 @@
 <a href="#" class="current-page-in-menu">List locality types</a>
 
 <h1 id="localityTypesTableHeader">All locality types</h1>
-<table id="localityTypesTable">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody id="tbodyid">
-    </tbody>
-</table>
-<br/>
+<p>
+    <table id="localityTypesTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
 
-<form id="filterLocalityTypesForm">
-    <label for="filterLocalityTypesForm_filter">Filter by name: </label>
-    <input type="text" id="filterLocalityTypesForm_filter">
-    <input type="button" value="Do filter" onclick="doFilterLocalityTypes('Filtered by', setHeaderAndPopulateTable)">
-</form>
-
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterLocalityTypesForm">
+            <p>
+                <label for="filterLocalityTypesForm_filter">Filter by name:</label>
+                <input type="text" id="filterLocalityTypesForm_filter">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterLocalityTypes('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
 </body>
 </html>

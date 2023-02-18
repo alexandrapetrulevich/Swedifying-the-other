@@ -71,12 +71,16 @@
 
 <h1 id="createEditLocalityTypeHeader">Create new locality type</h1>
 
-<form id="createEditLocalityTypeForm" >
-    <label for="localityTypeName"><b>Locality type name:</b></label>
-    <input type="text" size="50" id="localityTypeName"/><br/>
+<p>
+    <form id="createEditLocalityTypeForm" >
+        <p>
+            <label for="localityTypeName" class="for-editable">Locality type name:</label>
+            <input type="text" size="50" id="localityTypeName"/>
+        </p>
 
-    <input id="createEditButton" type="button" onclick="createOrEditLocalityType(localityTypeCreatedOrEdited, globLocalityTypeId)" value="Create">
-</form>
+        <input id="createEditButton" type="button" onclick="createOrEditLocalityType(localityTypeCreatedOrEdited, globLocalityTypeId)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>
