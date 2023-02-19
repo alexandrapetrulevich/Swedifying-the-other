@@ -256,72 +256,74 @@
 
 <h1 id="createEditNormalizedFormHeader">Create new normalized form</h1>
 
-<form id="createEditNormalizedFormForm" >
-    <p>
-        <label for="normalizedForm" class="for-editable">Normalized form:</label>
-        <input type="text" size="50" id="normalizedForm"/>
-    </p>
-    <p>
-        <label for="availableMorphologicalNameTypes" class="for-editable">Morphological name type:</label>
-        <select name="availableMorphologicalNameTypes" id="availableMorphologicalNameTypes" onchange="morphologicalNameTypeSelected()">
-        </select>
-    </p>
-    <p>
-        <label for="morphologicalNameTypeIsShaky" class="for-editable">Morphological name type is shaky?</label>
-        <input type="checkbox" id="morphologicalNameTypeIsShaky" onchange="morphologicalNameTypeIsShakyChanged()"/>
-    </p>
-    <fieldset>
-        <legend><b><i>Morphological data</i></b></legend>
+<p>
+    <form id="createEditNormalizedFormForm" >
         <p>
-            <label for="determinationClauseInPhrase" class="for-editable">Determination clause in phrase:</label>
-            <input type="text" size="50" id="determinationClauseInPhrase"/>
+            <label for="normalizedForm" class="for-editable">Normalized form:</label>
+            <input type="text" size="50" id="normalizedForm"/>
         </p>
         <p>
-            <label for="mainClauseInPhrase" class="for-editable">Main clause in phrase:</label>
-            <input type="text" size="50" id="mainClauseInPhrase"/>
+            <label for="availableMorphologicalNameTypes" class="for-editable">Morphological name type:</label>
+            <select name="availableMorphologicalNameTypes" id="availableMorphologicalNameTypes" onchange="morphologicalNameTypeSelected()">
+            </select>
         </p>
         <p>
-            <label for="simpleRootMorpheme" class="for-editable">Simple root morpheme:</label>
-            <input type="text" size="50" id="simpleRootMorpheme"/>
+            <label for="morphologicalNameTypeIsShaky" class="for-editable">Morphological name type is shaky?</label>
+            <input type="checkbox" id="morphologicalNameTypeIsShaky" onchange="morphologicalNameTypeIsShakyChanged()"/>
+        </p>
+        <fieldset>
+            <legend><b><i>Morphological data</i></b></legend>
+            <p>
+                <label for="determinationClauseInPhrase" class="for-editable">Determination clause in phrase:</label>
+                <input type="text" size="50" id="determinationClauseInPhrase"/>
+            </p>
+            <p>
+                <label for="mainClauseInPhrase" class="for-editable">Main clause in phrase:</label>
+                <input type="text" size="50" id="mainClauseInPhrase"/>
+            </p>
+            <p>
+                <label for="simpleRootMorpheme" class="for-editable">Simple root morpheme:</label>
+                <input type="text" size="50" id="simpleRootMorpheme"/>
+            </p>
+            <p>
+                <label for="derivationBase" class="for-editable">Derivation base:</label>
+                <input type="text" size="50" id="derivationBase"/>
+            </p>
+            <p>
+                <label for="derivationMorpheme" class="for-editable">Derivation morpheme:</label>
+                <input type="text" size="50" id="derivationMorpheme"/>
+            </p>
+            <p>
+                <label for="determinationClauseInComposition" class="for-editable">Determination clause in composition:</label>
+                <input type="text" size="50" id="determinationClauseInComposition"/>
+            </p>
+            <p>
+                <label for="jointMorphemeInComposition" class="for-editable">Joint morpheme in composition:</label>
+                <input type="text" size="50" id="jointMorphemeInComposition"/>
+            </p>
+            <p>
+                <label for="mainClauseInComposition" class="for-editable">Main clause in composition:</label>
+                <input type="text" size="50" id="mainClauseInComposition"/>
+            </p>
+        </fieldset>
+        <p>
+            <label for="comparativeFormInformation" class="for-editable">Comparative form information:</label><br/>
+            <textarea name="comparativeFormInformation" form="createEditNormalizedFormForm" id="comparativeFormInformation" rows="4" cols="50"></textarea>
         </p>
         <p>
-            <label for="derivationBase" class="for-editable">Derivation base:</label>
-            <input type="text" size="50" id="derivationBase"/>
+            <label for="availableEtymologyLanguages" class="for-editable">Etymology:</label>
+            <select name="availableEtymologyLanguages" id="availableEtymologyLanguages" onchange="etymologySelected()">
+            </select>
         </p>
         <p>
-            <label for="derivationMorpheme" class="for-editable">Derivation morpheme:</label>
-            <input type="text" size="50" id="derivationMorpheme"/>
+            <label for="availableMediatingLanguages" class="for-editable">Mediating language:</label>
+            <select name="availableMediatingLanguages" id="availableMediatingLanguages" onchange="mediatingLanguageSelected()">
+            </select>
         </p>
-        <p>
-            <label for="determinationClauseInComposition" class="for-editable">Determination clause in composition:</label>
-            <input type="text" size="50" id="determinationClauseInComposition"/>
-        </p>
-        <p>
-            <label for="jointMorphemeInComposition" class="for-editable">Joint morpheme in composition:</label>
-            <input type="text" size="50" id="jointMorphemeInComposition"/>
-        </p>
-        <p>
-            <label for="mainClauseInComposition" class="for-editable">Main clause in composition:</label>
-            <input type="text" size="50" id="mainClauseInComposition"/>
-        </p>
-    </fieldset>
-    <p>
-        <label for="comparativeFormInformation" class="for-editable">Comparative form information:</label><br/>
-        <textarea name="comparativeFormInformation" form="createEditNormalizedFormForm" id="comparativeFormInformation" rows="4" cols="50"></textarea>
-    </p>
-    <p>
-        <label for="availableEtymologyLanguages" class="for-editable">Etymology:</label>
-        <select name="availableEtymologyLanguages" id="availableEtymologyLanguages" onchange="etymologySelected()">
-        </select>
-    </p>
-    <p>
-        <label for="availableMediatingLanguages" class="for-editable">Mediating language:</label>
-        <select name="availableMediatingLanguages" id="availableMediatingLanguages" onchange="mediatingLanguageSelected()">
-        </select>
-    </p>
-        
-    <input id="createEditButton" type="button" onclick="createOrEditNormalizedForm(normalizedFormCreatedOrEdited, globNormalizedFormId, noLanguageValue)" value="Create">
-</form>
+            
+        <input id="createEditButton" type="button" onclick="createOrEditNormalizedForm(normalizedFormCreatedOrEdited, globNormalizedFormId, noLanguageValue)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>

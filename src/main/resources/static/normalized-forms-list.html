@@ -175,24 +175,27 @@
 <a href="#" class="current-page-in-menu">List normalized forms</a>
 
 <h1 id="normalizedFormsTableHeader">All normalized forms</h1>
-<table id="normalizedFormsTable">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Normalized Form</th>
-		<th>Morphological name type</th>
-		<th>Morphological name type is shaky</th>
-		<th>Morphological data</th>
-		<th>Comparative form information</th>
-		<th>Etymology language</th>
-		<th>Mediating language</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody id="tbodyid">
-    </tbody>
-</table>
+<p>
+    <table id="normalizedFormsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Normalized Form</th>
+            <th>Morphological name type</th>
+            <th>Morphological name type is shaky</th>
+            <th>Morphological data</th>
+            <th>Comparative form information</th>
+            <th>Etymology language</th>
+            <th>Mediating language</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
 
+<p>
 <fieldset>
     <legend>Paging</legend>
     <p>
@@ -209,13 +212,20 @@
         </form>
     </p>
 </fieldset>
-<br/>
+</p>
 
-<form id="filterNormalizedFormsForm">
-    <label for="filterByNormalizedForm">Filter by normalized form: </label>
-    <input type="text" id="filterByNormalizedForm"><br/>
-    <input type="button" value="Do filter" onclick="doFilterNormalizedForms('Filtered by', setHeaderAndPopulateTable)">
-</form>
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterNormalizedFormsForm">
+            <p>
+                <label for="filterByNormalizedForm">Filter by normalized form:</label>
+                <input type="text" id="filterByNormalizedForm">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterNormalizedForms('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
 
 </body>
 </html>

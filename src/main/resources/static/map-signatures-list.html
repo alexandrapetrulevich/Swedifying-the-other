@@ -47,6 +47,7 @@
 <a href="#" class="current-page-in-menu">List map signatures</a>
 
 <h1 id="mapSignaturesTableHeader">All map signatures</h1>
+<p>
 <table id="mapSignaturesTable">
     <thead>
     <tr>
@@ -58,13 +59,20 @@
     <tbody id="tbodyid">
     </tbody>
 </table>
-<br/>
+</p>
 
-<form id="filterMapSignaturesForm">
-    <label for="filterByMapSignature">Filter by map signature: </label>
-    <input type="text" id="filterByMapSignature"><br/>
-    <input type="button" value="Do filter" onclick="doFilterMapSignatures('Filtered by', setHeaderAndPopulateTable)">
-</form>
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterMapSignaturesForm">
+            <p>
+                <label for="filterByMapSignature">Filter by map signature: </label>
+                <input type="text" id="filterByMapSignature">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterMapSignatures('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
 
 </body>
 </html>

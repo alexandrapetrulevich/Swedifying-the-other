@@ -125,20 +125,30 @@
 
 <h1 id="createEditMapSourceHeader">Create new map source</h1>
 
-<form id="createEditMapSourceForm" >
-    <label for="dating" class="for-editable"><b>Dating (YYYY-MM-DD):</b></label>
-    <input type="text" id="dating"/><br/>
-    <label for="mapSheet" class="for-editable"><b>Map sheet:</b></label>
-    <input type="text" id="mapSheet"/><br/>
-    <label for="availableLandSurveyors" class="for-editable">Land Surveyor:</label>
-    <select name="availableLandSurveyors" id="availableLandSurveyors" onchange="landSurveyorSelected()">
-    </select><br/>
-    <label for="availableMapSignatures" class="for-editable">Map Signature:</label>
-    <select name="availableMapSignatures" id="availableMapSignatures" onchange="mapSignatureSelected()">
-    </select><br/>
+<p>
+    <form id="createEditMapSourceForm" >
+        <p>
+            <label for="dating" class="for-editable">Dating (YYYY-MM-DD):</label>
+            <input type="text" id="dating"/>
+        </p>
+        <p>
+            <label for="mapSheet" class="for-editable">Map sheet:</label>
+            <input type="text" id="mapSheet"/>
+        </p>
+        <p>
+            <label for="availableLandSurveyors" class="for-editable">Land Surveyor:</label>
+            <select name="availableLandSurveyors" id="availableLandSurveyors" onchange="landSurveyorSelected()">
+            </select>
+        </p>
+        <p>
+            <label for="availableMapSignatures" class="for-editable">Map Signature:</label>
+            <select name="availableMapSignatures" id="availableMapSignatures" onchange="mapSignatureSelected()">
+            </select>
+        </p>
 
-    <input id="createEditButton" type="button" onclick="createOrEditMapSource(mapSourceCreatedOrEdited, globMapSourceId)" value="Create">
-</form>
+        <input id="createEditButton" type="button" onclick="createOrEditMapSource(mapSourceCreatedOrEdited, globMapSourceId)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>

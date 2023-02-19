@@ -141,18 +141,26 @@
 
 <h1 id="createEditParishHeader">Create new parish</h1>
 
-<form id="createEditParishForm" >
-    <label for="parishName" class="for-editable"><b>Parish name:</b></label>
-    <input type="text" size="50" id="parishName"/><br/>
-	<label for="availableRegions" class="for-editable">Belongs to region:</label>
-    <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
-    </select><br/>
-	<label for="availablePrecincts" class="for-editable">Belongs to precinct:</label>
-    <select name="availablePrecincts" id="availablePrecincts" onchange="precinctSelected()">
-    </select><br/>
+<p>
+    <form id="createEditParishForm" >
+        <p>
+            <label for="parishName" class="for-editable">Parish name:</label>
+            <input type="text" size="50" id="parishName"/>
+        </p>
+        <p>
+            <label for="availableRegions" class="for-editable">Belongs to region:</label>
+            <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
+            </select>
+        </p>
+        <p>
+            <label for="availablePrecincts" class="for-editable">Belongs to precinct:</label>
+            <select name="availablePrecincts" id="availablePrecincts" onchange="precinctSelected()">
+            </select>
+        </p>
 
-    <input id="createEditButton" type="button" onclick="createOrEditParish(parishCreatedOrEdited, globParishId)" value="Create">
-</form>
+        <input id="createEditButton" type="button" onclick="createOrEditParish(parishCreatedOrEdited, globParishId)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>

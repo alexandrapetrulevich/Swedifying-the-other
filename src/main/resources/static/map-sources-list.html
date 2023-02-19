@@ -53,6 +53,7 @@
 <a href="#" class="current-page-in-menu">List map sources</a>
 
 <h1 id="mapSourcesTableHeader">All map sources</h1>
+<p>
 <table id="mapSourcesTable">
     <thead>
     <tr>
@@ -67,15 +68,20 @@
     <tbody id="tbodyid">
     </tbody>
 </table>
-<br/>
+</p>
 
-<!--
-<form id="filterMapSourcesForm">
-    <label for="filterByMapSource">Filter by map source: </label>
-    <input type="text" id="filterByMapSource"><br/>
-    <input type="button" value="Do filter" onclick="doFilterMapSources('Filtered by', setHeaderAndPopulateTable)">
-</form>
--->
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterMapSourcesForm">
+            <p>
+                <label for="filterByMapSource" class="disabled">Filter by map source: </label>
+                <input type="text" id="filterByMapSource" disabled>
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterMapSources('Filtered by', setHeaderAndPopulateTable)" disabled>
+        </form>
+    </p>
+</fieldset>
 
 </body>
 </html>
