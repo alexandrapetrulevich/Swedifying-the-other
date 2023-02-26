@@ -47,24 +47,32 @@
 <a href="#" class="current-page-in-menu">List regions</a>
 
 <h1 id="regionsTableHeader">All regions</h1>
-<table id="regionsTable">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody id="tbodyid">
-    </tbody>
-</table>
-<br/>
+<p>
+    <table id="regionsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
 
-<form id="filterRegionsForm">
-    <label for="filterByRegionName">Filter by region name: </label>
-    <input type="text" id="filterByRegionName"><br/>
-    <input type="button" value="Do filter" onclick="doFilterRegions('Filtered by', setHeaderAndPopulateTable)">
-</form>
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterRegionsForm">
+            <p>
+                <label for="filterByRegionName">Filter by region name:</label>
+                <input type="text" id="filterByRegionName">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterRegions('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
 
 </body>
 </html>

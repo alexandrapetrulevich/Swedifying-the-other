@@ -289,78 +289,84 @@
 
 <h1 id="createEditVariantFormHeader">Create new variant form</h1>
 
-<form id="createEditVariantFormForm" >
-    <p>
-        <label for="variantForm" class="for-editable"><b>Variant form:</b></label>
-        <input type="text" size="50" id="variantForm"/>
-    </p>
-    <p>
-        <label for="availableIsAdaptedToSwedishTypes" class="for-editable">Is adapted to Swedish:</label>
-        <select name="availableIsAdaptedToSwedishTypes" id="availableIsAdaptedToSwedishTypes" onchange="isAdaptedToSwedishSelected()">
-        </select>
-    </p>
-    <fieldset>
-        <legend><b><i>Add adaptation types (one or more)</i></b></legend>
-        <table class="no-border">
-            <tr class="no-border">
-                <td class="no-border">
-                    <label for="availableAdaptationTypes" class="for-editable" id="availableAdaptationTypesLabel">To add:</label><br/>
-                    <select name="availableAdaptationTypes" id="availableAdaptationTypes" size=5 multiple onchange="adaptationTypeSelected()" style="width: 250px;">
-                    </select>
-                </td>
-                <td class="no-border" style="text-align: center;">
-                    <button type="button" onclick="addSelectedAdaptationType()" id="addSelectedAdaptationTypeButton">Add &gt;&gt;</button>
-                    <br /><br />
-                    <button type="button" onclick="removeSelectedAdaptationTypes()" id="removeSelectedAdaptationTypeButton">&lt;&lt; Remove </button>
-                    <!--
-                    <br /><br />
-                    <button type="button" onclick="removeAllAddedAdaptationType()" id="removeAllAddedAdaptationTypeButton">Remove all</button>
-                    -->
-                </td>
-                <td class="no-border">
-                    <label for="addedAdaptationTypes" class="for-editable" id="addedAdaptationTypesLabel">Added:</label><br/>
-                    <select name="addedAdaptationTypes" form="createEditVariantFormForm" id="addedAdaptationTypes" size=5 multiple onchange="addedAdaptationTypeSelected()" style="width: 250px;">
-                    </select>
-                </td>
-            </tr>
-        </table>
-    </fieldset>
-    
-    <p>
-        <label for="availableNormalizedForms" class="for-editable">Normalized form:</label>
-        <select name="availableNormalizedForms" id="availableNormalizedForms" onchange="normalizedFormSelected()">
-        </select>
-    </p>
-    <fieldset>
-        <legend><b><i>Selected normalized form information</i></b></legend>
+<p>
+    <form id="createEditVariantFormForm" >
         <p>
-            <a href="#" id="editSelectedNormalizedForm">Edit selected normalized form</a>
+            <label for="variantForm" class="for-editable"><b>Variant form:</b></label>
+            <input type="text" size="50" id="variantForm"/>
         </p>
         <p>
-            <label for="normalizedForm_morphologicalNameType" class="disabled">Morphological name type:</label>
-            <input type="text" size="50" id="normalizedForm_morphologicalNameType" disabled/>
+            <label for="availableIsAdaptedToSwedishTypes" class="for-editable">Is adapted to Swedish:</label>
+            <select name="availableIsAdaptedToSwedishTypes" id="availableIsAdaptedToSwedishTypes" onchange="isAdaptedToSwedishSelected()">
+            </select>
         </p>
         <p>
-            <label for="normalizedForm_morphologicalNameTypeIsShaky" class="disabled">Morphological name type is shaky:</label>
-            <input type="text" size="50" id="normalizedForm_morphologicalNameTypeIsShaky" disabled/>
+            <fieldset>
+                <legend><b><i>Add adaptation types (one or more)</i></b></legend>
+                <table class="no-border">
+                    <tr class="no-border">
+                        <td class="no-border">
+                            <label for="availableAdaptationTypes" class="for-editable" id="availableAdaptationTypesLabel">To add:</label><br/>
+                            <select name="availableAdaptationTypes" id="availableAdaptationTypes" size=5 multiple onchange="adaptationTypeSelected()" style="width: 250px;">
+                            </select>
+                        </td>
+                        <td class="no-border" style="text-align: center;">
+                            <button type="button" onclick="addSelectedAdaptationType()" id="addSelectedAdaptationTypeButton">Add &gt;&gt;</button>
+                            <br /><br />
+                            <button type="button" onclick="removeSelectedAdaptationTypes()" id="removeSelectedAdaptationTypeButton">&lt;&lt; Remove </button>
+                            <!--
+                            <br /><br />
+                            <button type="button" onclick="removeAllAddedAdaptationType()" id="removeAllAddedAdaptationTypeButton">Remove all</button>
+                            -->
+                        </td>
+                        <td class="no-border">
+                            <label for="addedAdaptationTypes" class="for-editable" id="addedAdaptationTypesLabel">Added:</label><br/>
+                            <select name="addedAdaptationTypes" form="createEditVariantFormForm" id="addedAdaptationTypes" size=5 multiple onchange="addedAdaptationTypeSelected()" style="width: 250px;">
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+        </p>
+        
+        <p>
+            <label for="availableNormalizedForms" class="for-editable">Normalized form:</label>
+            <select name="availableNormalizedForms" id="availableNormalizedForms" onchange="normalizedFormSelected()">
+            </select>
         </p>
         <p>
-            <label for="normalizedForm_morphologicalData" class="disabled">Morphological data:</label><br/>
-            <textarea disabled name="normalizedForm_morphologicalData" form="createEditVariantFormForm" id="normalizedForm_morphologicalData" rows="4" cols="50">
-            </textarea>
+            <fieldset>
+                <legend><b><i>Selected normalized form information</i></b></legend>
+                <p>
+                    <a href="#" id="editSelectedNormalizedForm">Edit selected normalized form</a>
+                </p>
+                <p>
+                    <label for="normalizedForm_morphologicalNameType" class="disabled">Morphological name type:</label>
+                    <input type="text" size="50" id="normalizedForm_morphologicalNameType" disabled/>
+                </p>
+                <p>
+                    <label for="normalizedForm_morphologicalNameTypeIsShaky" class="disabled">Morphological name type is shaky:</label>
+                    <input type="text" size="50" id="normalizedForm_morphologicalNameTypeIsShaky" disabled/>
+                </p>
+                <p>
+                    <label for="normalizedForm_morphologicalData" class="disabled">Morphological data:</label><br/>
+                    <textarea disabled name="normalizedForm_morphologicalData" form="createEditVariantFormForm" id="normalizedForm_morphologicalData" rows="4" cols="50">
+                    </textarea>
+                </p>
+                <p>
+                    <label for="normalizedForm_etymology" class="disabled">Etymology:</label>
+                    <input type="text" size="50" id="normalizedForm_etymology" disabled/>
+                </p>
+                <p>
+                    <label for="normalizedForm_mediatingLanguage" class="disabled">Mediating language:</label>
+                    <input type="text" size="50" id="normalizedForm_mediatingLanguage" disabled/>
+                </p>
+            </fieldset>
         </p>
-        <p>
-            <label for="normalizedForm_etymology" class="disabled">Etymology:</label>
-            <input type="text" size="50" id="normalizedForm_etymology" disabled/>
-        </p>
-        <p>
-            <label for="normalizedForm_mediatingLanguage" class="disabled">Mediating language:</label>
-            <input type="text" size="50" id="normalizedForm_mediatingLanguage" disabled/>
-        </p>
-    </fieldset>
-    
-    <input id="createEditButton" type="button" onclick="createOrEditVariantForm(variantFormCreatedOrEdited, globVariantFormId, addedAdaptationTypesSet)" value="Create">
-</form>
+        
+        <input id="createEditButton" type="button" onclick="createOrEditVariantForm(variantFormCreatedOrEdited, globVariantFormId, addedAdaptationTypesSet)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>

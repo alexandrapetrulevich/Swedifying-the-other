@@ -49,25 +49,33 @@
 <a href="#" class="current-page-in-menu">List precincts</a>
 
 <h1 id="precinctsTableHeader">All precincts</h1>
-<table id="precinctsTable">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-		<th>Belongs to region</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody id="tbodyid">
-    </tbody>
-</table>
-<br/>
+<p>
+    <table id="precinctsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Belongs to region</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
 
-<form id="filterPrecinctsForm">
-    <label for="filterByPrecinctName">Filter by precinct name: </label>
-    <input type="text" id="filterByPrecinctName"><br/>
-    <input type="button" value="Do filter" onclick="doFilterPrecincts('Filtered by', setHeaderAndPopulateTable)">
-</form>
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterPrecinctsForm">
+            <p>
+                <label for="filterByPrecinctName">Filter by precinct name:</label>
+                <input type="text" id="filterByPrecinctName">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterPrecincts('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
 
 </body>
 </html>

@@ -152,16 +152,20 @@
 
 <h1 id="createEditSourceFindingHeader">Create new source finding</h1>
 
-<form id="createEditSourceFindingForm" >
-    <label for="availableSources" class="for-editable">Source:</label>
-    <select name="availableSources" id="availableSources" onchange="sourceSelected()">
-    </select><br/>
-	<label for="availablePartsOfSources" class="for-editable">Part of source:</label>
-    <select name="availablePartsOfSources" id="availablePartsOfSources" onchange="partOfSourceSelected()">
-    </select><br/>
-
-    <input id="createEditButton" type="button" onclick="createOrEditSourceFinding(sourceFindingCreatedOrEdited, globSourceFindingId)" value="Create">
-</form>
-
+<p>
+    <form id="createEditSourceFindingForm" >
+        <p>
+            <label for="availableSources" class="for-editable">Source:</label>
+            <select name="availableSources" id="availableSources" onchange="sourceSelected()">
+            </select>
+        </p>
+        <p>
+            <label for="availablePartsOfSources" class="for-editable">Part of source:</label>
+            <select name="availablePartsOfSources" id="availablePartsOfSources" onchange="partOfSourceSelected()">
+            </select>
+        </p>
+        <input id="createEditButton" type="button" onclick="createOrEditSourceFinding(sourceFindingCreatedOrEdited, globSourceFindingId)" value="Create">
+    </form>
+</p>
 </body>
 </html>

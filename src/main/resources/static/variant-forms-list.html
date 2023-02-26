@@ -135,45 +135,54 @@
 <a href="#" class="current-page-in-menu">List variant forms</a>
 
 <h1 id="variantFormsTableHeader">All variant forms</h1>
-<table id="variantFormsTable">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Variant Form</th>
-        <th>Adapted to Swedish?</th>
-        <th>Adaptation Types</th>
-        <th>Normalized Form</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody id="tbodyid">
-    </tbody>
-</table>
+<p>
+    <table id="variantFormsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Variant Form</th>
+            <th>Adapted to Swedish?</th>
+            <th>Adaptation Types</th>
+            <th>Normalized Form</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
 
-<fieldset>
-    <legend>Paging</legend>
-    <p>
-        <button type="button" id="firstLink" onclick="first()">&lt;&lt; First</button>
-        <button type="button" id="prevLink" onclick="prev()">&lt; Prev</button>
-        <button type="button" id="nextLink" onclick="next()">Next &gt;</button>
-        <button type="button" id="lastLink" onclick="last()">Last &gt;&gt;</button>
-    </p>
-    <p>
-        <form id="paging">
-            <label for="pageSize">Page size: </label>
-            <input type="text" id="pageSize">
-            <input type="button" value="Update" onclick="updatePageSize()">
+<p>
+    <fieldset>
+        <legend>Paging</legend>
+        <p>
+            <button type="button" id="firstLink" onclick="first()">&lt;&lt; First</button>
+            <button type="button" id="prevLink" onclick="prev()">&lt; Prev</button>
+            <button type="button" id="nextLink" onclick="next()">Next &gt;</button>
+            <button type="button" id="lastLink" onclick="last()">Last &gt;&gt;</button>
+        </p>
+        <p>
+            <form id="paging">
+                <label for="pageSize">Page size: </label>
+                <input type="text" id="pageSize">
+                <input type="button" value="Update" onclick="updatePageSize()">
+            </form>
+        </p>
+    </fieldset>
+</p>
+
+<p>
+    <fieldset>
+        <legend>Filtering</legend>
+        <form id="filterVariantFormsForm">
+            <p>
+                <label for="filterByVariantForm">Filter by variant form:</label>
+                <input type="text" id="filterByVariantForm">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterVariantForms('Filtered by', setHeaderAndPopulateTable)">
         </form>
-    </p>
-</fieldset>
-
-<br/>
-
-<form id="filterVariantFormsForm">
-    <label for="filterByVariantForm">Filter by variant form: </label>
-    <input type="text" id="filterByVariantForm"><br/>
-    <input type="button" value="Do filter" onclick="doFilterVariantForms('Filtered by', setHeaderAndPopulateTable)">
-</form>
+    </fieldset>
+</p>
 
 </body>
 </html>

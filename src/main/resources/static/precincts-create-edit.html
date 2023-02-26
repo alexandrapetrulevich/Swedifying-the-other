@@ -101,15 +101,20 @@
 
 <h1 id="createEditPrecinctHeader">Create new precinct</h1>
 
-<form id="createEditPrecinctForm" >
-    <label for="precinctName" class="for-editable"><b>Precinct name:</b></label>
-    <input type="text" size="50" id="precinctName"/><br/>
-	<label for="availableRegions" class="for-editable">Belongs to region:</label>
-    <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
-    </select><br/>
-
-    <input id="createEditButton" type="button" onclick="createOrEditPrecinct(precinctCreatedOrEdited, globPrecinctId)" value="Create">
-</form>
+<p>
+    <form id="createEditPrecinctForm" >
+        <p>
+            <label for="precinctName" class="for-editable">Precinct name:</label>
+            <input type="text" size="50" id="precinctName"/>
+        </p>
+        <p>
+            <label for="availableRegions" class="for-editable">Belongs to region:</label>
+            <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
+            </select>
+        </p>
+        <input id="createEditButton" type="button" onclick="createOrEditPrecinct(precinctCreatedOrEdited, globPrecinctId)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>
