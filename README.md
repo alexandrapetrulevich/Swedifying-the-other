@@ -9,8 +9,8 @@ Below is an Entity Relationship Diagram of the database.
 
 ![er-diagram](./docs/img/swedifying-the-other-erd-detailed.png)
 
-## TODO as of 2023-02-18
-Currently, the following tasks is left to do for a (sort of) complete version of the application:
+## TODO as of 2023-02-26
+Currently, the following tasks is left to do for a more complete version of the application:
 
 - Finish the user interface for adding/editing/browsing the entities. Most are done, a couple still remain.
   - ~~Attestation~~
@@ -23,7 +23,7 @@ Currently, the following tasks is left to do for a (sort of) complete version of
   - ~~Variant Form~~
 - Improve the *Attestations* view, for creating/editing and searching/filtering. As this is the "main" view of the application, the presentation of the data and the searching/filtering needs to be improved here.
 - ~~Connect to and store the data in a "real" database (as opposed to the volatile in memory database used during development), e.g. PostgreSQL or similar.~~
-- Add installation/setup instructions (and possibly scripts/tools) to set up and start using the database and application.
+- ~~Add installation/setup instructions (and possibly scripts/tools) to set up and start using the database and application.~~
 - Add documentation of the database and application to facilitate continued work
 - (*Good to have:* Add script/tool for adding the data already collected to the database automatically, i.e. a tool reading a csv file with attestations and adding them to the database using the API.)
 
