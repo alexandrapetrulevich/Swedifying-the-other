@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List parishes</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/parishes.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllParishes(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, parishes) {
+            document.getElementById("parishesTableHeader").innerHTML = headerText;
+            populateTable(parishes);
+        }
+
+        function populateTable(parishes) {
+            console.log("populateTable, no of parishes " + parishes.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < parishes.length; i++)
+            {
+				if (parishes[i].belongsToPrecinct) {
+					var belongsToPrecinctValue = parishes[i].belongsToPrecinct.name + " (ID: " + parishes[i].belongsToPrecinct.subRegionId + ")";
+				} else {
+					var belongsToPrecinctValue = "N/A";
+				}
+	            tableBody.innerHTML +=
+                    "<tr><td>"
+                    + parishes[i].subRegionId
+                    + "</td><td>"
+                    + parishes[i].name
+                    + "</td><td>"
+					+ parishes[i].belongsToRegion.regionName + " (ID: " + parishes[i].belongsToRegion.regionId + ")"
+					+ "</td><td>"
+					+ belongsToPrecinctValue
+					+ "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + parishes[i].subRegionId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+
+        function goToEditView(parishId) {
+            location.href = "/parishes-create-edit.html?parishId=" + parishId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="/index.html">Main menu</a>
+<br />
+<a href="/parishes-create-edit.html">Create/edit parishes</a>
+<a href="#" class="current-page-in-menu">List parishes</a>
+
+<h1 id="parishesTableHeader">All parishes</h1>
+<p>
+    <table id="parishesTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Belongs to region</th>
+            <th>Belongs to precinct</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
+
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterParishesForm">
+            <p>
+                <label for="filterByParishName">Filter by parish name:</label>
+                <input type="text" id="filterByParishName">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterParishes('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
+
+</body>
+</html>

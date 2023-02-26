@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List map sources</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/map-sources.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllMapSources(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, mapSources) {
+            document.getElementById("mapSourcesTableHeader").innerHTML = headerText;
+            populateTable(mapSources);
+        }
+
+        function populateTable(mapSources) {
+            console.log("populateTable, no of map sources " + mapSources.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < mapSources.length; i++)
+            {
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + mapSources[i].sourceId
+                    + "</td><td>"
+                    + mapSources[i].dating
+                    + "</td><td>"
+                    + mapSources[i].mapSheet
+                    + "</td><td>"
+                    + mapSources[i].landSurveyor.name + " (ID: " + mapSources[i].landSurveyor.landSurveyorId + ")"
+                    + "</td><td>"
+                    + mapSources[i].mapSignature.mapSignature + " (ID: " + mapSources[i].mapSignature.mapSignatureId + ")"
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + mapSources[i].sourceId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+
+        function goToEditView(sourceId) {
+            location.href = "/map-sources-create-edit.html?mapSourceId=" + sourceId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="/index.html">Main menu</a>
+<br />
+<a href="/map-sources-create-edit.html">Create/edit map sources</a>
+<a href="#" class="current-page-in-menu">List map sources</a>
+
+<h1 id="mapSourcesTableHeader">All map sources</h1>
+<p>
+<table id="mapSourcesTable">
+    <thead>
+    <tr>
+        <th>Source ID</th>
+        <th>Dating</th>
+        <th>Map Sheet</th>
+        <th>Land Surveyor</th>
+        <th>Map Signature</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody id="tbodyid">
+    </tbody>
+</table>
+</p>
+
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterMapSourcesForm">
+            <p>
+                <label for="filterByMapSource" class="disabled">Filter by map source: </label>
+                <input type="text" id="filterByMapSource" disabled>
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterMapSources('Filtered by', setHeaderAndPopulateTable)" disabled>
+        </form>
+    </p>
+</fieldset>
+
+</body>
+</html>

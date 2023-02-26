@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit parishes</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/js/util.js"></script>
+    <script src="/js/parishes.js"></script>
+	<script src="/js/regions.js"></script>
+    <script src="/js/precincts.js"></script>
+    <script>
+    var globParishId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    async function init() {
+		let regionsData = await getAllRegionsAsync();
+		populateAvailableRegions(regionsData._embedded.regions);
+	
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("parishId")) {
+            setUpForEdit(searchParams.get("parishId"));
+        } else {
+			let precinctsData = await getAllPrecinctsByBelongsToRegionIdAsync(regionsData._embedded.regions[0].regionId);
+			populateAvailablePrecincts(precinctsData._embedded.precincts);
+		}
+    }
+	
+	function populateAvailableRegions(regions) {
+        console.log("populateAvailableRegions, no of regions: " + regions.length);
+		let select = document.getElementById("availableRegions");
+        for (let i = 0; i < regions.length; i++) {
+            select.add(
+                new Option(regions[i].regionName + " (" + regions[i]._links.self.href + ")"
+                , regions[i]._links.self.href));
+        }
+    }
+    
+    function populateAvailablePrecincts(precincts) {
+        console.log("populateAvailablePrecincts, no of precincts: " + precincts.length);
+		let select = document.getElementById("availablePrecincts");
+        for (let i = 0; i < precincts.length; i++) {
+            select.add(
+                new Option(precincts[i].name + " (" + precincts[i]._links.self.href + ")"
+                , precincts[i]._links.self.href));
+        }
+    }
+
+    function setUpForEdit(parishId) {
+        globParishId = parishId;
+        console.log("Parish id to edit " + globParishId);
+        loadParish(globParishId);
+        document.getElementById("createEditParishHeader").innerHTML = "Editing parish " + globParishId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadParish(parishId) {
+        getParishById(parishId, displayParish, handleGetParishError);
+    }
+
+    function handleGetParishError(httpErrorStatus) {
+        let errorText = "Could not get parish " + globParishId;
+        if (httpErrorStatus == 404) {
+            errorText += ", parish not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globParishId = "";
+        document.getElementById("createEditParishHeader").innerHTML = "Create new parish";
+        document.getElementById("createEditButton").value = "Create";
+        document.getElementById("parishName").value = "";
+		document.getElementById("availableRegions").selectedIndex = 0;
+		regionSelected();
+		
+    }
+
+    function displayParish(parish) {
+        document.getElementById("parishName").value = parish.name;
+		let regionUrl = removeTrialingProjection(
+            parish._links.belongsToRegion.href);
+        genericGet(regionUrl, function(data) {
+            document.getElementById("availableRegions").value = data._links.self.href;
+        });
+		
+		removeAllOptionsFromSelect(document.getElementById("availablePrecincts"));
+		getAllPrecinctsByBelongsToRegionId(
+			parish.belongsToRegion.regionId
+			, function(precincts) {
+				populateAvailablePrecincts(precincts);
+				if (parish.belongsToPrecinct) {
+					let precinctUrl = removeTrialingProjection(
+						parish._links.belongsToPrecinct.href);
+					genericGet(precinctUrl, function(data) {
+						document.getElementById("availablePrecincts").value = data._links.self.href;
+					});
+				}
+			});
+			
+		
+    }
+
+    function parishCreatedOrEdited(parish) {
+		var format =  " parish "
+                + parish.name
+                + " (ID " +  parish.subRegionId + ")";
+        if (globParishId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+	
+	function regionSelected() {
+        console.log("Region selected: " + document.getElementById("availableRegions").value);
+		removeAllOptionsFromSelect(document.getElementById("availablePrecincts"));
+		getAllPrecinctsByBelongsToRegionId(
+			getIdFromHref(document.getElementById("availableRegions").value)
+			, populateAvailablePrecincts);
+    }
+
+    function precinctSelected() {
+        console.log("Precinct selected: " + document.getElementById("availablePrecincts").value);
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="/index.html">Main menu</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit parishes</a>
+<a href="/parishes-list.html">List parishes</a>
+
+<h1 id="createEditParishHeader">Create new parish</h1>
+
+<p>
+    <form id="createEditParishForm" >
+        <p>
+            <label for="parishName" class="for-editable">Parish name:</label>
+            <input type="text" size="50" id="parishName"/>
+        </p>
+        <p>
+            <label for="availableRegions" class="for-editable">Belongs to region:</label>
+            <select name="availableRegions" id="availableRegions" onchange="regionSelected()">
+            </select>
+        </p>
+        <p>
+            <label for="availablePrecincts" class="for-editable">Belongs to precinct:</label>
+            <select name="availablePrecincts" id="availablePrecincts" onchange="precinctSelected()">
+            </select>
+        </p>
+
+        <input id="createEditButton" type="button" onclick="createOrEditParish(parishCreatedOrEdited, globParishId)" value="Create">
+    </form>
+</p>
+
+</body>
+</html>

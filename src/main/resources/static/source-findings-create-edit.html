@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit source findings</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/js/util.js"></script>
+    <script src="/js/source-findings.js"></script>
+	<script src="/js/map-sources.js"></script>
+	<script src="/js/text-sources.js"></script>
+	<script src="/js/part-of-sources.js"></script>
+    <script>
+    var globSourceFindingId = "";
+	var MAP_SOURCE_TYPE = "MS";
+	var TEXT_SOURCE_TYPE = "TS";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    async function init() {
+		let mapSourcesData = await getAllMapSourcesAsync();
+		populateAvailableSources(mapSourcesData._embedded.mapSources, MAP_SOURCE_TYPE);
+		let textSourcesData = await getAllTextSourcesAsync();
+		populateAvailableSources(textSourcesData._embedded.textSources, TEXT_SOURCE_TYPE);
+		
+		let partsOfSourcesData = await getAllPartOfSourcesAsync();
+		populateAvailablePartsOfSources(partsOfSourcesData._embedded.partOfSources);
+		
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("sourceFindingId")) {
+            setUpForEdit(searchParams.get("sourceFindingId"));
+        }
+    }
+	
+	function populateAvailableSources(sources, sourceType) {
+        console.log("populateAvailableSources, no of sources: " + sources.length);
+		let select = document.getElementById("availableSources");
+        for (let i = 0; i < sources.length; i++) {
+            let sourceText = "";
+			if (sourceType === MAP_SOURCE_TYPE) {
+				sourceText = getMapSourceOptionText(sources[i]);
+			} else {
+				sourceText = getTextSourceOptionText(sources[i]);
+			}
+			select.add(
+                new Option(
+					sourceText
+					, sources[i]._links.self.href));
+        }
+    }
+	
+	function populateAvailablePartsOfSources(partsOfSources) {
+		console.log("populateAvailablePartsOfSources, no of parts of sources: " + partsOfSources.length);
+		let select = document.getElementById("availablePartsOfSources");
+        for (let i = 0; i < partsOfSources.length; i++) {
+			select.add(
+                new Option(
+					partsOfSources[i].partOfSourceName + " (" + partsOfSources[i]._links.self.href +")"
+					, partsOfSources[i]._links.self.href));
+        }
+	}
+	
+	function getMapSourceOptionText(mapSource) {
+		return "Map source " + mapSource.sourceId 
+			+ " sheet: " + mapSource.mapSheet 
+			+ " signature: " + mapSource.mapSignature.mapSignature
+			+ " dating: " + mapSource.dating
+			+ " land surveyor: " + mapSource.landSurveyor.name
+	}
+	
+	function getTextSourceOptionText(textSource) {
+		return "Text source " + textSource.sourceId 
+			+ " name: " + textSource.name 
+			+ " sub section: " + textSource.subSection
+			+ " page: " + textSource.page
+			+ " dating: " + textSource.dating
+			+ " land surveyor: " + textSource.landSurveyor.name
+	}
+
+    function setUpForEdit(sourceFindingId) {
+        globSourceFindingId = sourceFindingId;
+        console.log("SourceFinding id to edit " + globSourceFindingId);
+        loadSourceFinding(globSourceFindingId);
+        document.getElementById("createEditSourceFindingHeader").innerHTML = "Editing source finding " + globSourceFindingId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadSourceFinding(sourceFindingId) {
+        getSourceFindingById(sourceFindingId, displaySourceFinding, handleGetSourceFindingError);
+    }
+
+    function handleGetSourceFindingError(httpErrorStatus) {
+        let errorText = "Could not get sourceFinding " + globSourceFindingId;
+        if (httpErrorStatus == 404) {
+            errorText += ", sourceFinding not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globSourceFindingId = "";
+        document.getElementById("createEditSourceFindingHeader").innerHTML = "Create new source finding";
+        document.getElementById("createEditButton").value = "Create";
+		document.getElementById("availableSources").selectedIndex = 0;
+		document.getElementById("availablePartsOfSources").selectedIndex = 0;
+    }
+
+    function displaySourceFinding(sourceFinding) {
+		var sourceUrl = removeTrialingProjection(
+            sourceFinding._links.source.href);
+        var partOfSourceUrl = removeTrialingProjection(
+            sourceFinding._links.partOfSource.href);
+        genericGet(sourceUrl, function(data) {
+            document.getElementById("availableSources").value = data._links.self.href;
+        });
+        genericGet(partOfSourceUrl, function(data) {
+            document.getElementById("availablePartsOfSources").value = data._links.self.href;
+        });
+    }
+
+    function sourceFindingCreatedOrEdited(sourceFinding) {
+		var format =  " source finding "
+                + sourceFinding.sourceFindingId;
+        if (globSourceFindingId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+	
+	function sourceSelected() {
+        console.log("source selected: " + document.getElementById("availableSources").value);
+    }
+	
+	function partOfSourceSelected() {
+        console.log("part of source selected: " + document.getElementById("availablePartsOfSources").value);
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="/index.html">Main menu</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit source findings</a>
+<a href="/source-findings-list.html">List source findings</a>
+
+<h1 id="createEditSourceFindingHeader">Create new source finding</h1>
+
+<p>
+    <form id="createEditSourceFindingForm" >
+        <p>
+            <label for="availableSources" class="for-editable">Source:</label>
+            <select name="availableSources" id="availableSources" onchange="sourceSelected()">
+            </select>
+        </p>
+        <p>
+            <label for="availablePartsOfSources" class="for-editable">Part of source:</label>
+            <select name="availablePartsOfSources" id="availablePartsOfSources" onchange="partOfSourceSelected()">
+            </select>
+        </p>
+        <input id="createEditButton" type="button" onclick="createOrEditSourceFinding(sourceFindingCreatedOrEdited, globSourceFindingId)" value="Create">
+    </form>
+</p>
+</body>
+</html>

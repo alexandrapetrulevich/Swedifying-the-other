@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit variant forms</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .no-border {
+            border-style: none;
+        }
+    </style>
+
+    <script src="/js/util.js"></script>
+    <script src="/js/variant-forms.js"></script>
+    <script src="/js/is-adapted-to-swedish-types.js"></script>
+    <script src="/js/normalized-forms.js"></script>
+    <script src="/js/adaptation-types.js"></script>
+    <script>
+    var globVariantFormId = "";
+    var addedAdaptationTypesSet = new Set();
+    const IS_ADAPTED_TO_SWEDISH_NO_VALUE = "NO";
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    async function init() {
+        populateAvailableIsAdaptedToSwedishTypes(await getAllIsAdaptedToSwedishTypesAsync());
+        let adapationTypes = await getAllAdaptationTypesAsync();
+        populateAvailableAdaptationTypes(adapationTypes._embedded.adaptationTypes);
+        let normalizedForms = await getAllNormalizedFormsAsync();
+        populateAvailableNormalizedForms(normalizedForms._embedded.normalizedForms);
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("variantFormId")) {
+            setUpForEdit(searchParams.get("variantFormId"));
+        } else {
+            isAdaptedToSwedishSelected();
+            adaptationTypeSelected();
+            normalizedFormSelected();
+        }
+    }
+    
+    
+    function populateAvailableIsAdaptedToSwedishTypes(isAdaptedToSwedishTypes) {
+        console.log("isAdaptedToSwedishTypes: " + isAdaptedToSwedishTypes);
+        console.log("populateAvailableIsAdaptedToSwedishTypes, no of IsAdaptedToSwedishTypes: " + isAdaptedToSwedishTypes.length);
+        let select = document.getElementById("availableIsAdaptedToSwedishTypes");
+        for (let i = 0; i < isAdaptedToSwedishTypes.length; i++) {
+            select.add(
+                new Option(
+                    isAdaptedToSwedishTypes[i]
+                    , isAdaptedToSwedishTypes[i]));
+        }
+    }
+    
+    
+    function populateAvailableAdaptationTypes(adapationTypes) {
+        console.log("No of adapationTypes: " + adapationTypes.length);
+        let selectForAdaptationTypes = document.getElementById("availableAdaptationTypes");
+        for (let i = 0; i < adapationTypes.length; i++) {
+            selectForAdaptationTypes.add(
+                new Option(
+                    adapationTypes[i].name
+                    , adapationTypes[i]._links.self.href));
+        }
+    }
+    
+    function populateAvailableNormalizedForms(normalizedForms) {
+        console.log("No of normalized forms: " + normalizedForms.length);
+        let selectForNormalizedForms = document.getElementById("availableNormalizedForms");
+        for (let i = 0; i < normalizedForms.length; i++) {
+            selectForNormalizedForms.add(
+                new Option(
+                    normalizedForms[i].normalizedForm
+                    , normalizedForms[i]._links.self.href));
+        }
+    }
+    
+
+    function setUpForEdit(variantFormId) {
+        globVariantFormId = variantFormId;
+        console.log("Variant form id to edit " + globVariantFormId);
+        loadVariantForm(globVariantFormId);
+        document.getElementById("createEditVariantFormHeader").innerHTML = "Editing variant form " + globVariantFormId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadVariantForm(variantFormId) {
+        getVariantFormById(variantFormId, displayVariantForm, handleGetVariantFormError);
+    }
+
+    function handleGetVariantFormError(httpErrorStatus) {
+        var errorText = "Could not get variant form " + globVariantFormId;
+        if (httpErrorStatus == 404) {
+            errorText += ", variant form not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globVariantFormId = "";
+		document.getElementById("variantForm").value = "";
+        addedAdaptationTypesSet.length = 0;
+        document.getElementById("addedAdaptationTypes").length = 0;
+        document.getElementById("availableIsAdaptedToSwedishTypes").selectedIndex = 0;
+        isAdaptedToSwedishSelected();
+        document.getElementById("availableAdaptationTypes").selectedIndex = 0;
+        adaptationTypeSelected();
+        document.getElementById("availableNormalizedForms").selectedIndex = 0;
+        normalizedFormSelected();
+        
+        document.getElementById("createEditVariantFormHeader").innerHTML = "Create new variant form";
+        document.getElementById("createEditButton").value = "Create";
+    }
+
+    function displayVariantForm(variantForm) {
+        document.getElementById("variantForm").value = variantForm.variantForm;
+        
+        let options = Array.from(document.getElementById("availableAdaptationTypes").selectedOptions);
+        addAdaptationTypes(
+            new Map(variantForm.adaptationTypes.map((adaptationType) => [removeTrialingProjection(adaptationType._links.self.href), adaptationType.name])));
+        
+        
+        let normalizedFormUrl = removeTrialingProjection(variantForm._links.normalizedForm.href);
+        genericGet(normalizedFormUrl, function(data) {
+            document.getElementById("availableNormalizedForms").value = data._links.self.href;
+            normalizedFormSelected();
+        });
+        
+        isAdaptedToSwedishSelected();
+        adaptationTypeSelected();
+    }
+
+    function variantFormCreatedOrEdited(variantForm) {
+        let confirmText =  " variant form " + variantForm.variantForm + " (ID " +  variantForm.variantFormId + "). ";
+        if (globVariantFormId === "") {
+            confirmText = "Created" + confirmText;
+        } else {
+            confirmText = "Edited" + confirmText;
+        }
+        confirmText += " OK to continue editing this variant form, CANCEL to create a new one.";
+        if (!confirm(confirmText)) {
+            globVariantFormId = "";
+            setUpForCreate();
+        }
+    }
+    
+    function isAdaptedToSwedishSelected() {
+        let selectedIsAdaptedToSwedishType = document.getElementById("availableIsAdaptedToSwedishTypes").value;
+        console.log("selectedIsAdaptedToSwedishType: " + selectedIsAdaptedToSwedishType);
+        if (selectedIsAdaptedToSwedishType === IS_ADAPTED_TO_SWEDISH_NO_VALUE) {
+            disableAndEmptyAddAdaptationTypes();
+        } else {
+            enableAddAdaptationTypes();
+        }
+    }
+    
+    function getAllSelectedAdaptationTypesToAdd() {
+        let options = Array.from(document.getElementById("availableAdaptationTypes").selectedOptions);
+        return new Map(options.map((opt) => [opt.value, opt.text]));
+    }
+    
+    function adaptationTypeSelected() {
+        console.log("selectedAdaptationType: " + getAllSelectedAdaptationTypesToAdd());
+    }
+    
+    function getAllSelectedAddedAdaptationTypes() {
+        let options = Array.from(document.getElementById("addedAdaptationTypes").selectedOptions);
+        return new Map(options.map((opt) => [opt.value, opt.text]));
+    }
+    
+    function addedAdaptationTypeSelected() {
+        console.log("selectedAdaptationType: " + getAllSelectedAddedAdaptationTypes());
+    }
+    
+    function disableAndEmptyAddAdaptationTypes() {
+        console.log("disableAndEmptyAddAdaptationTypes()");
+        // empty array
+        addedAdaptationTypesSet.length = 0;
+        // empty added values
+        document.getElementById("addedAdaptationTypes").length = 0;
+        
+        // Disable labels
+        document.getElementById("availableAdaptationTypesLabel").classList.remove("for-editable");
+        document.getElementById("availableAdaptationTypesLabel").classList.add("disabled");
+        document.getElementById("addedAdaptationTypesLabel").classList.remove("for-editable");
+        document.getElementById("addedAdaptationTypesLabel").classList.add("disabled");
+        // Disable select box and buttons
+        document.getElementById("availableAdaptationTypes").disabled = true;
+        document.getElementById("addSelectedAdaptationTypeButton").disabled = true;
+        document.getElementById("removeSelectedAdaptationTypeButton").disabled = true;
+        document.getElementById("addedAdaptationTypes").disabled = true;
+    }
+    
+    function enableAddAdaptationTypes() {
+        console.log("enableAddAdaptationTypes()");
+        // Enable label
+        document.getElementById("availableAdaptationTypesLabel").classList.add("for-editable");
+        document.getElementById("availableAdaptationTypesLabel").classList.remove("disabled");
+        document.getElementById("addedAdaptationTypesLabel").classList.add("for-editable");
+        document.getElementById("addedAdaptationTypesLabel").classList.remove("disabled");
+        // Disable select box and buttons
+        document.getElementById("availableAdaptationTypes").disabled = false;
+        document.getElementById("addSelectedAdaptationTypeButton").disabled = false;
+        document.getElementById("removeSelectedAdaptationTypeButton").disabled = false;
+        document.getElementById("addedAdaptationTypes").disabled = false;
+    }
+    
+    function normalizedFormSelected() {
+        let selectedNormalizedForm = document.getElementById("availableNormalizedForms").value;
+        console.log("selectedNormalizedForm: " + selectedNormalizedForm);
+        let id = getIdFromHref(selectedNormalizedForm);
+        getNormalizedFormById(id, displayNormalizedForm)
+    }
+    
+    function displayNormalizedForm(normalizedForm) {
+        document.getElementById("editSelectedNormalizedForm").href = "/normalized-forms-create-edit.html?normalizedFormId=" + normalizedForm.normalizedFormId;
+        document.getElementById("normalizedForm_morphologicalNameType").value = normalizedForm.morphologicalNameType;
+        document.getElementById("normalizedForm_morphologicalNameTypeIsShaky").value = normalizedForm.morphologicalNameTypeIsShaky;
+        // 2 means that two spaces are used as indention
+        document.getElementById("normalizedForm_morphologicalData").value = JSON.stringify(normalizedForm.morphologicalData, (k, v) => v ?? undefined, 2);
+        if (normalizedForm.etymology) {
+            document.getElementById("normalizedForm_etymology").value = normalizedForm.etymology.languageName;
+        } else {
+            document.getElementById("normalizedForm_etymology").value = "N/A";
+        }
+        if (normalizedForm.mediatingLanguage) {
+            document.getElementById("normalizedForm_mediatingLanguage").value = normalizedForm.mediatingLanguage.languageName;
+        } else {
+            document.getElementById("normalizedForm_mediatingLanguage").value = "N/A";
+        }
+    }
+    
+    function addSelectedAdaptationType() {
+        addAdaptationTypes(getAllSelectedAdaptationTypesToAdd())
+    }
+    
+    function addAdaptationTypes(adaptationTypesToAddMap) {
+        console.log("Add " + adaptationTypesToAddMap.keys());
+        if (adaptationTypesToAddMap.size == 0) {
+            console.log("addAdaptationType, size 0, nothing to add");
+        }
+        
+        for (const k of adaptationTypesToAddMap.keys()) {
+            addedAdaptationTypesSet.add(k);
+        }
+        var addedAdaptationTypesSelect = document.getElementById("addedAdaptationTypes");
+        var addedAdaptationTypesSelectOptionValues = Array.from(addedAdaptationTypesSelect.options).map((opt) => opt.value);
+        adaptationTypesToAddMap.forEach((v, k) => {
+            if(!addedAdaptationTypesSelectOptionValues.includes(k)) {
+                console.log("addedAdaptationTypesSelectOptionValues (" + addedAdaptationTypesSelectOptionValues + ") does not include " + k);
+                addedAdaptationTypesSelect.add(new Option(v, k));
+            }
+        });
+    
+        console.log("addedAdaptationTypes after add: " + addedAdaptationTypesSet.values());
+    }
+    
+    function removeSelectedAdaptationTypes() {
+        let selectedToRemove = getAllSelectedAddedAdaptationTypes();
+        
+        // Remove from select box
+        let addedAdaptationTypesSelect = document.getElementById("addedAdaptationTypes");
+        for (let i = 0; i < selectedToRemove.size; i++) {
+            addedAdaptationTypesSelect.remove(addedAdaptationTypesSelect.selectedIndex);
+        }
+        
+        // Remove from set
+        selectedToRemove.forEach((v, k) => addedAdaptationTypesSet.delete(k));
+        
+        console.log("addedAdaptationTypes after remove: " + addedAdaptationTypesSet);
+    }
+    
+    function removeAllAddedAdaptationType() {
+        console.log("Remove all");
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="/index.html">Main menu</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit variant forms</a>
+<a href="/variant-forms-list.html">List variant forms</a>
+
+<h1 id="createEditVariantFormHeader">Create new variant form</h1>
+
+<p>
+    <form id="createEditVariantFormForm" >
+        <p>
+            <label for="variantForm" class="for-editable"><b>Variant form:</b></label>
+            <input type="text" size="50" id="variantForm"/>
+        </p>
+        <p>
+            <label for="availableIsAdaptedToSwedishTypes" class="for-editable">Is adapted to Swedish:</label>
+            <select name="availableIsAdaptedToSwedishTypes" id="availableIsAdaptedToSwedishTypes" onchange="isAdaptedToSwedishSelected()">
+            </select>
+        </p>
+        <p>
+            <fieldset>
+                <legend><b><i>Add adaptation types (one or more)</i></b></legend>
+                <table class="no-border">
+                    <tr class="no-border">
+                        <td class="no-border">
+                            <label for="availableAdaptationTypes" class="for-editable" id="availableAdaptationTypesLabel">To add:</label><br/>
+                            <select name="availableAdaptationTypes" id="availableAdaptationTypes" size=5 multiple onchange="adaptationTypeSelected()" style="width: 250px;">
+                            </select>
+                        </td>
+                        <td class="no-border" style="text-align: center;">
+                            <button type="button" onclick="addSelectedAdaptationType()" id="addSelectedAdaptationTypeButton">Add &gt;&gt;</button>
+                            <br /><br />
+                            <button type="button" onclick="removeSelectedAdaptationTypes()" id="removeSelectedAdaptationTypeButton">&lt;&lt; Remove </button>
+                            <!--
+                            <br /><br />
+                            <button type="button" onclick="removeAllAddedAdaptationType()" id="removeAllAddedAdaptationTypeButton">Remove all</button>
+                            -->
+                        </td>
+                        <td class="no-border">
+                            <label for="addedAdaptationTypes" class="for-editable" id="addedAdaptationTypesLabel">Added:</label><br/>
+                            <select name="addedAdaptationTypes" form="createEditVariantFormForm" id="addedAdaptationTypes" size=5 multiple onchange="addedAdaptationTypeSelected()" style="width: 250px;">
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+        </p>
+        
+        <p>
+            <label for="availableNormalizedForms" class="for-editable">Normalized form:</label>
+            <select name="availableNormalizedForms" id="availableNormalizedForms" onchange="normalizedFormSelected()">
+            </select>
+        </p>
+        <p>
+            <fieldset>
+                <legend><b><i>Selected normalized form information</i></b></legend>
+                <p>
+                    <a href="#" id="editSelectedNormalizedForm">Edit selected normalized form</a>
+                </p>
+                <p>
+                    <label for="normalizedForm_morphologicalNameType" class="disabled">Morphological name type:</label>
+                    <input type="text" size="50" id="normalizedForm_morphologicalNameType" disabled/>
+                </p>
+                <p>
+                    <label for="normalizedForm_morphologicalNameTypeIsShaky" class="disabled">Morphological name type is shaky:</label>
+                    <input type="text" size="50" id="normalizedForm_morphologicalNameTypeIsShaky" disabled/>
+                </p>
+                <p>
+                    <label for="normalizedForm_morphologicalData" class="disabled">Morphological data:</label><br/>
+                    <textarea disabled name="normalizedForm_morphologicalData" form="createEditVariantFormForm" id="normalizedForm_morphologicalData" rows="4" cols="50">
+                    </textarea>
+                </p>
+                <p>
+                    <label for="normalizedForm_etymology" class="disabled">Etymology:</label>
+                    <input type="text" size="50" id="normalizedForm_etymology" disabled/>
+                </p>
+                <p>
+                    <label for="normalizedForm_mediatingLanguage" class="disabled">Mediating language:</label>
+                    <input type="text" size="50" id="normalizedForm_mediatingLanguage" disabled/>
+                </p>
+            </fieldset>
+        </p>
+        
+        <input id="createEditButton" type="button" onclick="createOrEditVariantForm(variantFormCreatedOrEdited, globVariantFormId, addedAdaptationTypesSet)" value="Create">
+    </form>
+</p>
+
+</body>
+</html>

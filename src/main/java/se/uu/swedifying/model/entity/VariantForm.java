@@ -22,6 +22,7 @@ public class VariantForm {
     private String variantForm;
 
     @Column(name = "IS_ADAPTED_TO_SWEDISH")
+    @Enumerated(EnumType.STRING)
     private IsAdaptedToSwedishType isAdaptedToSwedish;
 
     @ManyToMany

@@ -13,3 +13,7 @@ th {
 label.for-editable {
   font-weight: bold;
 }
+
+label.disabled, label[disabled] {
+  opacity: .4;
+}

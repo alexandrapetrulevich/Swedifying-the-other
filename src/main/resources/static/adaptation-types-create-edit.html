@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Create/edit adaptation types</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
-    <script src="./js/util.js"></script>
-    <script src="./js/adaptation-types.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/adaptation-types.js"></script>
     <script>
     var globAdaptationTypeId = "";
     document.addEventListener('DOMContentLoaded', function() {
@@ -68,30 +68,21 @@
 </head>
 <body>
 
+<a href="/index.html">Main menu</a>
+<br />
 <a href="#" class="current-page-in-menu">Create/edit adaptation types</a>
-<a href="./adaptation-types-list.html">List adaptation types</a>
-<br />
-<a href="./attestations-create-edit.html">Create/edit attestations</a>
-<a href="./attestations-list.html">List attestations</a>
-<br />
-<a href="./districts-create-edit.html">Create/edit districts</a>
-<a href="./districts-list.html">List districts</a>
-<br />
-<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
-<a href="./land-surveyors-list.html">List land surveyors</a>
-<br />
-<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
-<a href="./locality-types-list.html">List locality types</a>
-<br />
-<a href="./locations.html">List locations</a>
+<a href="/adaptation-types-list.html">List adaptation types</a>
 
 <h1 id="createEditAdaptationTypeHeader">Create new adaptation type</h1>
 
 <form id="createEditAdaptationTypeForm" >
-    <label for="adaptationTypeName"><b>Adaptation type name:</b></label>
-    <input type="text" size="50" id="adaptationTypeName"/><br/>
-
-    <input id="createEditButton" type="button" onclick="createOrEditAdaptationType(adaptationTypeCreatedOrEdited, globAdaptationTypeId)" value="Create">
+    <p>
+        <label for="adaptationTypeName"><b>Adaptation type name:</b></label>
+        <input type="text" size="50" id="adaptationTypeName"/>
+    </p>
+    <p>
+        <input id="createEditButton" type="button" onclick="createOrEditAdaptationType(adaptationTypeCreatedOrEdited, globAdaptationTypeId)" value="Create">
+    </p>
 </form>
 
 </body>

@@ -7,6 +7,10 @@ function getAllAdaptationTypes(callback) {
         });
 }
 
+async function getAllAdaptationTypesAsync() {
+    return await genericGetAllAsync("adaptationTypes", "adaptationTypeView");
+}
+
 function getAdaptationTypeById(id, callback, errorCallback) {
     genericGetById(id, "adaptationTypes", callback, errorCallback);
 }

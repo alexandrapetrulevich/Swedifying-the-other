@@ -4,13 +4,26 @@ Place-name database for the project *Swedifying the other* https://www.vr.se/eng
 ## Overview
 The application consists of an SQL database holding place-name data as needed in the project *Swedifying the other* and a user interface to allow the user to interact with the database. The database exposed is exposed with a REST API through a web application (Java/Spring Boot), accesible to the user via a web browser user interface for adding data to and searching/filtering the database (HTML/JavaScript).
 
-## TODO as of 2022-11-13
+## Database diagram
+Below is an Entity Relationship Diagram of the database.
+
+![er-diagram](./docs/img/swedifying-the-other-erd-detailed.png)
+
+## TODO as of 2023-02-18
 Currently, the following tasks is left to do for a (sort of) complete version of the application:
 
 - Finish the user interface for adding/editing/browsing the entities. Most are done, a couple still remain.
+  - ~~Attestation~~
+  - ~~Map Source~~
+  - ~~Normalized Form~~
+  - ~~Parish~~
+  - ~~Precinct~~
+  - ~~Source Finding~~
+  - ~~Text Source~~
+  - ~~Variant Form~~
 - Improve the *Attestations* view, for creating/editing and searching/filtering. As this is the "main" view of the application, the presentation of the data and the searching/filtering needs to be improved here.
-- Connect to and store the data in a "real" database (as opposed to the volatile in memory database used during development), e.g. PostgreSQL or similar.
-- Add installation/setup instructions (and possbibly scripts/tools) to set up and start using the database and application.
+- ~~Connect to and store the data in a "real" database (as opposed to the volatile in memory database used during development), e.g. PostgreSQL or similar.~~
+- Add installation/setup instructions (and possibly scripts/tools) to set up and start using the database and application.
 - Add documentation of the database and application to facilitate continued work
 - (*Good to have:* Add script/tool for adding the data already collected to the database automatically, i.e. a tool reading a csv file with attestations and adding them to the database using the API.)
 

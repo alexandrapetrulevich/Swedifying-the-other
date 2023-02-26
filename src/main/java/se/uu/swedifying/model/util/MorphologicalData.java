@@ -12,8 +12,8 @@ import javax.persistence.Embeddable;
  * @param determinationClauseInPhrase      Applies to PHRASE
  * @param mainClauseInPhrase               Applies to PHRASE
  * @param simpleRootMorpheme               Applies to SIMPLE
- * @param diversionBase                    Applies to DIVERSION
- * @param diversionMorpheme                Applies to DIVERSION
+ * @param derivationBase                   Applies to DERIVATION
+ * @param derivationMorpheme               Applies to DERIVATION
  * @param determinationClauseInComposition Applies to COMPOSITION
  * @param jointMorphemeInComposition       Applies to COMPOSITION
  * @param mainClauseInComposition          Applies to COMPOSITION
@@ -28,10 +28,16 @@ public class MorphologicalData {
   private String determinationClauseInPhrase;
   // Applies to PHRASE
   private String mainClauseInPhrase;
+  // Applies to SIMPLE
   private String simpleRootMorpheme;
+  // Applies to DERIVATION
   private String derivationBase;
+  // Applies to DERIVATION
   private String derivationMorpheme;
+  // Applies to COMPOSITION
   private String determinationClauseInComposition;
+  // Applies to COMPOSITION
   private String jointMorphemeInComposition;
+  // Applies to COMPOSITION
   private String mainClauseInComposition;
 }

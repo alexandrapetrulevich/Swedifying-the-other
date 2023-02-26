@@ -1,6 +1,8 @@
 package se.uu.swedifying.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import se.uu.swedifying.model.api.CreateAttestationRequest;
 import se.uu.swedifying.model.api.LocationDto;
@@ -63,7 +65,8 @@ class AttestationServiceImpl implements AttestationService {
 
   @Override
   public List<Attestation> getAllAttestations() {
-    List<Attestation> allAttestations = attestationRepository.findAll();
+    List<Attestation> allAttestations = attestationRepository.findAll(
+      PageRequest.of(0, Integer.MAX_VALUE)).toList();
     return allAttestations;
       //.stream()
       //.map(AttestationConversionHelper::attestationToAttestationDto)
@@ -78,18 +81,28 @@ class AttestationServiceImpl implements AttestationService {
   }
 
   @Override
-  public List<Attestation> getAllFiltered(String morphologicalNameTypeFilter, String etymologyFilter) {
+  public List<Attestation> getAllFiltered(
+    String morphologicalNameTypeFilter
+    , String etymologyFilter
+    , int page
+    , int pageSize) {
     MorphologicalNameType morphologicalNameType =
       morphologicalNameTypeFilter != null ?
         MorphologicalNameType.valueOf(morphologicalNameTypeFilter)
         : null;
     List<Language> etymologies = languageRepository.findByLanguageNameContains(etymologyFilter);
-    List<NormalizedForm> normalizedForms = normalizedFormRepository
-      .findByMorphologicalNameTypeAndEtymologyIn(morphologicalNameType, etymologies);
-    List<VariantForm> variantForms = variantFormRepository
-      .findByNormalizedFormIn(normalizedForms);
+    Page<NormalizedForm> normalizedForms = normalizedFormRepository
+      .findByMorphologicalNameTypeAndEtymologyIn(
+        morphologicalNameType
+        , etymologies
+        , PageRequest.of(0, Integer.MAX_VALUE));
+    Page<VariantForm> variantForms = variantFormRepository
+      .findByNormalizedFormIn(
+        normalizedForms.toList()
+        , PageRequest.of(0, Integer.MAX_VALUE));
     return attestationRepository
-      .findByVariantFormIn(variantForms);
+      .findByVariantFormIn(variantForms.toList(), PageRequest.of(page, pageSize))
+      .toList();
       //.stream()
       //.map(AttestationConversionHelper::attestationToAttestationDto).toList();
   }

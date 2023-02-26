@@ -7,6 +7,10 @@ function getAllPartOfSources(callback) {
         });
 }
 
+async function getAllPartOfSourcesAsync() {
+    return await genericGetAllAsync("partOfSources", "partOfSourceView");
+}
+
 function getPartOfSourceById(id, callback, errorCallback) {
     genericGetById(id, "partOfSources", callback, errorCallback);
 }

@@ -3,80 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <title>Attestation create/edit</title>
-    <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="./js/locations.js"></script>
-    <script src="./js/util.js"></script>
-    <!-- TODO: REMOVE JQUERY! -->
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/attestations.js"></script>
+    <script src="/js/locations.js"></script>
+    <script src="/js/variant-forms.js"></script>
+    <script src="/js/source-findings.js"></script>
     <script>
+    var globAttestationId = "";
 
-    $(document).ready(function(){
-        getAllLocations(populateAvailableLocations);
-        loadVariantForms(populateVariantForms);
-        loadSourceFindings(populateSourceFindings);
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+    
+    async function init() {
+        populateAvailableLocations(await getAllLocationsAsync());
+        populateVariantForms(await getAllVariantFormsAsync());
+        populateSourceFindings(await getAllSourceFindingsAsync());
         let searchParams = new URLSearchParams(window.location.search)
         if (searchParams.has("attestationId")) {
             let attestationId = searchParams.get("attestationId");
             console.log("Editing attestation " + attestationId);
-            loadAttestation(attestationId);
-            $("#createEditHeader").text("Edit attestation " + attestationId);
-            $("#createEditButton").prop("value", "Update");
+            setUpForEdit(attestationId);
         }
-    });
-
-    function loadAttestation(attestationId) {
-        $.get("/api/attestations/" + attestationId + "?projection=attestationView",  function(data, status) {
-            displayAttestation(data);
-        }, "json");
+    }
+    
+    function setUpForEdit(attestationId) {
+        globAttestationId = attestationId;
+        console.log("Attestation id to edit " + globAttestationId);
+        loadAttestation(globAttestationId);
+        document.getElementById("createEditHeader").innerHTML = "Editing attestation form " + globAttestationId;
+        document.getElementById("createEditButton").value = "Update";
     }
 
-    function displayAttestation(attestation) {
-        $("#originalForm").val(attestation.originalForm);
-        $("#notes").val(attestation.notes);
-        var selectedVariantForm = removeTrialingProjection(attestation.variantForm._links.self.href);
-        console.log("Selecting variant form " + selectedVariantForm);
-        $("#availableVariantForms").val(selectedVariantForm);
-        $("#availableLocations").val(removeTrialingProjection(attestation.location._links.self.href));
-        $("#availableSourceFindings").val(removeTrialingProjection(attestation.sourceFinding._links.self.href));
+    function loadAttestation(attestationId) {
+        getAttestationById(attestationId, displayAttestation, handleGetAttestationError);
+    }
+    
+    function handleGetAttestationError(httpErrorStatus) {
+        var errorText = "Could not get attestation " + globAttestationId;
+        if (httpErrorStatus == 404) {
+            errorText += ", attestation not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+    
+    function setUpForCreate() {
+        globAttestationId = "";
+        document.getElementById("createEditHeader").innerHTML = "Create new attestation";
+        document.getElementById("createEditButton").value = "Create";
+        
+        document.getElementById("originalForm").value = "";
+        document.getElementById("notes").value = "";
+        
+        document.getElementById("availableVariantForms").selectedIndex = 0;
+        document.getElementById("availableLocations").selectedIndex = 0;
+        document.getElementById("availableSourceFindings").selectedIndex = 0;
         variantFormSelected();
         locationSelected();
         sourceFindingSelected();
     }
 
-    function loadVariantForms(callback) {
-        $.get("/api/variantForms/",  function(data, status) {
-            callback(data._embedded.variantForms);
-        }, "json");
+    function displayAttestation(attestation) {
+        document.getElementById("originalForm").value = attestation.originalForm;
+        document.getElementById("notes").value = attestation.notes;
+        var selectedVariantForm = removeTrialingProjection(attestation.variantForm._links.self.href);
+        console.log("Selecting variant form " + selectedVariantForm);
+        document.getElementById("availableVariantForms").value = selectedVariantForm;
+        document.getElementById("availableLocations").value = removeTrialingProjection(attestation.location._links.self.href);
+        document.getElementById("availableSourceFindings").value = removeTrialingProjection(attestation.sourceFinding._links.self.href);
+        variantFormSelected();
+        locationSelected();
+        sourceFindingSelected();
     }
 
     function populateVariantForms(variantForms) {
+        let selectForAvailableVariantForms = document.getElementById("availableVariantForms");
         for (let i = 0; i < variantForms.length; i++) {
-            $("#availableVariantForms")
-                .append(
-                    new Option(
-                        variantForms[i].variantForm
-                        + " (" + variantForms[i]._links.self.href + ")"
-                        , variantForms[i]._links.self.href));
+            selectForAvailableVariantForms.add(
+                new Option(
+                    variantForms[i].variantForm
+                    , variantForms[i]._links.self.href));
         }
         variantFormSelected();
     }
 
     function variantFormSelected() {
-        var selectedVariantForm = $("#availableVariantForms").val();
-        $.get(selectedVariantForm + "?projection=variantFormView", function(data, status) {
+        var selectedVariantForm = document.getElementById("availableVariantForms").value;
+        console.log("variantFormSelected: " + selectedVariantForm);
+        genericGet(selectedVariantForm + "?projection=variantFormView", function(data) {
             displaySelectedVariantForm(data);
-        }, "json");
-        console.log("variantFormSelected");
+        });
+        
+        
     }
 
     function displaySelectedVariantForm(variantForm) {
-        $("#variantFormId").val(variantForm.variantFormId);
-        $("#variantFormIsAdaptedToSwedish").val(variantForm.isAdaptedToSwedish);
+        document.getElementById("variantFormId").value = variantForm.variantFormId;
+        document.getElementById("variantFormIsAdaptedToSwedish").value = variantForm.isAdaptedToSwedish;
         if (variantForm.isAdaptedToSwedish === "NO") {
-            $("#variantFormAdaptationType").val("N/A");
+            document.getElementById("variantFormAdaptationType").value = "N/A";
         } else {
             var adaptationTypesString = variantForm.adaptationTypes[0].name
-                + "(ID "
+                + " (ID "
                 + variantForm.adaptationTypes[0].adaptationTypeId
                 + ")";
             for (let i = 1; i < variantForm.adaptationTypes.length; i++) {
@@ -85,102 +117,96 @@
                     + variantForm.adaptationTypes[i].adaptationTypeId
                     + ")";
             }
-            $("#variantFormAdaptationType").val(adaptationTypesString);
+            document.getElementById("variantFormAdaptationType").value = adaptationTypesString;
         }
         displayNormalizedForm(variantForm.normalizedForm);
     }
 
     function displayNormalizedForm(normalizedForm) {
-        $("#normalizedFormNormalizedFormId").val(normalizedForm.normalizedFormId);
-        $("#normalizedFormNormalizedForm").val(normalizedForm.normalizedForm);
+        document.getElementById("normalizedFormNormalizedFormId").value = normalizedForm.normalizedFormId;
+        document.getElementById("normalizedFormNormalizedForm").value = normalizedForm.normalizedForm;
         var morphologicalNameType = normalizedForm.morphologicalNameType;
         if (normalizedForm.morphologicalNameTypeIsShaky) {
             morphologicalNameType = morphologicalNameType + "?";
         }
-        $("#normalizedFormMorphologicalNameType").val(morphologicalNameType);
-        $("#normalizedFormComparativeFormInformation").val(normalizedForm.comparativeFormInformation);
+        document.getElementById("normalizedFormMorphologicalNameType").value = morphologicalNameType;
+        document.getElementById("normalizedFormComparativeFormInformation").value = normalizedForm.comparativeFormInformation;
         displayMorphologicalData(normalizedForm.morphologicalData);
         displayEtymology(normalizedForm.etymology);
         displayMediatingLanguage(normalizedForm.mediatingLanguage);
     }
 
     function displayMorphologicalData(morphologicalData) {
-        if (morphologicalData.mainClauseInPhrase == null) {
-            $("#normalizedFormMainClauseInPhrase").val("N/A");
+        if (!morphologicalData.mainClauseInPhrase) {
+            document.getElementById("normalizedFormMainClauseInPhrase").value = "N/A";
         } else {
-            $("#normalizedFormMainClauseInPhrase").val(morphologicalData.mainClauseInPhrase);
+            document.getElementById("normalizedFormMainClauseInPhrase").value = morphologicalData.mainClauseInPhrase;
         }
 
-        if (morphologicalData.simpleRootMorpheme == null) {
-            $("#normalizedFormSimpleRootMorpheme").val("N/A");
+        if (!morphologicalData.simpleRootMorpheme) {
+            document.getElementById("normalizedFormSimpleRootMorpheme").value = "N/A";
         } else {
-            $("#normalizedFormSimpleRootMorpheme").val(morphologicalData.simpleRootMorpheme);
+            document.getElementById("normalizedFormSimpleRootMorpheme").value = morphologicalData.simpleRootMorpheme;
         }
 
-        if (morphologicalData.derivationMorpheme == null) {
-            $("#normalizedFormDerivationMorpheme").val("N/A");
+        if (!morphologicalData.derivationMorpheme) {
+            document.getElementById("normalizedFormDerivationMorpheme").value = "N/A";
         } else {
-            $("#normalizedFormDerivationMorpheme").val(morphologicalData.derivationMorpheme);
+            document.getElementById("normalizedFormDerivationMorpheme").value = morphologicalData.derivationMorpheme;
         }
 
-        if (morphologicalData.determinationClauseInPhrase == null) {
-            $("#normalizedFormDeterminationClauseInPhrase").val("N/A");
+        if (!morphologicalData.determinationClauseInPhrase) {
+            document.getElementById("normalizedFormDeterminationClauseInPhrase").value = "N/A";
         } else {
-            $("#normalizedFormDeterminationClauseInPhrase").val(morphologicalData.determinationClauseInPhrase);
+            document.getElementById("normalizedFormDeterminationClauseInPhrase").value = morphologicalData.determinationClauseInPhrase;
         }
 
-        if (morphologicalData.jointMorphemeInComposition == null) {
-            $("#normalizedFormJointMorphemeInComposition").val("N/A");
+        if (!morphologicalData.jointMorphemeInComposition) {
+            document.getElementById("normalizedFormJointMorphemeInComposition").value = "N/A";
         } else {
-            $("#normalizedFormJointMorphemeInComposition").val(morphologicalData.jointMorphemeInComposition);
+            document.getElementById("normalizedFormJointMorphemeInComposition").value = morphologicalData.jointMorphemeInComposition;
         }
 
-        if (morphologicalData.mainClauseInComposition == null) {
-            $("#normalizedFormMainClauseInComposition").val("N/A");
+        if (!morphologicalData.mainClauseInComposition) {
+            document.getElementById("normalizedFormMainClauseInComposition").value = "N/A";
         } else {
-            $("#normalizedFormMainClauseInComposition").val(morphologicalData.mainClauseInComposition);
+            document.getElementById("normalizedFormMainClauseInComposition").value = morphologicalData.mainClauseInComposition;
         }
 
-        if (morphologicalData.determinationClauseInComposition == null) {
-            $("#normalizedFormDeterminationClauseInComposition").val("N/A");
+        if (!morphologicalData.determinationClauseInComposition) {
+            document.getElementById("normalizedFormDeterminationClauseInComposition").value = "N/A";
         } else {
-            $("#normalizedFormDeterminationClauseInComposition").val(morphologicalData.determinationClauseInComposition);
+            document.getElementById("normalizedFormDeterminationClauseInComposition").value = morphologicalData.determinationClauseInComposition;
         }
 
-        if (morphologicalData.derivationBase == null) {
-            $("#normalizedFormDerivationBase").val("N/A");
+        if (!morphologicalData.derivationBase) {
+            document.getElementById("normalizedFormDerivationBase").value = "N/A";
         } else {
-            $("#normalizedFormDerivationBase").val(morphologicalData.derivationBase);
+            document.getElementById("normalizedFormDerivationBase").value = morphologicalData.derivationBase;
         }
     }
 
     function displayEtymology(etymology) {
-        displayLanguage("#normalizedFormEtymology", etymology);
+        displayLanguage("normalizedFormEtymology", etymology);
     }
 
     function displayMediatingLanguage(mediatingLanguage) {
-        displayLanguage("#normalizedFormMediatingLanguage", mediatingLanguage);
+        displayLanguage("normalizedFormMediatingLanguage", mediatingLanguage);
     }
 
     function displayLanguage(textId, language) {
         if (language != null) {
-            $(textId).val(
-                language.languageName + " (" + language.languageCode + ", " + language.languageId + ")");
+            document.getElementById(textId).value = 
+                language.languageName + " (" + language.languageCode + ", " + language.languageId + ")";
         } else {
-            $(textId).val("N/A");
+            document.getElementById(textId).value = "N/A";
         }
-    }
-
-    function loadSourceFindings(callback) {
-        $.get("/api/sourceFindings/", function(data, status) {
-            callback(data._embedded.sourceFindings);
-        }, "json");
     }
 
     function populateSourceFindings(sourceFindings) {
         for (let i = 0; i < sourceFindings.length; i++)
         {
-            $("#availableSourceFindings")
+            document.getElementById("availableSourceFindings")
                 .append(
                     new Option(
                         sourceFindings[i]._links.self.href.split("/").pop()
@@ -192,26 +218,26 @@
 
     function sourceFindingSelected() {
         console.log("sourceFindingSelected");
-        var selectedSourceFinding = $("#availableSourceFindings").val();
-        $.get(selectedSourceFinding + "?projection=sourceFindingView", function(data, status) {
+        var selectedSourceFinding = document.getElementById("availableSourceFindings").value;
+        genericGet(selectedSourceFinding + "?projection=sourceFindingView", function(data) {
             displaySelectedSourceFinding(data);
-        }, "json");
+        });
     }
 
     function displaySelectedSourceFinding(sourceFinding) {
-        $("#sourceFindingSourceId").val(sourceFinding.source.sourceId);
-        $("#sourceFindingSourceType").val(sourceFinding.source.type);
-        $("#sourceFindingSourceDating").val(sourceFinding.source.dating);
-        $("#sourceFindingSourceLandSurveyor")
-            .val(sourceFinding.source.landSurveyor.name
+        document.getElementById("sourceFindingSourceId").value = sourceFinding.source.sourceId;
+        document.getElementById("sourceFindingSourceType").value = sourceFinding.source.type;
+        document.getElementById("sourceFindingSourceDating").value = sourceFinding.source.dating;
+        document.getElementById("sourceFindingSourceLandSurveyor")
+            .value = sourceFinding.source.landSurveyor.name
                 + " (ID: "
                 + sourceFinding.source.landSurveyor.landSurveyorId
-                + ")");
-        $("#sourceFindingPartOfSource")
-            .val(sourceFinding.partOfSource.partOfSourceName
+                + ")";
+        document.getElementById("sourceFindingPartOfSource")
+            .value = sourceFinding.partOfSource.partOfSourceName
                 + " (ID: "
                 + sourceFinding.partOfSource.partOfSourceId
-                + ")");
+                + ")";
 
         var urlToGet = removeTrialingProjection(sourceFinding._links.source.href);
         if (sourceFinding.source.type.startsWith("Map")) {
@@ -219,38 +245,38 @@
         } else if (sourceFinding.source.type.startsWith("Text")) {
             urlToGet = urlToGet + "?projection=textSourceView";
         }
-        $.get(urlToGet, function(data, status) {
+        genericGet(urlToGet, function(data) {
             displaySourceTypeSpecific(data, sourceFinding.source.type);
-        }, "json");
+        });
     }
 
     function displaySourceTypeSpecific(source, sourceType) {
         if (sourceType.startsWith("Map")) {
-            $("#sourceFindingMapSourceMapSignature").val(source.mapSignature.mapSignature + " (ID: " + source.mapSignature.mapSignatureId + ")")
-            $("#sourceFindingMapSourceMapSheet").val(source.mapSheet);
-            $("#sourceFindingTextSourceName").val("N/A");
-            $("#sourceFindingTextSourceSubsection").val("N/A");
-            $("#sourceFindingTextSourcePage").val("N/A");
+            document.getElementById("sourceFindingMapSourceMapSignature").value = source.mapSignature.mapSignature + " (ID: " + source.mapSignature.mapSignatureId + ")"
+            document.getElementById("sourceFindingMapSourceMapSheet").value = source.mapSheet;
+            document.getElementById("sourceFindingTextSourceName").value = "N/A";
+            document.getElementById("sourceFindingTextSourceSubsection").value = "N/A";
+            document.getElementById("sourceFindingTextSourcePage").value = "N/A";
         } else if (sourceType.startsWith("Text")) {
-            $("#sourceFindingMapSourceMapSignature").val("N/A")
-            $("#sourceFindingMapSourceMapSheet").val("N/A");
-            $("#sourceFindingTextSourceName").val(source.name);
-            $("#sourceFindingTextSourceSubsection").val(source.subSection);
-            $("#sourceFindingTextSourcePage").val(source.page);
+            document.getElementById("sourceFindingMapSourceMapSignature").value = "N/A";
+            document.getElementById("sourceFindingMapSourceMapSheet").value = "N/A";
+            document.getElementById("sourceFindingTextSourceName").value = source.name;
+            document.getElementById("sourceFindingTextSourceSubsection").value = source.subSection;
+            document.getElementById("sourceFindingTextSourcePage").value = source.page;
         } else {
             console.log("Unknown source type: " + sourceType);
-            $("#sourceFindingMapSourceMapSignature").val("N/A")
-            $("#sourceFindingMapSourceMapSheet").val("N/A");
-            $("#sourceFindingTextSourceName").val("N/A");
-            $("#sourceFindingTextSourceSubsection").val("N/A");
-            $("#sourceFindingTextSourcePage").val("N/A");
+            document.getElementById("sourceFindingMapSourceMapSignature").value = "N/A";
+            document.getElementById("sourceFindingMapSourceMapSheet").value = "N/A";
+            document.getElementById("sourceFindingTextSourceName").value = "N/A";
+            document.getElementById("sourceFindingTextSourceSubsection").value = "N/A";
+            document.getElementById("sourceFindingTextSourcePage").value = "N/A";
         }
     }
 
     function populateAvailableLocations(locations) {
         for (let i = 0; i < locations.length; i++)
         {
-            $("#availableLocations")
+            document.getElementById("availableLocations")
                 .append(
                     new Option(
                         locations[i].modernLookupForm
@@ -260,32 +286,28 @@
         locationSelected();
     }
 
-    function adaptedToSwedishClicked() {
-        $("#adaptationType").prop("disabled", !$("#adaptedToSwedish").is(':checked'));
-    }
-
     function displayLocalityType(localityType) {
-        $("#locationLocalityType").val(localityType.localityTypeName);
-        $("#locationLocalityTypeId").val(localityType._links.self.href.split("/").pop());
+        document.getElementById("locationLocalityType").value = localityType.localityTypeName;
+        document.getElementById("locationLocalityTypeId").value = removeTrialingProjection(localityType._links.self.href).split("/").pop();
     }
 
     function displayRegion(region) {
-        $("#locationRegion").val(region.regionName);
-        $("#locationRegionId").val(region._links.self.href.split("/").pop());
+        document.getElementById("locationRegion").value = region.regionName;
+        document.getElementById("locationRegionId").value = removeTrialingProjection(region._links.self.href).split("/").pop();
     }
 
     function displayDistrictOrParish(districtOrParish) {
-        $("#locationDistrictOrParish").val(districtOrParish.name);
-        $("#locationDistrictOrParishId").val(districtOrParish._links.self.href.split("/").pop());
+        document.getElementById("locationDistrictOrParish").value = districtOrParish.name;
+        document.getElementById("locationDistrictOrParishId").value = removeTrialingProjection(districtOrParish._links.self.href).split("/").pop();
 
         displayRegion(districtOrParish.belongsToRegion);
     }
 
     function displaySelectedLocation(location) {
-        $("#locationId").val(location._links.self.href.split("/").pop());
-        $("#locationLongitude").val(location.longitude);
-        $("#locationLatitude").val(location.latitude);
-        $("#locationModernLookupForm").val(location.modernLookupForm);
+        document.getElementById("locationId").value = location._links.self.href.split("/").pop();
+        document.getElementById("locationLongitude").value = location.longitude;
+        document.getElementById("locationLatitude").value = location.latitude;
+        document.getElementById("locationModernLookupForm").value = location.modernLookupForm ? location.modernLookupForm : "-";
 
         displayLocalityType(location.localityType);
         displayDistrictOrParish(location.districtOrParish);
@@ -293,170 +315,282 @@
     }
 
     function locationSelected() {
-        var selectedLocation = $("#availableLocations").val();
-        $.get(selectedLocation + "?projection=locationView", function(data, status) {
+        var selectedLocation = document.getElementById("availableLocations").value;
+        
+        genericGet(selectedLocation + "?projection=locationView", function(data) {
             displaySelectedLocation(data);
-        }, "json");
+        });
     }
-
-
-
-
-
+    
+    function goToEditLocation() {
+        window.open("/locations-create-edit.html?locationId=" + document.getElementById("locationId").value, "_blank").focus();
+    }
+    
+    function goToEditVariantForm() {
+        window.open("/variant-forms-create-edit.html?variantFormId=" + document.getElementById("variantFormId").value, "_blank").focus();
+    }
+    
+    function goToEditSourceFinding() {
+        window.open(
+            "/source-findings-create-edit.html?sourceFindingId=" + document.getElementById("availableSourceFindings").value.split("/").pop()
+            , "_blank")
+                .focus();
+    }
+    
+    function attestationCreatedOrEdited(attestation) {
+        let confirmText =  " attestation form " + attestation.originalForm + " (ID " +  attestation.attestationId + "). ";
+        if (globAttestationId === "") {
+            confirmText = "Created" + confirmText;
+        } else {
+            confirmText = "Edited" + confirmText;
+        }
+        confirmText += " OK to continue editing this attestation, CANCEL to create a new one.";
+        if (!confirm(confirmText)) {
+            globAttestationId = "";
+            setUpForCreate();
+        } else {
+            globAttestationId = attestation.attestationId;
+            document.getElementById("createEditHeader").innerHTML = "Editing attestation form " + globAttestationId;
+            document.getElementById("createEditButton").value = "Update";
+        }
+    }
 
     </script>
 </head>
 <body>
 
-<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
-<a href="./adaptation-types-list.html">List adaptation types</a>
+<a href="/index.html">Main menu</a>
 <br />
 <a href="#" class="current-page-in-menu">Create/edit attestation</a>
-<a href="./attestations-list.html">List attestations</a>
-<br />
-<a href="./districts-create-edit.html">Create/edit districts</a>
-<a href="./districts-list.html">List districts</a>
-<br />
-<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
-<a href="./land-surveyors-list.html">List land surveyors</a>
-<br />
-<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
-<a href="./locality-types-list.html">List locality types</a>
-<br />
-<a href="./locations.html">List locations</a>
+<a href="/attestations-list.html">List attestations</a>
 
 <h1 id="createEditHeader">Create new attestation</h1>
 <form id="createEditAttestationForm">
-    <label for="originalForm"><b>Original form:</b></label>
-    <input type="text" size="100" id="originalForm"/><br/>
+    <p>
+        <label for="originalForm"><b>Original form:</b></label>
+        <input type="text" size="100" id="originalForm"/><br/>
+    </p>
+    <p>
+        <label for="notes"><b>Notes:</b></label>
+        <textarea name="notes" rows="5" cols="100" form="createEditAttestationForm" id="notes">Notes...</textarea> <br/>
+    </p>
 
-    <label for="notes"><b>Notes:</b></label>
-    <textarea name="notes" form="createEditAttestationForm" id="notes">Notes...</textarea> <br/>
+    <fieldset>
+        <legend><b><i>Locations</i></b></legend>
+        <p>
+            <button type="button" onclick="goToEditLocation();">Edit Source Finding</button>
+        </p>
+        
+        <p>
+            <label for="availableLocations"><b>Location:</b></label>
+            <select name="availableLocations" id="availableLocations" onchange="locationSelected()">
+            </select>
+        </p>
 
-    <label for="availableLocations"><b>Location:</b></label>
-    <select name="availableLocations" id="availableLocations" onchange="locationSelected()">
-    </select><br/>
+        <p>
+            <label for="locationId">Location id:</label>
+            <input type="text" name="locationId" id="locationId" disabled>
+        </p>
+        
+        <p>
+            <label for="locationLongitude">Location longitude:</label>
+            <input type="text" name="locationLongitude" id="locationLongitude" disabled>
+        </p>
+        
+        <p>
+            <label for="locationLatitude">Location latitude:</label>
+            <input type="text" name="locationLatitude" id="locationLatitude" disabled>
+        </p>
+        
+        <p>
+            <label for="locationModernLookupForm">Modern Lookup Form:</label>
+            <input type="text" name="locationModernLookupForm" id="locationModernLookupForm" disabled>
+        </p>
+        
+        <p>
+            <label for="locationLocalityTypeId">Location locality type ID:</label>
+            <input type="text" name="locationLocalityTypeId" id="locationLocalityTypeId" disabled>
+        </p>
+        
+        <p>
+            <label for="locationLocalityType">Location locality type:</label>
+            <input type="text" name="locationLocalityType" id="locationLocalityType" disabled>
+        </p>
+        
+        <p>
+            <label for="locationDistrictOrParishId">District or parish ID:</label>
+            <input type="text" name="locationDistrictOrParishId" id="locationDistrictOrParishId" disabled>
+        </p>
+        
+        <p>
+            <label for="locationDistrictOrParish">District or parish:</label>
+            <input type="text" name="locationDistrictOrParish" id="locationDistrictOrParish" disabled>
+        </p>
 
-    <label for="locationId">Location id:</label>
-    <input type="text" name="locationId" id="locationId" disabled><br/>
+        <p>
+            <label for="locationRegionId">Region ID:</label>
+            <input type="text" name="locationRegionId" id="locationRegionId" disabled>
+        </p>
+        
+        <p>
+            <label for="locationRegion">Region:</label>
+            <input type="text" name="locationRegion" id="locationRegion" disabled>
+        </p>
+    </fieldset>
+    
+    
+    <fieldset>
+        <legend><b><i>Variant form</i></b></legend>
+        
+        <p>
+            <button type="button" onclick="goToEditVariantForm();">Edit Variant Form</button>
+        </p>
+        
+        <p>
+            <label for="availableVariantForms"><b>Variant form:</b></label>
+            <select name="availableVariantForms" id="availableVariantForms" onchange="variantFormSelected()"></select><br/>
+        </p>
 
-    <label for="locationLongitude">Location longitude:</label>
-    <input type="text" name="locationLongitude" id="locationLongitude" disabled><br/>
+        <p>
+            <label for="variantFormId">Variant form ID:</label>
+            <input type="text" id="variantFormId" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="variantFormIsAdaptedToSwedish">Is adapted to Swedish:</label>
+            <input type="text" id="variantFormIsAdaptedToSwedish" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="variantFormAdaptationType">Adaptation type:</label>
+            <input type="text" size="100" id="variantFormAdaptationType" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormNormalizedFormId">Normalized form ID:</label>
+            <input type="text" id="normalizedFormNormalizedFormId" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormNormalizedForm">Normalized form:</label>
+            <input type="text" id="normalizedFormNormalizedForm" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormMorphologicalNameType">Morphological name type:</label>
+            <input type="text" id="normalizedFormMorphologicalNameType" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormComparativeFormInformation">Comparative form information:</label>
+            <input type="text" size=100 id="normalizedFormComparativeFormInformation" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormEtymology">Etymology:</label>
+            <input type="text" id="normalizedFormEtymology" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormMediatingLanguage">Mediating language:</label>
+            <input type="text" id="normalizedFormMediatingLanguage" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormMainClauseInPhrase">Main clause in phrase:</label>
+            <input type="text" id="normalizedFormMainClauseInPhrase" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormSimpleRootMorpheme">Simple root morpheme:</label>
+            <input type="text" id="normalizedFormSimpleRootMorpheme" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormDerivationMorpheme">Derivation morpheme:</label>
+            <input type="text" id="normalizedFormDerivationMorpheme" disabled /><br/>
+        </p>
+        <p>
+            <label for="normalizedFormDeterminationClauseInPhrase">Determination clause in phrase:</label>
+            <input type="text" id="normalizedFormDeterminationClauseInPhrase" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormJointMorphemeInComposition">Joint morpheme in composition:</label>
+            <input type="text" id="normalizedFormJointMorphemeInComposition" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormMainClauseInComposition">Main clause in composition:</label>
+            <input type="text" id="normalizedFormMainClauseInComposition" disabled /><br/>
+        </p>
+        
+        <p>
+            <label for="normalizedFormDeterminationClauseInComposition">Determination clause in composition:</label>
+            <input type="text" id="normalizedFormDeterminationClauseInComposition" disabled /><br/>
+        </p>
+        <p>
+            <label for="normalizedFormDerivationBase">Derivation base:</label>
+            <input type="text" id="normalizedFormDerivationBase" disabled /><br/>
+        </p>
+    </fieldset>
+    
+    
+    <fieldset>
+        <legend><b><i>Source finding</i></b></legend>
+        
+        <p>
+            <button type="button" onclick="goToEditSourceFinding();">Edit Source Finding</button>
+        </p>
+        
+        <p>
+            <label for="availableSourceFindings"><b>Source finding:</b></label>
+            <select name="availableSourceFindings" id="availableSourceFindings" onchange="sourceFindingSelected()"></select><br/>
+        </p>
+        <p>
+            <label for="sourceFindingSourceId">Source ID:</label>
+            <input type="text" id="sourceFindingSourceId" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingSourceType">Source type:</label>
+            <input type="text" id="sourceFindingSourceType" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingMapSourceMapSignature">Map signature:</label>
+            <input type="text" id="sourceFindingMapSourceMapSignature" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingMapSourceMapSheet">Map sheet:</label>
+            <input type="text" id="sourceFindingMapSourceMapSheet" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingTextSourceName">Text source name:</label>
+            <input type="text" id="sourceFindingTextSourceName" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingTextSourceSubsection">Text source subsection:</label>
+            <input type="text" id="sourceFindingTextSourceSubsection" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingTextSourcePage">Text source page:</label>
+            <input type="text" id="sourceFindingTextSourcePage" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingSourceDating">Source dating:</label>
+            <input type="text" id="sourceFindingSourceDating" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingSourceLandSurveyor">Land surveyor (name and ID):</label>
+            <input type="text" id="sourceFindingSourceLandSurveyor" disabled /><br/>
+        </p>
+        <p>
+            <label for="sourceFindingPartOfSource">Part of source:</label>
+            <input type="text" id="sourceFindingPartOfSource" disabled /><br/>
+        </p>    
+    </fieldset>
 
-    <label for="locationLatitude">Location latitude:</label>
-    <input type="text" name="locationLatitude" id="locationLatitude" disabled><br/>
 
-    <label for="locationModernLookupForm">Modern Lookup Form:</label>
-    <input type="text" name="locationModernLookupForm" id="locationModernLookupForm" disabled><br/>
-
-    <label for="locationLocalityTypeId">Location locality type ID:</label>
-    <input type="text" name="locationLocalityTypeId" id="locationLocalityTypeId" disabled><br/>
-
-    <label for="locationLocalityType">Location locality type:</label>
-    <input type="text" name="locationLocalityType" id="locationLocalityType" disabled><br/>
-
-    <label for="locationDistrictOrParishId">District or parish ID:</label>
-    <input type="text" name="locationDistrictOrParishId" id="locationDistrictOrParishId" disabled><br/>
-
-    <label for="locationDistrictOrParish">District or parish:</label>
-    <input type="text" name="locationDistrictOrParish" id="locationDistrictOrParish" disabled><br/>
-
-    <label for="locationRegionId">Region ID:</label>
-    <input type="text" name="locationRegionId" id="locationRegionId" disabled><br/>
-
-    <label for="locationRegion">Region:</label>
-    <input type="text" name="locationRegion" id="locationRegion" disabled><br/>
-
-    <label for="availableVariantForms"><b>Variant form:</b></label>
-    <select name="availableVariantForms" id="availableVariantForms" onchange="variantFormSelected()"></select><br/>
-
-    <label for="variantFormId">Variant form ID:</label>
-    <input type="text" id="variantFormId" disabled/><br/>
-
-    <label for="variantFormIsAdaptedToSwedish">Is adapted to Swedish:</label>
-    <input type="text" id="variantFormIsAdaptedToSwedish" disabled/><br/>
-
-    <label for="variantFormAdaptationType">Adaptation type:</label>
-    <input type="text" size="100" id="variantFormAdaptationType" disabled/><br/>
-
-    <label for="normalizedFormNormalizedFormId">Normalized form ID:</label>
-    <input type="text" id="normalizedFormNormalizedFormId" disabled/><br/>
-
-    <label for="normalizedFormNormalizedForm">Normalized form:</label>
-    <input type="text" id="normalizedFormNormalizedForm" disabled/><br/>
-
-    <label for="normalizedFormMorphologicalNameType">Morphological name type:</label>
-    <input type="text" id="normalizedFormMorphologicalNameType" disabled/><br/>
-
-    <label for="normalizedFormComparativeFormInformation">Comparative form information:</label>
-    <input type="text" id="normalizedFormComparativeFormInformation" disabled/><br/>
-
-    <label for="normalizedFormEtymology">Etymology:</label>
-    <input type="text" id="normalizedFormEtymology" disabled/><br/>
-
-    <label for="normalizedFormMediatingLanguage">Mediating language:</label>
-    <input type="text" id="normalizedFormMediatingLanguage" disabled/><br/>
-
-    <label for="normalizedFormMainClauseInPhrase">Main clause in phrase:</label>
-    <input type="text" id="normalizedFormMainClauseInPhrase" disabled/><br/>
-
-    <label for="normalizedFormSimpleRootMorpheme">Simple root morpheme:</label>
-    <input type="text" id="normalizedFormSimpleRootMorpheme" disabled/><br/>
-
-    <label for="normalizedFormDerivationMorpheme">Derivation morpheme:</label>
-    <input type="text" id="normalizedFormDerivationMorpheme" disabled/><br/>
-
-    <label for="normalizedFormDeterminationClauseInPhrase">Determination clause in phrase:</label>
-    <input type="text" id="normalizedFormDeterminationClauseInPhrase" disabled/><br/>
-
-    <label for="normalizedFormJointMorphemeInComposition">Joint morpheme in composition:</label>
-    <input type="text" id="normalizedFormJointMorphemeInComposition" disabled/><br/>
-
-    <label for="normalizedFormMainClauseInComposition">Main clause in composition:</label>
-    <input type="text" id="normalizedFormMainClauseInComposition" disabled/><br/>
-
-    <label for="normalizedFormDeterminationClauseInComposition">Determination clause in composition:</label>
-    <input type="text" id="normalizedFormDeterminationClauseInComposition" disabled/><br/>
-
-    <label for="normalizedFormDerivationBase">Derivation base:</label>
-    <input type="text" id="normalizedFormDerivationBase" disabled/><br/>
-
-
-    <label for="availableSourceFindings"><b>Source finding:</b></label>
-    <select name="availableSourceFindings" id="availableSourceFindings" onchange="sourceFindingSelected()"></select><br/>
-
-    <label for="sourceFindingSourceId">Source ID:</label>
-    <input type="text" id="sourceFindingSourceId" disabled/><br/>
-
-    <label for="sourceFindingSourceType">Source type:</label>
-    <input type="text" id="sourceFindingSourceType" disabled/><br/>
-
-    <label for="sourceFindingMapSourceMapSignature">Map signature:</label>
-    <input type="text" id="sourceFindingMapSourceMapSignature" disabled/><br/>
-
-    <label for="sourceFindingMapSourceMapSheet">Map sheet:</label>
-    <input type="text" id="sourceFindingMapSourceMapSheet" disabled/><br/>
-
-    <label for="sourceFindingTextSourceName">Text source name:</label>
-    <input type="text" id="sourceFindingTextSourceName" disabled/><br/>
-
-    <label for="sourceFindingTextSourceSubsection">Text source subsection:</label>
-    <input type="text" id="sourceFindingTextSourceSubsection" disabled/><br/>
-
-    <label for="sourceFindingTextSourcePage">Text source page:</label>
-    <input type="text" id="sourceFindingTextSourcePage" disabled/><br/>
-
-    <label for="sourceFindingSourceDating">Source dating:</label>
-    <input type="text" id="sourceFindingSourceDating" disabled/><br/>
-
-    <label for="sourceFindingSourceLandSurveyor">Land surveyor (name and ID):</label>
-    <input type="text" id="sourceFindingSourceLandSurveyor" disabled/><br/>
-
-    <label for="sourceFindingPartOfSource">Part of source:</label>
-    <input type="text" id="sourceFindingPartOfSource" disabled/><br/>
-
-
-    <input id="createEditButton" type="button" onclick="createLocalityType(populateTable)" value="Create">
+    <input id="createEditButton" type="button" onclick="createOrEditAttestation(attestationCreatedOrEdited, globAttestationId)" value="Create">
 </form>
 
 </body>

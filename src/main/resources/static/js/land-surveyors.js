@@ -7,6 +7,10 @@ function getAllLandSurveyors(callback) {
         });
 }
 
+async function getAllLandSurveyorsAsync() {
+    return await genericGetAllAsync("landSurveyors", "landSurveyorView");
+}
+
 function getLandSurveyorById(id, callback, errorCallback) {
     genericGetById(id, "landSurveyors", callback, errorCallback);
 }

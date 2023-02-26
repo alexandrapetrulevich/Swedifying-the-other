@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Create/edit part of sources</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
-    <script src="./js/util.js"></script>
-    <script src="./js/part-of-sources.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/part-of-sources.js"></script>
     <script>
     var globPartOfSourceId = "";
     document.addEventListener('DOMContentLoaded', function() {
@@ -68,31 +68,23 @@
 </head>
 <body>
 
-<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
-<a href="./adaptation-types-list.html">List adaptation types</a>
-<br />
-<a href="./attestations-create-edit.html">Create/edit attestations</a>
-<a href="./attestations-list.html">List attestations</a>
-<br />
-<a href="./districts-create-edit.html">Create/edit districts</a>
-<a href="./districts-list.html">List districts</a>
+<a href="/index.html">Main menu</a>
 <br />
 <a href="#" class="current-page-in-menu">Create/edit part of sources</a>
-<a href="./part-of-sources-list.html">List part of sources</a>
-<br />
-<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
-<a href="./locality-types-list.html">List locality types</a>
-<br />
-<a href="./locations.html">List locations</a>
+<a href="/part-of-sources-list.html">List part of sources</a>
 
 <h1 id="createEditPartOfSourceHeader">Create new part of source</h1>
 
-<form id="createEditPartOfSourceForm" >
-    <label for="partOfSourceName" class="for-editable"><b>Part of source name:</b></label>
-    <input type="text" size="50" id="partOfSourceName"/><br/>
+<p>
+    <form id="createEditPartOfSourceForm" >
+        <p>
+            <label for="partOfSourceName" class="for-editable"><b>Part of source name:</b></label>
+            <input type="text" size="50" id="partOfSourceName"/>
+        </p>
 
-    <input id="createEditButton" type="button" onclick="createOrEditPartOfSource(partOfSourceCreatedOrEdited, globPartOfSourceId)" value="Create">
-</form>
+        <input id="createEditButton" type="button" onclick="createOrEditPartOfSource(partOfSourceCreatedOrEdited, globPartOfSourceId)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>

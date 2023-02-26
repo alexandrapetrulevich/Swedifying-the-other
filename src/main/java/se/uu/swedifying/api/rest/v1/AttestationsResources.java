@@ -37,7 +37,11 @@ public class AttestationsResources {
         if (morphNameType.isBlank() && etymology.isBlank()) {
             return ResponseEntity.ok(attestationService.getAllAttestations());
         } else {
-            return ResponseEntity.ok(attestationService.getAllFiltered(morphNameType, etymology));
+            return ResponseEntity.ok(attestationService.getAllFiltered(
+              morphNameType
+              , etymology
+              , 0
+              , Integer.MAX_VALUE));
         }
     }
 

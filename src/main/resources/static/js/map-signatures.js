@@ -8,6 +8,10 @@ function getAllMapSignatures(callback) {
         });
 }
 
+async function getAllMapSignaturesAsync() {
+    return await genericGetAllAsync("mapSignatures", "mapSignatureView");
+}
+
 function getMapSignatureById(id, callback, errorCallback) {
     genericGetById(id, "mapSignatures", callback, errorCallback);
 }

@@ -1,19 +1,39 @@
-function getAllAttestations(callback) {
-    $.get("/api/v1/attestations", function(data, status) {
+
+
+
+function getAllAttestations(callback, page, pageSize) {
+    genericGetAll(
+        "attestations"
+        , "attestationView"
+        , function(data) {
             callback(data);
-        }, "json");
+        }
+		, typeof page !== "undefined" ? "&page=" + page + "&size=" + pageSize : null);
 }
 
-function doFilterAttestations(newHeaderText, callback) {
-    var morphNameTypeFilter = $("#filterAttestationsTextMorphNameType").val();
-    var etymologyFilter = $("#filterAttestationsTextEtymology").val();
-    newHeaderText = newHeaderText + "MorphNameType: \"" + morphNameTypeFilter
-        + "\" and Etymology: \"" + etymologyFilter + "\"";
-    $.get(
-        "/api/v1/attestations?morphNameType="
-        + encodeURIComponent(morphNameTypeFilter)
-        + "&etymology="
-        + encodeURIComponent(etymologyFilter), function(data, status) {
-            callback(newHeaderText, data);
-        }, "json");
+
+function getAttestationById(id, callback, errorCallback) {
+    genericGetById(id, "attestations", callback, errorCallback, "attestationView");
+}
+
+function createOrEditAttestation(callback, attestationId) {
+    const originalFormValue = document.getElementById("originalForm").value;
+	const notesValue = document.getElementById("notes").value;
+	const locationValue = document.getElementById("availableLocations").value;
+	const sourceFindingValue = document.getElementById("availableSourceFindings").value;
+	const variantFormValue = document.getElementById("availableVariantForms").value;
+	var attestationData = {
+        attestationId: null
+		, originalForm: originalFormValue
+        , notes: notesValue
+		, location: locationValue
+		, sourceFinding: sourceFindingValue
+		, variantForm: variantFormValue
+    };
+    if (attestationId === "") {
+        genericCreate(attestationData, "attestations", callback);
+    } else {
+		attestationData.attestationId = parseInt(attestationId);
+        genericUpdate(attestationData, "attestations", attestationId, "PATCH", callback);
+    }
 }

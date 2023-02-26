@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List text sources</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/text-sources.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllTextSources(populateTable);
+        });
+
+        function setHeaderAndPopulateTable(headerText, textSources) {
+            document.getElementById("textSourcesTableHeader").innerHTML = headerText;
+            populateTable(textSources);
+        }
+
+        function populateTable(textSources) {
+            console.log("populateTable, no of map sources " + textSources.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < textSources.length; i++)
+            {
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + textSources[i].sourceId
+                    + "</td><td>"
+                    + textSources[i].dating
+                    + "</td><td>"
+                    + textSources[i].landSurveyor.name + " (ID: " + textSources[i].landSurveyor.landSurveyorId + ")"
+					+ "</td><td>"
+                    + textSources[i].name
+                    + "</td><td>"
+                    + textSources[i].subSection
+                    + "</td><td>"
+					+ textSources[i].page
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + textSources[i].sourceId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+
+        function goToEditView(sourceId) {
+            location.href = "/text-sources-create-edit.html?textSourceId=" + sourceId;
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="/index.html">Main menu</a>
+<br />
+<a href="/text-sources-create-edit.html">Create/edit text sources</a>
+<a href="#" class="current-page-in-menu">List text sources</a>
+<br />
+
+<h1 id="textSourcesTableHeader">All text sources</h1>
+<p>
+    <table id="textSourcesTable">
+        <thead>
+        <tr>
+            <th>Source ID</th>
+            <th>Dating</th>
+            <th>Land Surveyor</th>
+            <th>Text name</th>
+            <th>In sub section</th>
+            <th>On page</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
+
+<!--
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterTextSourcesForm">
+            <label for="filterByTextSource">Filter by map source: </label>
+            <input type="text" id="filterByTextSource"><br/>
+            <input type="button" value="Do filter" onclick="doFilterTextSources('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
+-->
+
+</body>
+</html>
