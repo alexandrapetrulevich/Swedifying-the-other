@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit map sources</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/js/util.js"></script>
+    <script src="/js/map-sources.js"></script>
+    <script src="/js/land-surveyors.js"></script>
+    <script src="/js/map-signatures.js"></script>
+    
+    <script>
+    var globMapSourceId = "";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    async function init() {
+        let landSurveyorsData = await getAllLandSurveyorsAsync();
+        populateAvailableLandSurveyors(landSurveyorsData._embedded.landSurveyors);
+        console.log("land surveyors select populated");
+        let mapSignaturesData = await getAllMapSignaturesAsync();
+        populateAvailableMapSignatures(mapSignaturesData._embedded.mapSignatures);
+        console.log("map signatures select populated");
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("mapSourceId")) {
+            setUpForEdit(searchParams.get("mapSourceId"));
+        }
+    }
+    
+    function populateAvailableLandSurveyors(landSurveyors) {
+        console.log("populateAvailableLandSurveyors, no of land surveyors: " + landSurveyors.length);
+        let select = document.getElementById("availableLandSurveyors");
+        for (let i = 0; i < landSurveyors.length; i++) {
+            select.add(
+                new Option(landSurveyors[i].name + " (" + landSurveyors[i]._links.self.href + ")"
+                , landSurveyors[i]._links.self.href));
+        }
+    }
+    
+    function populateAvailableMapSignatures(mapSignatures) {
+        console.log("populateAvailableMapSignatures, no of map signatures: " + mapSignatures.length);
+        let select = document.getElementById("availableMapSignatures");
+        for (let i = 0; i < mapSignatures.length; i++) {
+            select.add(
+                new Option(mapSignatures[i].mapSignature + " (" + mapSignatures[i]._links.self.href + ")"
+                , mapSignatures[i]._links.self.href));
+        }
+    }
+
+    function setUpForEdit(mapSourceId) {
+        globMapSourceId = mapSourceId;
+        console.log("Map source id to edit " + globMapSourceId);
+        loadMapSource(globMapSourceId);
+        document.getElementById("createEditMapSourceHeader").innerHTML = "Editing map source " + globMapSourceId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadMapSource(mapSourceId) {
+        getMapSourceById(mapSourceId, displayMapSource, handleGetMapSourceError);
+    }
+
+    function handleGetMapSourceError(httpErrorStatus) {
+        var errorText = "Could not get map source " + globMapSourceId;
+        if (httpErrorStatus == 404) {
+            errorText += ", map source not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globMapSourceId = "";
+        document.getElementById("dating").value = "";
+        document.getElementById("mapSheet").value = "";
+        document.getElementById("createEditMapSourceHeader").innerHTML = "Create new map source";
+        document.getElementById("createEditButton").value = "Create";
+    }
+
+    function displayMapSource(mapSource) {
+        document.getElementById("dating").value = mapSource.dating;
+        document.getElementById("mapSheet").value = mapSource.mapSheet;
+        var landSurveyorUrl = removeTrialingProjection(
+            mapSource._links.landSurveyor.href);
+        var mapSignatureUrl = removeTrialingProjection(
+            mapSource._links.mapSignature.href);
+        genericGet(landSurveyorUrl, function(data) {
+            document.getElementById("availableLandSurveyors").value = data._links.self.href;
+        });
+        genericGet(mapSignatureUrl, function(data) {
+            document.getElementById("availableMapSignatures").value = data._links.self.href;
+        });
+        
+    }
+
+    function mapSourceCreatedOrEdited(mapSource) {
+        var format =  " map source with ID " +  mapSource.sourceId;
+        if (globMapSourceId === "") {
+            alert("Created" + format);
+        } else {
+            alert("Edited" + format);
+        }
+        setUpForCreate();
+    }
+
+    function landSurveyorSelected() {
+        console.log("Land surveyor selected: " + document.getElementById("availableLandSurveyors").value);
+    }
+
+    function mapSignatureSelected() {
+        console.log("map signature selected: " + document.getElementById("availableMapSignatures").value);
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="/index.html">Main menu</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit map sources</a>
+<a href="/map-sources-list.html">List map sources</a>
+
+<h1 id="createEditMapSourceHeader">Create new map source</h1>
+
+<p>
+    <form id="createEditMapSourceForm" >
+        <p>
+            <label for="dating" class="for-editable">Dating (YYYY-MM-DD):</label>
+            <input type="text" id="dating"/>
+        </p>
+        <p>
+            <label for="mapSheet" class="for-editable">Map sheet:</label>
+            <input type="text" id="mapSheet"/>
+        </p>
+        <p>
+            <label for="availableLandSurveyors" class="for-editable">Land Surveyor:</label>
+            <select name="availableLandSurveyors" id="availableLandSurveyors" onchange="landSurveyorSelected()">
+            </select>
+        </p>
+        <p>
+            <label for="availableMapSignatures" class="for-editable">Map Signature:</label>
+            <select name="availableMapSignatures" id="availableMapSignatures" onchange="mapSignatureSelected()">
+            </select>
+        </p>
+
+        <input id="createEditButton" type="button" onclick="createOrEditMapSource(mapSourceCreatedOrEdited, globMapSourceId)" value="Create">
+    </form>
+</p>
+
+</body>
+</html>

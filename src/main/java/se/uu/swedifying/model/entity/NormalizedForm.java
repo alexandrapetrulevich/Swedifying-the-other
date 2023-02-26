@@ -22,6 +22,7 @@ public class NormalizedForm {
   private String normalizedForm;
 
   @Column(name = "MORPHOLOGICAL_NAME_TYPE")
+  @Enumerated(EnumType.STRING)
   private MorphologicalNameType morphologicalNameType;
 
   @Column(name = "MORPHOLOGICAL_NAME_TYPE_IS_SHAKY")

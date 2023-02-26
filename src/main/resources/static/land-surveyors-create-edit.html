@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Create/edit land surveyors</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
-    <script src="./js/util.js"></script>
-    <script src="./js/land-surveyors.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/land-surveyors.js"></script>
     <script>
     var globLandSurveyorId = "";
     document.addEventListener('DOMContentLoaded', function() {
@@ -67,31 +67,22 @@
 </head>
 <body>
 
-<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
-<a href="./adaptation-types-list.html">List adaptation types</a>
-<br />
-<a href="./attestations-create-edit.html">Create/edit attestations</a>
-<a href="./attestations-list.html">List attestations</a>
-<br />
-<a href="./districts-create-edit.html">Create/edit districts</a>
-<a href="./districts-list.html">List districts</a>
+<a href="/index.html">Main menu</a>
 <br />
 <a href="#" class="current-page-in-menu">Create/edit land surveyors</a>
-<a href="./land-surveyors-list.html">List land surveyors</a>
-<br />
-<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
-<a href="./locality-types-list.html">List locality types</a>
-<br />
-<a href="./locations.html">List locations</a>
+<a href="/land-surveyors-list.html">List land surveyors</a>
 
 <h1 id="createEditLandSurveyorHeader">Create new land surveyor</h1>
 
-<form id="createEditLandSurveyorForm" >
-    <label for="landSurveyorName" class="for-editable"><b>Land surveyor name:</b></label>
-    <input type="text" size="50" id="landSurveyorName"/><br/>
+<p>
+    <form id="createEditLandSurveyorForm" >
+        <p>
+            <label for="landSurveyorName" class="for-editable">Land surveyor name:</label>
+            <input type="text" size="50" id="landSurveyorName"/>
+        </p>
 
-    <input id="createEditButton" type="button" onclick="createOrEditLandSurveyor(landSurveyorCreatedOrEdited, globLandSurveyorId)" value="Create">
-</form>
-
+        <input id="createEditButton" type="button" onclick="createOrEditLandSurveyor(landSurveyorCreatedOrEdited, globLandSurveyorId)" value="Create">
+    </form>
+</p>
 </body>
 </html>

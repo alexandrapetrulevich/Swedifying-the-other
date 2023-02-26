@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List normalized forms</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/normalized-forms.js"></script>
+    <script>
+        
+        const defaultPageSize = 20;
+        let firstLink = "";
+        let nextLink = "";
+        let prevLink = "";
+        let lastLink = "";
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllNormalizedForms(function(data) {
+                populateTable(data._embedded.normalizedForms);
+                addPagingLinks(data._links);
+                document.getElementById("pageSize").value = defaultPageSize;
+            }, 0, defaultPageSize);
+        });
+
+        function setHeaderAndPopulateTable(headerText, normalizedForms) {
+            document.getElementById("normalizedFormsTableHeader").innerHTML = headerText;
+            populateTable(normalizedForms._embedded.normalizedForms);
+            addPagingLinks(normalizedForms._links);
+        }
+        
+        function addPagingLinks(links) {
+            firstLink = links.first ? links.first.href : "";
+            nextLink = links.next ? links.next.href : "";
+            prevLink = links.prev ? links.prev.href : "";
+            lastLink = links.last ? links.last.href : "";
+            document.getElementById('nextLink').disabled = nextLink === "";
+            document.getElementById('prevLink').disabled = prevLink === "";
+            document.getElementById('firstLink').disabled = firstLink === "";
+            document.getElementById('lastLink').disabled = lastLink === "";
+        }
+
+        function populateTable(normalizedForms) {
+            console.log("populateTable, no of normalized forms " + normalizedForms.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+			for (let i = 0; i < normalizedForms.length; i++)
+            {
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + normalizedForms[i].normalizedFormId
+                    + "</td><td>"
+                    + normalizedForms[i].normalizedForm
+                    + "</td><td>"
+					+ normalizedForms[i].morphologicalNameType
+                    + "</td><td>"
+					+ getMorphTypeIsShakyText(normalizedForms[i])
+                    + "</td><td>"
+					+ getMorphologicalDataText(normalizedForms[i].morphologicalData)
+                    + "</td><td>"
+					+ normalizedForms[i].comparativeFormInformation
+                    + "</td><td>"
+					+ getLanguageText(normalizedForms[i].etymology)
+                    + "</td><td>"
+					+ getLanguageText(normalizedForms[i].mediatingLanguage)
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + normalizedForms[i].normalizedFormId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+		
+		function getMorphTypeIsShakyText(normalizedForm) {
+			if (normalizedForm.morphologicalNameTypeIsShaky) {
+				return "Yes";
+			}
+			return "No";
+		}
+		
+		function getLanguageText(language) {
+			if (language) {
+				return language.languageName + " (" + language.languageCode + ")";
+			}
+			return "N/A";
+		}
+		
+		function getMorphologicalDataText(morphologicalData) {
+			let morphologicalDataString = "";
+			let added = false;
+			if (morphologicalData.determinationClauseInPhrase) {
+				morphologicalDataString += "<b>Determination clause in phrase</b>: " + morphologicalData.determinationClauseInPhrase;
+				added = true;
+			}
+			if (morphologicalData.mainClauseInPhrase) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Main clause in phrase</b>: " + morphologicalData.mainClauseInPhrase;
+				added = true;
+			}
+			if (morphologicalData.simpleRootMorpheme) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Simple root morpheme</b>: " + morphologicalData.simpleRootMorpheme;
+				added = true;
+			}
+			if (morphologicalData.derivationBase) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Derivation base</b>: " + morphologicalData.derivationBase;
+				added = true;
+			}
+			if (morphologicalData.derivationMorpheme) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Derivation morpheme</b>: " + morphologicalData.derivationMorpheme;
+				added = true;
+			}
+			if (morphologicalData.determinationClauseInComposition) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Determination clause in composition</b>: " + morphologicalData.determinationClauseInComposition;
+				added = true;
+			}
+			if (morphologicalData.jointMorphemeInComposition) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Joint morpheme in composition</b>: " + morphologicalData.jointMorphemeInComposition;
+				added = true;
+			}
+			if (morphologicalData.mainClauseInComposition) {
+				morphologicalDataString += prepareAddToMorphologicalDataString(added) + "<b>Main clause in composition</b>: " + morphologicalData.mainClauseInComposition;
+				added = true;
+			}
+			return morphologicalDataString;
+		}
+		
+		function prepareAddToMorphologicalDataString(added) {
+			if (added) {
+				return "<br>";
+			}
+			return "";
+		}
+
+        function goToEditView(normalizedFormId) {
+            location.href = "/normalized-forms-create-edit.html?normalizedFormId=" + normalizedFormId;
+        }
+        
+        function next() {
+            if (nextLink !== "") {
+                genericGet(nextLink, function(data) {
+                    populateTable(data._embedded.normalizedForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function prev() {
+            if (prevLink !== "") {
+                genericGet(prevLink, function(data) {
+                    populateTable(data._embedded.normalizedForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function last() {
+            if (lastLink !== "") {
+                genericGet(lastLink, function(data) {
+                    populateTable(data._embedded.normalizedForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function updatePageSize() {
+            getAllNormalizedForms(function(data) {
+                populateTable(data._embedded.normalizedForms);
+                addPagingLinks(data._links);
+            }, 0, parseInt(document.getElementById("pageSize").value));
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="/index.html">Main menu</a>
+<br />
+<a href="/normalized-forms-create-edit.html">Create/edit normalized forms</a>
+<a href="#" class="current-page-in-menu">List normalized forms</a>
+
+<h1 id="normalizedFormsTableHeader">All normalized forms</h1>
+<p>
+    <table id="normalizedFormsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Normalized Form</th>
+            <th>Morphological name type</th>
+            <th>Morphological name type is shaky</th>
+            <th>Morphological data</th>
+            <th>Comparative form information</th>
+            <th>Etymology language</th>
+            <th>Mediating language</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
+
+<p>
+<fieldset>
+    <legend>Paging</legend>
+    <p>
+        <button type="button" id="firstLink" onclick="first()">&lt;&lt; First</button>
+        <button type="button" id="prevLink" onclick="prev()">&lt; Prev</button>
+        <button type="button" id="nextLink" onclick="next()">Next &gt;</button>
+        <button type="button" id="lastLink" onclick="last()">Last &gt;&gt;</button>
+    </p>
+    <p>
+        <form id="paging">
+            <label for="pageSize">Page size: </label>
+            <input type="text" id="pageSize">
+            <input type="button" value="Update" onclick="updatePageSize()">
+        </form>
+    </p>
+</fieldset>
+</p>
+
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterNormalizedFormsForm">
+            <p>
+                <label for="filterByNormalizedForm">Filter by normalized form:</label>
+                <input type="text" id="filterByNormalizedForm">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterNormalizedForms('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </p>
+</fieldset>
+
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create/edit normalized forms</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/js/util.js"></script>
+    <script src="/js/normalized-forms.js"></script>
+    <script src="/js/morphological-name-types.js"></script>
+    <script src="/js/languages.js"></script>
+    <script>
+    var globNormalizedFormId = "";
+    var noLanguageValue = "NO_LANGUAGE";
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    async function init() {
+        populateAvailableMorphologicalNameTypes(await getAllMorphologicalNameTypesAsync());
+        populateAvailableLanguages(await getAllLanguagesAsync());
+        let searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has("normalizedFormId")) {
+            setUpForEdit(searchParams.get("normalizedFormId"));
+        } else {
+            morphologicalNameTypeSelected();
+        }
+    }
+    
+    function populateAvailableMorphologicalNameTypes(morphologicalNameTypes) {
+        console.log("morphologicalNameTypes: " + morphologicalNameTypes);
+        console.log("populateAvailableMorphologicalNameTypes, no of MorphologicalNameTypes: " + morphologicalNameTypes.length);
+        let select = document.getElementById("availableMorphologicalNameTypes");
+        for (let i = 0; i < morphologicalNameTypes.length; i++) {
+            select.add(
+                new Option(
+                    morphologicalNameTypes[i]
+                    , morphologicalNameTypes[i]));
+        }
+    }
+    
+    function populateAvailableLanguages(languages) {
+        console.log("No of languages: " + languages.length);
+        let selectForEtymologyLanguages = document.getElementById("availableEtymologyLanguages");
+        let selectForMediatingLanguages = document.getElementById("availableMediatingLanguages");
+        selectForEtymologyLanguages.add(new Option("N/A", noLanguageValue));
+        selectForMediatingLanguages.add(new Option("N/A", noLanguageValue));
+        for (let i = 0; i < languages.length; i++) {
+            selectForEtymologyLanguages.add(
+                new Option(
+                    languages[i].languageName
+                    , languages[i]._links.self.href));
+            selectForMediatingLanguages.add(
+                new Option(
+                    languages[i].languageName
+                    , languages[i]._links.self.href));
+        }
+    }
+
+    function setUpForEdit(normalizedFormId) {
+        globNormalizedFormId = normalizedFormId;
+        console.log("Normalized form id to edit " + globNormalizedFormId);
+        loadNormalizedForm(globNormalizedFormId);
+        document.getElementById("createEditNormalizedFormHeader").innerHTML = "Editing normalized form " + globNormalizedFormId;
+        document.getElementById("createEditButton").value = "Update";
+    }
+
+    function loadNormalizedForm(normalizedFormId) {
+        getNormalizedFormById(normalizedFormId, displayNormalizedForm, handleGetNormalizedFormError);
+    }
+
+    function handleGetNormalizedFormError(httpErrorStatus) {
+        var errorText = "Could not get normalized form " + globNormalizedFormId;
+        if (httpErrorStatus == 404) {
+            errorText += ", normalized form not found";
+        } else {
+            errorText += " due to status " + httpErrorStatus;
+        }
+        alert(errorText + ". Setting up for create...");
+        setUpForCreate();
+    }
+
+    function setUpForCreate() {
+        globNormalizedFormId = "";
+        document.getElementById("normalizedForm").value = "";
+        document.getElementById("availableMorphologicalNameTypes").selectedIndex = 0;
+        document.getElementById("determinationClauseInPhrase").value = "";
+        document.getElementById("mainClauseInPhrase").value = "";
+        document.getElementById("simpleRootMorpheme").value = "";
+        document.getElementById("derivationBase").value = "";
+        document.getElementById("derivationMorpheme").value = "";
+        document.getElementById("determinationClauseInComposition").value = "";
+        document.getElementById("jointMorphemeInComposition").value = "";
+        document.getElementById("mainClauseInComposition").value = "";
+        document.getElementById("morphologicalNameTypeIsShaky").checked = false;
+        document.getElementById("comparativeFormInformation").value = "";
+        document.getElementById("availableEtymologyLanguages").value = noLanguageValue;
+        document.getElementById("availableMediatingLanguages").value = noLanguageValue;
+        
+        document.getElementById("createEditNormalizedFormHeader").innerHTML = "Create new normalized form";
+        document.getElementById("createEditButton").value = "Create";
+        morphologicalNameTypeSelected();
+        
+    }
+
+    function displayNormalizedForm(normalizedForm) {
+        document.getElementById("normalizedForm").value = normalizedForm.normalizedForm;
+        document.getElementById("availableMorphologicalNameTypes").value = normalizedForm.morphologicalNameType;
+        document.getElementById("determinationClauseInPhrase").value = normalizedForm.morphologicalData.determinationClauseInPhrase;
+        document.getElementById("mainClauseInPhrase").value = normalizedForm.morphologicalData.mainClauseInPhrase;
+        document.getElementById("simpleRootMorpheme").value = normalizedForm.morphologicalData.simpleRootMorpheme;
+        document.getElementById("derivationBase").value = normalizedForm.morphologicalData.derivationBase;
+        document.getElementById("derivationMorpheme").value = normalizedForm.morphologicalData.derivationMorpheme;
+        document.getElementById("determinationClauseInComposition").value = normalizedForm.morphologicalData.determinationClauseInComposition;
+        document.getElementById("jointMorphemeInComposition").value = normalizedForm.morphologicalData.jointMorphemeInComposition;
+        document.getElementById("mainClauseInComposition").value = normalizedForm.morphologicalData.mainClauseInComposition;
+        document.getElementById("morphologicalNameTypeIsShaky").checked = normalizedForm.morphologicalNameTypeIsShaky;
+        document.getElementById("comparativeFormInformation").value = normalizedForm.comparativeFormInformation;
+        if (normalizedForm.etymology) {
+            let etymologyUrl = removeTrialingProjection(normalizedForm._links.etymology.href);
+            genericGet(etymologyUrl, function(data) {
+                document.getElementById("availableEtymologyLanguages").value = data._links.self.href;
+            });
+        } else {
+            document.getElementById("availableEtymologyLanguages").value = noLanguageValue;
+        }
+        if (normalizedForm.mediatingLanguage) {
+            let mediatingLanguageUrl = removeTrialingProjection(normalizedForm._links.mediatingLanguage.href);
+            genericGet(mediatingLanguageUrl, function(data) {
+                document.getElementById("availableMediatingLanguages").value = data._links.self.href;
+            });
+        } else {
+            document.getElementById("availableMediatingLanguages").value = noLanguageValue;
+        }
+        
+        morphologicalNameTypeSelected();
+    }
+
+    function normalizedFormCreatedOrEdited(normalizedForm) {
+        let confirmText =  " normalized form " + normalizedForm.normalizedForm + " (ID " +  normalizedForm.normalizedFormId + "). ";
+        if (globNormalizedFormId === "") {
+            confirmText = "Created" + confirmText;
+        } else {
+            confirmText = "Edited" + confirmText;
+        }
+        confirmText += " OK to continue editing this normalized form, CANCEL to create a new one.";
+        if (!confirm(confirmText)) {
+            globNormalizedFormId = "";
+            setUpForCreate();
+        }
+    }
+    
+    function morphologicalNameTypeSelected() {
+        let selectedMorphNameType = document.getElementById("availableMorphologicalNameTypes").value;
+        console.log("morphologicalNameType selected: " + selectedMorphNameType);
+        enableDisableMorphologicalTextDataFields(selectedMorphNameType);
+    }
+    
+    function morphologicalNameTypeIsShakyChanged() {
+        if (document.getElementById("morphologicalNameTypeIsShaky").checked) {
+            enableAllMorphologicalDataFields();
+        } else {
+            enableDisableMorphologicalTextDataFields(document.getElementById("availableMorphologicalNameTypes").value);
+        }   
+    }
+    
+    function enableDisableMorphologicalTextDataFields(selectedMorphNameType) {
+        if (document.getElementById("morphologicalNameTypeIsShaky").checked) {
+            enableAllMorphologicalDataFields();
+        } else {
+            if (selectedMorphNameType === "PHRASE") {
+                enableMorphologicalTextDataField(document.getElementById("determinationClauseInPhrase"));
+                enableMorphologicalTextDataField(document.getElementById("mainClauseInPhrase"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("simpleRootMorpheme"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("derivationBase"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("derivationMorpheme"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("determinationClauseInComposition"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("jointMorphemeInComposition"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("mainClauseInComposition"));
+            } else if (selectedMorphNameType === "SIMPLE") {
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("determinationClauseInPhrase"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("mainClauseInPhrase"));
+                enableMorphologicalTextDataField(document.getElementById("simpleRootMorpheme"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("derivationBase"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("derivationMorpheme"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("determinationClauseInComposition"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("jointMorphemeInComposition"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("mainClauseInComposition"));
+            } else if (selectedMorphNameType === "DERIVATION") {
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("determinationClauseInPhrase"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("mainClauseInPhrase"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("simpleRootMorpheme"));
+                enableMorphologicalTextDataField(document.getElementById("derivationBase"));
+                enableMorphologicalTextDataField(document.getElementById("derivationMorpheme"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("determinationClauseInComposition"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("jointMorphemeInComposition"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("mainClauseInComposition"));
+            } else if (selectedMorphNameType === "COMPOSITION") {
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("determinationClauseInPhrase"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("mainClauseInPhrase"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("simpleRootMorpheme"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("derivationBase"));
+                disableAndEmptyMorphologicalTextDataField(document.getElementById("derivationMorpheme"));
+                enableMorphologicalTextDataField(document.getElementById("determinationClauseInComposition"));
+                enableMorphologicalTextDataField(document.getElementById("jointMorphemeInComposition"));
+                enableMorphologicalTextDataField(document.getElementById("mainClauseInComposition"));
+            } else if (selectedMorphNameType === "PLURAL") {
+                enableAllMorphologicalDataFields();
+            } else {
+                enableAllMorphologicalDataFields();
+            }
+        }
+    }
+    
+    function enableAllMorphologicalDataFields() {
+        enableMorphologicalTextDataField(document.getElementById("determinationClauseInPhrase"));
+        enableMorphologicalTextDataField(document.getElementById("mainClauseInPhrase"));
+        enableMorphologicalTextDataField(document.getElementById("simpleRootMorpheme"));
+        enableMorphologicalTextDataField(document.getElementById("derivationBase"));
+        enableMorphologicalTextDataField(document.getElementById("derivationMorpheme"));
+        enableMorphologicalTextDataField(document.getElementById("determinationClauseInComposition"));
+        enableMorphologicalTextDataField(document.getElementById("jointMorphemeInComposition"));
+        enableMorphologicalTextDataField(document.getElementById("mainClauseInComposition"));
+    }
+    
+    function enableMorphologicalTextDataField(element) {
+        element.disabled = false;
+        element.labels[0].classList.remove("disabled");
+        element.labels[0].classList.add("for-editable");
+    }
+    
+    function disableAndEmptyMorphologicalTextDataField(element) {
+        element.value = "";
+        element.disabled = true;
+        element.labels[0].disabled = true;
+        element.labels[0].classList.remove("for-editable");
+        element.labels[0].classList.add("disabled");
+    }
+    
+    function etymologySelected() {
+        console.log("Etymology selected: " + document.getElementById("availableEtymologyLanguages").value);
+    }
+    
+    function mediatingLanguageSelected() {
+        console.log("Mediating language selected: " + document.getElementById("availableMediatingLanguages").value);
+    }
+
+    </script>
+</head>
+<body>
+
+<a href="/index.html">Main menu</a>
+<br />
+<a href="#" class="current-page-in-menu">Create/edit normalized forms</a>
+<a href="/normalized-forms-list.html">List normalized forms</a>
+
+<h1 id="createEditNormalizedFormHeader">Create new normalized form</h1>
+
+<p>
+    <form id="createEditNormalizedFormForm" >
+        <p>
+            <label for="normalizedForm" class="for-editable">Normalized form:</label>
+            <input type="text" size="50" id="normalizedForm"/>
+        </p>
+        <p>
+            <label for="availableMorphologicalNameTypes" class="for-editable">Morphological name type:</label>
+            <select name="availableMorphologicalNameTypes" id="availableMorphologicalNameTypes" onchange="morphologicalNameTypeSelected()">
+            </select>
+        </p>
+        <p>
+            <label for="morphologicalNameTypeIsShaky" class="for-editable">Morphological name type is shaky?</label>
+            <input type="checkbox" id="morphologicalNameTypeIsShaky" onchange="morphologicalNameTypeIsShakyChanged()"/>
+        </p>
+        <fieldset>
+            <legend><b><i>Morphological data</i></b></legend>
+            <p>
+                <label for="determinationClauseInPhrase" class="for-editable">Determination clause in phrase:</label>
+                <input type="text" size="50" id="determinationClauseInPhrase"/>
+            </p>
+            <p>
+                <label for="mainClauseInPhrase" class="for-editable">Main clause in phrase:</label>
+                <input type="text" size="50" id="mainClauseInPhrase"/>
+            </p>
+            <p>
+                <label for="simpleRootMorpheme" class="for-editable">Simple root morpheme:</label>
+                <input type="text" size="50" id="simpleRootMorpheme"/>
+            </p>
+            <p>
+                <label for="derivationBase" class="for-editable">Derivation base:</label>
+                <input type="text" size="50" id="derivationBase"/>
+            </p>
+            <p>
+                <label for="derivationMorpheme" class="for-editable">Derivation morpheme:</label>
+                <input type="text" size="50" id="derivationMorpheme"/>
+            </p>
+            <p>
+                <label for="determinationClauseInComposition" class="for-editable">Determination clause in composition:</label>
+                <input type="text" size="50" id="determinationClauseInComposition"/>
+            </p>
+            <p>
+                <label for="jointMorphemeInComposition" class="for-editable">Joint morpheme in composition:</label>
+                <input type="text" size="50" id="jointMorphemeInComposition"/>
+            </p>
+            <p>
+                <label for="mainClauseInComposition" class="for-editable">Main clause in composition:</label>
+                <input type="text" size="50" id="mainClauseInComposition"/>
+            </p>
+        </fieldset>
+        <p>
+            <label for="comparativeFormInformation" class="for-editable">Comparative form information:</label><br/>
+            <textarea name="comparativeFormInformation" form="createEditNormalizedFormForm" id="comparativeFormInformation" rows="4" cols="50"></textarea>
+        </p>
+        <p>
+            <label for="availableEtymologyLanguages" class="for-editable">Etymology:</label>
+            <select name="availableEtymologyLanguages" id="availableEtymologyLanguages" onchange="etymologySelected()">
+            </select>
+        </p>
+        <p>
+            <label for="availableMediatingLanguages" class="for-editable">Mediating language:</label>
+            <select name="availableMediatingLanguages" id="availableMediatingLanguages" onchange="mediatingLanguageSelected()">
+            </select>
+        </p>
+            
+        <input id="createEditButton" type="button" onclick="createOrEditNormalizedForm(normalizedFormCreatedOrEdited, globNormalizedFormId, noLanguageValue)" value="Create">
+    </form>
+</p>
+
+</body>
+</html>

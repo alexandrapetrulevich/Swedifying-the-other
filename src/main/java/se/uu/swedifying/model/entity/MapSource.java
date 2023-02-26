@@ -1,9 +1,6 @@
 package se.uu.swedifying.model.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Column;
@@ -16,6 +13,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString(callSuper = true)
 public class MapSource extends Source {
   @ManyToOne
   @JoinColumn(name = "MAP_SIGNATURE_ID")

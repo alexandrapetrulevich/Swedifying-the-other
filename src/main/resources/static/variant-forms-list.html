@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List variant forms</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/variant-forms.js"></script>
+    <script>
+    
+        const defaultPageSize = 20;
+        let firstLink = "";
+        let nextLink = "";
+        let prevLink = "";
+        let lastLink = "";
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllVariantForms(function(data) {
+                populateTable(data._embedded.variantForms);
+                addPagingLinks(data._links);
+                document.getElementById("pageSize").value = defaultPageSize;
+            }, 0, defaultPageSize);
+        });
+
+        function setHeaderAndPopulateTable(headerText, variantForms) {
+            document.getElementById("variantFormsTableHeader").innerHTML = headerText;
+            populateTable(variantForms._embedded.variantForms);
+            addPagingLinks(variantForms._links);
+        }
+        
+        function addPagingLinks(links) {
+            firstLink = links.first ? links.first.href : "";
+            nextLink = links.next ? links.next.href : "";
+            prevLink = links.prev ? links.prev.href : "";
+            lastLink = links.last ? links.last.href : "";
+            document.getElementById('nextLink').disabled = nextLink === "";
+            document.getElementById('prevLink').disabled = prevLink === "";
+            document.getElementById('firstLink').disabled = firstLink === "";
+            document.getElementById('lastLink').disabled = lastLink === "";
+        }
+
+        function populateTable(variantForms) {
+            console.log("populateTable, no of variant forms " + variantForms.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
+            for (let i = 0; i < variantForms.length; i++)
+            {
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + variantForms[i].variantFormId
+                    + "</td><td>"
+                    + variantForms[i].variantForm
+                    + "</td><td>"
+                    + variantForms[i].isAdaptedToSwedish
+                    + "</td><td>"
+                    + getAdaptationTypesText(variantForms[i].adaptationTypes)
+                    + "</td><td><a href=\"/normalized-forms-create-edit.html?normalizedFormId=" + variantForms[i].normalizedForm.normalizedFormId + "\">"
+                    + variantForms[i].normalizedForm.normalizedForm + " (ID: " + variantForms[i].normalizedForm.normalizedFormId + ")</a>"
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + variantForms[i].variantFormId + ");\">Edit</button>"
+                    + "</td></tr>";
+            }
+        }
+        
+        function getAdaptationTypesText(adaptationTypes) {
+            if (!adaptationTypes || adaptationTypes.length == 0) {
+                return "N/A";
+            }
+            let adaptationTypeLinkStart = "<a href=\"/adaptation-types-create-edit.html?adaptationTypeId=";
+            let ret = adaptationTypeLinkStart
+                + adaptationTypes[0].adaptationTypeId 
+                + "\">" 
+                + adaptationTypes[0].name 
+                + "</a>";
+            for (let i = 1; i < adaptationTypes.length; i++) {
+                ret += "<br/>" + adaptationTypeLinkStart + adaptationTypes[i].adaptationTypeId + "\">" + adaptationTypes[i].name + "</a>";
+            }
+            return ret;
+        }
+
+        function goToEditView(variantFormId) {
+            location.href = "/variant-forms-create-edit.html?variantFormId=" + variantFormId;
+        }
+        
+        function first() {
+            if (firstLink !== "") {
+                genericGet(firstLink, function(data) {
+                    populateTable(data._embedded.variantForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function next() {
+            if (nextLink !== "") {
+                genericGet(nextLink, function(data) {
+                    populateTable(data._embedded.variantForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function prev() {
+            if (prevLink !== "") {
+                genericGet(prevLink, function(data) {
+                    populateTable(data._embedded.variantForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function last() {
+            if (lastLink !== "") {
+                genericGet(lastLink, function(data) {
+                    populateTable(data._embedded.variantForms);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function updatePageSize() {
+            getAllVariantForms(function(data) {
+                populateTable(data._embedded.variantForms);
+                addPagingLinks(data._links);
+            }, 0, parseInt(document.getElementById("pageSize").value));
+        }
+
+
+    </script>
+</head>
+<body>
+<a href="/index.html">Main menu</a>
+<br />
+<a href="/variant-forms-create-edit.html">Create/edit variant forms</a>
+<a href="#" class="current-page-in-menu">List variant forms</a>
+
+<h1 id="variantFormsTableHeader">All variant forms</h1>
+<p>
+    <table id="variantFormsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Variant Form</th>
+            <th>Adapted to Swedish?</th>
+            <th>Adaptation Types</th>
+            <th>Normalized Form</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
+
+<p>
+    <fieldset>
+        <legend>Paging</legend>
+        <p>
+            <button type="button" id="firstLink" onclick="first()">&lt;&lt; First</button>
+            <button type="button" id="prevLink" onclick="prev()">&lt; Prev</button>
+            <button type="button" id="nextLink" onclick="next()">Next &gt;</button>
+            <button type="button" id="lastLink" onclick="last()">Last &gt;&gt;</button>
+        </p>
+        <p>
+            <form id="paging">
+                <label for="pageSize">Page size: </label>
+                <input type="text" id="pageSize">
+                <input type="button" value="Update" onclick="updatePageSize()">
+            </form>
+        </p>
+    </fieldset>
+</p>
+
+<p>
+    <fieldset>
+        <legend>Filtering</legend>
+        <form id="filterVariantFormsForm">
+            <p>
+                <label for="filterByVariantForm">Filter by variant form:</label>
+                <input type="text" id="filterByVariantForm">
+            </p>
+            <input type="button" value="Do filter" onclick="doFilterVariantForms('Filtered by', setHeaderAndPopulateTable)">
+        </form>
+    </fieldset>
+</p>
+
+</body>
+</html>

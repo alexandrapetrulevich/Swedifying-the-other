@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Create/edit map signatures</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
-    <script src="./js/util.js"></script>
-    <script src="./js/map-signatures.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/map-signatures.js"></script>
     <script>
     var globMapSignatureId = "";
     document.addEventListener('DOMContentLoaded', function() {
@@ -68,31 +68,22 @@
 </head>
 <body>
 
-<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
-<a href="./adaptation-types-list.html">List adaptation types</a>
-<br />
-<a href="./attestations-create-edit.html">Create/edit attestations</a>
-<a href="./attestations-list.html">List attestations</a>
-<br />
-<a href="./districts-create-edit.html">Create/edit districts</a>
-<a href="./districts-list.html">List districts</a>
+<a href="/index.html">Main menu</a>
 <br />
 <a href="#" class="current-page-in-menu">Create/edit map signatures</a>
-<a href="./map-signatures-list.html">List map signatures</a>
-<br />
-<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
-<a href="./locality-types-list.html">List locality types</a>
-<br />
-<a href="./locations.html">List locations</a>
+<a href="/map-signatures-list.html">List map signatures</a>
 
 <h1 id="createEditMapSignatureHeader">Create new map signature</h1>
 
+<p>
 <form id="createEditMapSignatureForm" >
-    <label for="mapSignatureName" class="for-editable"><b>Map signature name:</b></label>
-    <input type="text" size="50" id="mapSignatureName"/><br/>
-
+    <p>
+    <label for="mapSignatureName" class="for-editable">Map signature name:</label>
+    <input type="text" size="50" id="mapSignatureName"/>
+    </p>
     <input id="createEditButton" type="button" onclick="createOrEditMapSignature(mapSignatureCreatedOrEdited, globMapSignatureId)" value="Create">
 </form>
+</p>
 
 </body>
 </html>

@@ -2,88 +2,219 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Locality types</title>
-    <link rel="stylesheet" href="./css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="./js/attestations.js"></script>
-    <!-- TODO: REMOVE JQUERY! -->
+    <title>Attestations</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/attestations.js"></script>
+    
     <script>
-        $(document).ready(function(){
-            getAllAttestations(populateTable);
+        const defaultPageSize = 20;
+        let firstLink = "";
+        let nextLink = "";
+        let prevLink = "";
+        let lastLink = "";
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            getAllAttestations(function(data) {
+                populateTable(data._embedded.attestations);
+                addPagingLinks(data._links);
+                document.getElementById("pageSize").value = defaultPageSize;
+            }, 0, defaultPageSize);
         });
+        
+        function addPagingLinks(links) {
+            firstLink = links.first ? links.first.href : "";
+            nextLink = links.next ? links.next.href : "";
+            prevLink = links.prev ? links.prev.href : "";
+            lastLink = links.last ? links.last.href : "";
+            document.getElementById('nextLink').disabled = nextLink === "";
+            document.getElementById('prevLink').disabled = prevLink === "";
+            document.getElementById('firstLink').disabled = firstLink === "";
+            document.getElementById('lastLink').disabled = lastLink === "";
+        }
 
         function setHeaderAndPopulateTable(headerText, attestations) {
-            $("#attestationsTableHeader").text(headerText);
+            document.getElementById("attestationsTableHeader").innerHTML = headerText;
             populateTable(attestations);
         }
 
         function populateTable(attestations) {
-            $("#attestationsTable > tbody").empty();
-            console.log("populate table...");
+            console.log("populateTable, no of attestations " + attestations.length);
+            var tableBody = document.getElementById('tbodyid');
+            tableBody.innerHTML = "";
             for (let i = 0; i < attestations.length; i++)
             {
-                console.log(
-                    "Row no " + i + "... with attestation ID " + attestations[i].attestationId
-                    + " and original form " + attestations[i].originalForm);
-                $("#attestationsTable > tbody").append(
-                    "<tr>"
-                    + "<td>" + attestations[i].attestationId + "</td>"
-                    + "<td>" + attestations[i].originalForm + "</td>"
-                    + "<td>" + JSON.stringify(attestations[i].variantForm) + "</td>"
-                    + "<td>" + JSON.stringify(attestations[i].location) + "</td>"
-                    + "<td>" + JSON.stringify(attestations[i].sourceFinding) + "</td>"
-                    + "<td>" + attestations[i].notes + "</td>"
-                    + "</tr>"
-                );
+                tableBody.innerHTML +=
+                    "<tr><td>"
+                    + attestations[i].attestationId
+                    + "</td><td>"
+                    + attestations[i].originalForm 
+                    + "</td><td>"
+                    + getVariantFormTablePresentation(attestations[i].variantForm)
+                    + "</td><td>"
+                    + getLocationTablePresentation(attestations[i].location)
+                    + "</td><td>"
+                    + getSourceFindingTablePresentation(attestations[i].sourceFinding)
+                    + "</td><td>"
+                    + attestations[i].notes 
+                    + "</td><td>"
+                    + "<button type=\"button\" onclick=\"goToEditView(" + attestations[i].attestationId + ");\">Edit</button>"
+                    + "</td></tr>";
             }
         }
-
-
+        
+        function getVariantFormTablePresentation(variantForm) {
+            if (!variantForm) {
+                return "N/A";
+            }
+            let variantFormLinkStart = "<a href=\"/variant-forms-create-edit.html?variantFormId=";
+            let ret = variantFormLinkStart
+                + variantForm.variantFormId 
+                + "\">" 
+                + variantForm.variantForm 
+                + "</a>";
+            return ret;
+        }
+        
+        function getLocationTablePresentation(location) {
+            if (!location) {
+                return "N/A";
+            }
+            let modernLookupForm = location.modernLookupForm ? location.modernLookupForm : "- <i>(No modern lookup form)</i>"; 
+            let locationLinkStart = "<a href=\"/locations-create-edit.html?locationId=";
+            let ret = locationLinkStart
+                + location.locationId 
+                + "\">" 
+                + modernLookupForm
+                + "</a>";
+            return ret;
+        }
+        
+        function getSourceFindingTablePresentation(sourceFinding) {
+            if (!sourceFinding) {
+                return "N/A";
+            }
+            let sourceFindingLinkStart = "<a href=\"/source-findings-create-edit.html?sourceFindingId=";
+            let ret = sourceFindingLinkStart
+                + sourceFinding.sourceFindingId 
+                + "\">" 
+                + "Type: " 
+                + sourceFinding.source.type 
+                + ", (source ID: "
+                + sourceFinding.source.sourceId 
+                + "), Part-of-source: "
+                + sourceFinding.partOfSource.partOfSourceName
+                + "</a>";
+            return ret;
+        }
+        
+        function goToEditView(attestationId) {
+            location.href = "/attestations-create-edit.html?attestationId=" + attestationId;
+        }
+        
+        function first() {
+            if (firstLink !== "") {
+                genericGet(firstLink, function(data) {
+                    populateTable(data._embedded.attestations);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function next() {
+            if (nextLink !== "") {
+                genericGet(nextLink, function(data) {
+                    populateTable(data._embedded.attestations);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function prev() {
+            if (prevLink !== "") {
+                genericGet(prevLink, function(data) {
+                    populateTable(data._embedded.attestations);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function last() {
+            if (lastLink !== "") {
+                genericGet(lastLink, function(data) {
+                    populateTable(data._embedded.attestations);
+                    addPagingLinks(data._links);
+                });
+            }
+        }
+        
+        function updatePageSize() {
+            getAllAttestations(function(data) {
+                populateTable(data._embedded.attestations);
+                addPagingLinks(data._links);
+            }, 0, parseInt(document.getElementById("pageSize").value));
+        }
 
     </script>
 </head>
 <body>
-<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
-<a href="./adaptation-types-list.html">List adaptation types</a>
+<a href="/index.html">Main menu</a>
 <br />
-<a href="./attestations-create-edit.html">Create/edit attestation</a>
+<a href="/attestations-create-edit.html">Create/edit attestation</a>
 <a href="#" class="current-page-in-menu">List attestations</a>
-<br />
-<a href="./districts-create-edit.html">Create/edit districts</a>
-<a href="./districts-list.html">List districts</a>
-<br />
-<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
-<a href="./land-surveyors-list.html">List land surveyors</a>
-<br />
-<a href="./locality-types-create-edit.html">Create/edit Locality types</a>
-<a href="./locality-types-list.html">List locality types</a>
-<br />
-<a href="./locations.html">List locations</a>
 
 <h1 id="attestationsTableHeader">All attestations</h1>
-<table id="attestationsTable">
-    <thead>
-    <tr>
-        <th>Attestation ID</th>
-        <th>Original form (Belägg)</th>
-        <th>Variant Form (Variantform)</th>
-        <th>Location (-)</th>
-        <th>SourceFinding</th>
-        <th>Notes (Anteckningar)</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-<br/>
-<form id="filterAttestationsForm">
+<p>
+    <table id="attestationsTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Original form (Belägg)</th>
+            <th>Variant form (Variantform)</th>
+            <th>Location (-)</th>
+            <th>Source finding</th>
+            <th>Notes (Anteckningar)</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody id="tbodyid">
+        </tbody>
+    </table>
+</p>
+<fieldset>
+    <legend>Paging</legend>
+    <p>
+        <button type="button" id="firstLink" onclick="first()">&lt;&lt; First</button>
+        <button type="button" id="prevLink" onclick="prev()">&lt; Prev</button>
+        <button type="button" id="nextLink" onclick="next()">Next &gt;</button>
+        <button type="button" id="lastLink" onclick="last()">Last &gt;&gt;</button>
+    </p>
+    <p>
+        <form id="paging">
+            <label for="pageSize">Page size: </label>
+            <input type="text" id="pageSize">
+            <input type="button" value="Update" onclick="updatePageSize()">
+        </form>
+    </p>
+</fieldset>
 
-    <label for="filterAttestationsTextMorphNameType">Filter by Morphological Name Type:</label>
-    <input type="text" id="filterAttestationsTextMorphNameType">
-    <label for="filterAttestationsTextEtymology">Filter by etymology:</label>
-    <input type="text" id="filterAttestationsTextEtymology">
-
-    <input type="button" value="Do filter" onclick="doFilterAttestations('Filtered by', setHeaderAndPopulateTable)">
-</form>
+<fieldset>
+    <legend>Filtering</legend>
+    <p>
+        <form id="filterAttestationsForm">
+            <p>
+                <label for="filterAttestationsTextMorphNameType" class="disabled">Filter by Morphological Name Type:</label>
+                <input type="text" id="filterAttestationsTextMorphNameType" disabled>
+            </p>
+            <p>
+                <label for="filterAttestationsTextEtymology" class="disabled">Filter by etymology:</label>
+                <input type="text" id="filterAttestationsTextEtymology" disabled>
+            </p>
+            <p>
+                <input type="button" value="Do filter" onclick="doFilterAttestations('Filtered by', setHeaderAndPopulateTable)" disabled>
+            </p>
+        </form>
+    </p>
+</fieldset>
 </body>
 </html>

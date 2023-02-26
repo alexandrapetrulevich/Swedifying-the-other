@@ -7,6 +7,11 @@ function getAllLanguages(callback) {
             });
 }
 
+async function getAllLanguagesAsync() {
+    let ret = await genericGetAllAsync("languages", "languageView");
+    return ret._embedded.languages;
+}
+
 function getLanguageById(id, callback, errorCallback) {
     genericGetById(id, "languages", callback, errorCallback);
 }

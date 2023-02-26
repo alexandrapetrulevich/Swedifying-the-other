@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Create/edit locality types</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
-    <script src="./js/util.js"></script>
-    <script src="./js/locality-types.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/locality-types.js"></script>
     <script>
     var globLocalityTypeId = "";
     document.addEventListener('DOMContentLoaded', function() {
@@ -64,31 +64,23 @@
 </head>
 <body>
 
-<a href="./adaptation-types-create-edit.html">Create/edit adaptation types</a>
-<a href="./adaptation-types-list.html">List adaptation types</a>
-<br />
-<a href="./attestations-create-edit.html">Create/edit attestation</a>
-<a href="./attestations-list.html">List attestation</a>
-<br />
-<a href="./districts-create-edit.html">Create/edit districts</a>
-<a href="./districts-list.html">List districts</a>
-<br />
-<a href="./land-surveyors-create-edit.html">Create/edit land surveyors</a>
-<a href="./land-surveyors-list.html">List land surveyors</a>
+<a href="/index.html">Main menu</a>
 <br />
 <a href="#" class="current-page-in-menu">Create/edit locality types</a>
-<a href="./locality-types-list.html">List locality types</a>
-<br />
-<a href="./locations.html">List locations</a>
+<a href="/locality-types-list.html">List locality types</a>
 
 <h1 id="createEditLocalityTypeHeader">Create new locality type</h1>
 
-<form id="createEditLocalityTypeForm" >
-    <label for="localityTypeName"><b>Locality type name:</b></label>
-    <input type="text" size="50" id="localityTypeName"/><br/>
+<p>
+    <form id="createEditLocalityTypeForm" >
+        <p>
+            <label for="localityTypeName" class="for-editable">Locality type name:</label>
+            <input type="text" size="50" id="localityTypeName"/>
+        </p>
 
-    <input id="createEditButton" type="button" onclick="createOrEditLocalityType(localityTypeCreatedOrEdited, globLocalityTypeId)" value="Create">
-</form>
+        <input id="createEditButton" type="button" onclick="createOrEditLocalityType(localityTypeCreatedOrEdited, globLocalityTypeId)" value="Create">
+    </form>
+</p>
 
 </body>
 </html>
