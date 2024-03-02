@@ -19,6 +19,7 @@
     var globVariantFormId = "";
     var addedAdaptationTypesSet = new Set();
     const IS_ADAPTED_TO_SWEDISH_NO_VALUE = "NO";
+    const IS_ADAPTED_TO_SWEDISH_NOT_APPLICABLE_VALUE = "NOT_APPLICABLE";
     
     document.addEventListener('DOMContentLoaded', function() {
         init();
@@ -118,6 +119,7 @@
 
     function displayVariantForm(variantForm) {
         document.getElementById("variantForm").value = variantForm.variantForm;
+        document.getElementById("availableIsAdaptedToSwedishTypes").value = variantForm.isAdaptedToSwedish;
         
         let options = Array.from(document.getElementById("availableAdaptationTypes").selectedOptions);
         addAdaptationTypes(
@@ -151,7 +153,8 @@
     function isAdaptedToSwedishSelected() {
         let selectedIsAdaptedToSwedishType = document.getElementById("availableIsAdaptedToSwedishTypes").value;
         console.log("selectedIsAdaptedToSwedishType: " + selectedIsAdaptedToSwedishType);
-        if (selectedIsAdaptedToSwedishType === IS_ADAPTED_TO_SWEDISH_NO_VALUE) {
+        if (selectedIsAdaptedToSwedishType === IS_ADAPTED_TO_SWEDISH_NO_VALUE
+            || selectedIsAdaptedToSwedishType === IS_ADAPTED_TO_SWEDISH_NOT_APPLICABLE_VALUE) {
             disableAndEmptyAddAdaptationTypes();
         } else {
             enableAddAdaptationTypes();
