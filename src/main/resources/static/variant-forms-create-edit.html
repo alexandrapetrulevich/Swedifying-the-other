@@ -121,10 +121,10 @@
         
         let options = Array.from(document.getElementById("availableAdaptationTypes").selectedOptions);
         addAdaptationTypes(
-            new Map(variantForm.adaptationTypes.map((adaptationType) => [removeTrialingProjection(adaptationType._links.self.href), adaptationType.name])));
+            new Map(variantForm.adaptationTypes.map((adaptationType) => [removeTrailingProjection(adaptationType._links.self.href), adaptationType.name])));
         
         
-        let normalizedFormUrl = removeTrialingProjection(variantForm._links.normalizedForm.href);
+        let normalizedFormUrl = removeTrailingProjection(variantForm._links.normalizedForm.href);
         genericGet(normalizedFormUrl, function(data) {
             document.getElementById("availableNormalizedForms").value = data._links.self.href;
             normalizedFormSelected();
