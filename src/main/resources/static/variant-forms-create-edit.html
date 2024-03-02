@@ -26,8 +26,8 @@
 
     async function init() {
         populateAvailableIsAdaptedToSwedishTypes(await getAllIsAdaptedToSwedishTypesAsync());
-        let adapationTypes = await getAllAdaptationTypesAsync();
-        populateAvailableAdaptationTypes(adapationTypes._embedded.adaptationTypes);
+        let adaptationTypes = await getAllAdaptationTypesAsync();
+        populateAvailableAdaptationTypes(adaptationTypes._embedded.adaptationTypes);
         let normalizedForms = await getAllNormalizedFormsAsync();
         populateAvailableNormalizedForms(normalizedForms._embedded.normalizedForms);
         let searchParams = new URLSearchParams(window.location.search);
@@ -54,14 +54,14 @@
     }
     
     
-    function populateAvailableAdaptationTypes(adapationTypes) {
-        console.log("No of adapationTypes: " + adapationTypes.length);
+    function populateAvailableAdaptationTypes(adaptationTypes) {
+        console.log("No of adaptationTypes: " + adaptationTypes.length);
         let selectForAdaptationTypes = document.getElementById("availableAdaptationTypes");
-        for (let i = 0; i < adapationTypes.length; i++) {
+        for (let i = 0; i < adaptationTypes.length; i++) {
             selectForAdaptationTypes.add(
                 new Option(
-                    adapationTypes[i].name
-                    , adapationTypes[i]._links.self.href));
+                    adaptationTypes[i].name
+                    , adaptationTypes[i]._links.self.href));
         }
     }
     
